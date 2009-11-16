@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.impl;
+package org.jboss.arquillian.jboss;
 
-import org.jboss.arquillian.api.Controlable;
-import org.jboss.arquillian.api.Deployer;
+import org.jboss.arquillian.spi.DeployableContainer;
+import org.jboss.arquillian.spi.DeploymentException;
+import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
 import org.jboss.embedded.core.server.JBossASEmbeddedServerImpl;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.tmpdpl.api.container.DeploymentException;
 
 /**
  * JbossEmbeddedContainer
@@ -29,7 +29,7 @@ import org.jboss.tmpdpl.api.container.DeploymentException;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossEmbeddedContainer implements Controlable, Deployer
+public class JbossEmbeddedContainer implements DeployableContainer
 {
    private JBossASEmbeddedServer server;
    
@@ -40,26 +40,54 @@ public class JbossEmbeddedContainer implements Controlable, Deployer
    }
 
    @Override
-   public void start() throws Exception
+   public void start() throws LifecycleException
    {
-      server.start();
+      try 
+      {
+         server.start();
+      }
+      catch (Exception e) 
+      {
+         throw new LifecycleException("Could not start container", e);
+      }
    }
    
    @Override
-   public void stop() throws Exception
+   public void stop() throws LifecycleException
    {
-      server.shutdown();
+      try 
+      {
+         server.stop();
+      }
+      catch (Exception e) 
+      {
+         throw new LifecycleException("Could not stop container", e);
+      }
    }
    
    @Override
    public void deploy(Archive<?> archive) throws DeploymentException
    {
-      server.deploy(archive);
+      try 
+      {
+         server.deploy(archive);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not deploy to container", e);
+      }
    }
    
    @Override
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
-      server.undeploy(archive);
+      try 
+      {
+         server.undeploy(archive);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not undeploy from container", e);
+      }
    }
 }

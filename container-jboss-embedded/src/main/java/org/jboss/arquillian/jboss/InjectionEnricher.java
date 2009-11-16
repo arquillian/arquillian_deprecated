@@ -14,49 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.impl;
+package org.jboss.arquillian.jboss;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 
-import org.jboss.arquillian.api.Deployment;
-import org.jboss.shrinkwrap.api.Archive;
+import javax.ejb.EJB;
+import javax.naming.InitialContext;
+
+import org.jboss.arquillian.spi.TestEnricher;
 
 /**
- * UserCreatedArchiveGenerator
+ * InjectionEnricher
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class UserCreatedArchiveGenerator implements ArchiveGenerator
+public class InjectionEnricher implements TestEnricher
 {
-
    @Override
-   public Archive<?> generateArchive(Class<?> testCase)
+   public void enrich(Object testCase)
    {
-      Method deploymentMethod = findDeploymentMethod(testCase);
-      if(deploymentMethod == null) 
-      {
-         throw new RuntimeException("No static method annotated with " + Deployment.class.getName() + " found");
-      }
+      injectClass(testCase);
+   }
+
+   void injectClass(Object testCase) 
+   {
       try 
       {
-         return (Archive<?>)deploymentMethod.invoke(null);
+         for(Field field : testCase.getClass().getDeclaredFields()) 
+         {
+            if(field.isAnnotationPresent(EJB.class)) 
+            {
+               Object ejb = lookupEJB(field);
+               field.setAccessible(true);
+               field.set(testCase, ejb);
+            }
+         }
       } 
       catch (Exception e) 
       {
-         throw new RuntimeException("Could not get Deploymnet", e);
+         throw new RuntimeException("Could not inject members", e);
       }
    }
-   
-   private Method findDeploymentMethod(Class<?> testCase) {
-      
-      Method[] methods = testCase.getMethods();
-      for(Method method: methods)
-      {
-         if(method.isAnnotationPresent(Deployment.class)) {
-            return method;
-         }
-      }
-      return null;
+
+   private Object lookupEJB(Field field) throws Exception 
+   {
+      // TODO: figure out test context ? 
+      InitialContext context = new InitialContext();
+      return context.lookup("test/" + field.getType().getSimpleName() + "Bean/local");
    }
 }
