@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <!-- Parent -->
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../build/pom.xml</relativePath>
+   </parent>
+
+   <!-- Model Version -->
+   <modelVersion>4.0.0</modelVersion>
+
+   <!-- Artifact Configuration -->
+   <artifactId>arquillian-jboss-remote-60</artifactId>
+   <name>Arquillian Container Jboss AS Remote 6.0</name>
+   <description>Jboss AS 5.1 Remote Container integration for the Arquillian Project</description>
+
+
+   <!-- Properties -->
+   <properties>
+
+      <!-- Versioning -->
+
+   </properties>
+
+   <!-- Dependencies -->
+   <dependencies>
+
+      <!-- 
+    org.jboss.arquillian
+     -->
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-protocol-servlet</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!-- 
+    org.jboss
+     -->
+
+      <dependency>
+         <groupId>org.jboss.jbossas</groupId>
+         <artifactId>jboss-as-client</artifactId>
+         <type>pom</type>
+         <version>6.0.0.M1-SNAPSHOT</version>
+      </dependency>
+      <!--
+         <dependency> <groupId>org.jboss.jbossas</groupId>
+         <artifactId>jboss-as-profileservice</artifactId>
+         <version>5.1.0.GA</version> <scope>compile</scope>
+         </dependency> <dependency> <groupId>org.jboss.jbossas</groupId>
+         <artifactId>jboss-as-system</artifactId>
+         <version>5.1.0.GA</version> <scope>compile</scope>
+         </dependency> <dependency> <groupId>org.jboss.jbossas</groupId>
+         <artifactId>jboss-as-server</artifactId>
+         <version>5.1.0.GA</version> <scope>compile</scope>
+         </dependency>
+      -->
+   </dependencies>
+</project>
+
