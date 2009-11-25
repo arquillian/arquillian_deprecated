@@ -35,7 +35,13 @@
       <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-spi</artifactId>
-	 <version>${project.version}</version>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-protocol-servlet</artifactId>
+         <version>${project.version}</version>
       </dependency>
 
       <!-- 
@@ -47,6 +53,11 @@
          <classifier>launcher</classifier>
       </dependency>
 
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
    </dependencies>
 </project>
 
