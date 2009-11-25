@@ -16,6 +16,10 @@
  */
 package org.jboss.arquillian.jboss;
 
+import java.net.URL;
+
+import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -66,11 +70,19 @@ public class JbossEmbeddedContainer implements DeployableContainer
    }
    
    @Override
-   public void deploy(Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Archive<?> archive) throws DeploymentException
    {
       try 
       {
          server.deploy(archive);
+         
+         return new ServletMethodExecutor(
+               new URL(
+                     "http",
+                     server.getConfiguration().getBindAddress(),
+                     8080,
+                     "/")
+               );
       }
       catch (Exception e) 
       {
