@@ -14,53 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
-
-import java.lang.reflect.Field;
-
-import javax.ejb.EJB;
-import javax.naming.InitialContext;
+package org.jboss.arquillian.testenricher.jboss;
 
 import org.jboss.arquillian.spi.TestEnricher;
 
 /**
- * InjectionEnricher
+ * ResourceInjectionEnricher
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class InjectionEnricher implements TestEnricher
+public class ResourceInjectionEnricher implements TestEnricher
 {
+
    @Override
    public void enrich(Object testCase)
    {
-      injectClass(testCase);
-   }
-
-   void injectClass(Object testCase) 
-   {
-      try 
-      {
-         for(Field field : testCase.getClass().getDeclaredFields()) 
-         {
-            if(field.isAnnotationPresent(EJB.class)) 
-            {
-               Object ejb = lookupEJB(field);
-               field.setAccessible(true);
-               field.set(testCase, ejb);
-            }
-         }
-      } 
-      catch (Exception e) 
-      {
-         throw new RuntimeException("Could not inject members", e);
-      }
-   }
-
-   private Object lookupEJB(Field field) throws Exception 
-   {
-      // TODO: figure out test context ? 
-      InitialContext context = new InitialContext();
-      return context.lookup("test/" + field.getType().getSimpleName() + "Bean/local");
+      
    }
 }

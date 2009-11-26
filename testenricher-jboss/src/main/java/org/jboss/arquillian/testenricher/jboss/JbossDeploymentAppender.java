@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
+package org.jboss.arquillian.testenricher.jboss;
 
 import org.jboss.arquillian.spi.DeploymentAppender;
 import org.jboss.shrinkwrap.api.Archive;
@@ -39,10 +39,10 @@ public class JbossDeploymentAppender implements DeploymentAppender
    @Override
    public Archive<?> createArchive()
    {
-      JavaArchive archive = Archives.create("jboss-embedded-container.jar", JavaArchive.class)
+      JavaArchive archive = Archives.create("jboss-testenrichers.jar", JavaArchive.class)
                         .addPackages(
                               true, 
-                              Package.getPackage("org.jboss.arquillian.jboss"))
+                              Package.getPackage("org.jboss.arquillian.testenricher.jboss"))
                         .addManifestResource(
                               "META-INF/services/org.jboss.arquillian.spi.TestEnricher",
                               "services/org.jboss.arquillian.spi.TestEnricher");

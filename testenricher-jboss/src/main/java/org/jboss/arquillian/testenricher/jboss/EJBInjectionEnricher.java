@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
+package org.jboss.arquillian.testenricher.jboss;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.List;
 
-import javax.ejb.EJB;
 import javax.naming.InitialContext;
 
 import org.jboss.arquillian.spi.TestEnricher;
@@ -29,28 +30,37 @@ import org.jboss.arquillian.spi.TestEnricher;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class InjectionEnricher implements TestEnricher
+public class EJBInjectionEnricher implements TestEnricher
 {
-   private static final long serialVersionUID = 1L;
-
+   
+   private static final String ANNOTATION_NAME = "javax.ejb.EJB";
+   private static final String ANNOTATION_FIELD_BEAN_INTERFACE = "beanInterface";
+   private static final String ANNOTATION_FIELD_MAPPED_NAME = "mappedName";
+   
    @Override
    public void enrich(Object testCase)
    {
-      injectClass(testCase);
+      if(SecurityActions.isClassPresent(ANNOTATION_NAME)) 
+      {
+         injectClass(testCase);
+      }
    }
 
    void injectClass(Object testCase) 
    {
       try 
       {
-         for(Field field : testCase.getClass().getDeclaredFields()) 
+         @SuppressWarnings("unchecked")
+         Class<? extends Annotation> ejbAnnotation = (Class<? extends Annotation>)SecurityActions.getThreadContextClassLoader().loadClass(ANNOTATION_NAME);
+         
+         List<Field> annotatedFields = SecurityActions.getFieldsWithAnnotation(
+               testCase.getClass(), 
+               ejbAnnotation);
+         
+         for(Field field : annotatedFields) 
          {
-            if(field.isAnnotationPresent(EJB.class)) 
-            {
-               Object ejb = lookupEJB(field);
-               field.setAccessible(true);
-               field.set(testCase, ejb);
-            }
+            Object ejb = lookupEJB(field);
+            field.set(testCase, ejb);
          }
       } 
       catch (Exception e) 

@@ -14,9 +14,9 @@
    <modelVersion>4.0.0</modelVersion>
 
    <!-- Artifact Configuration -->
-   <artifactId>arquillian-jboss-embedded</artifactId>
-   <name>Arquillian Container Jboss AS Embedded 6.0</name>
-   <description>Jboss Embedded Container integration for the Arquillian Project</description>
+   <artifactId>arquillian-jboss-testenricher</artifactId>
+   <name>Arquillian TestEnricher Jboss AS</name>
+   <description>Jboss AS TestEnrichers for the Arquillian Project</description>
 
 
    <!-- Properties -->
@@ -38,26 +38,18 @@
          <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-protocol-servlet</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-jboss-testenricher</artifactId>
-         <version>${project.version}</version>
-      </dependency>
 
-      <!-- 
-    org.jboss.embedded
-     -->
       <dependency>
-         <groupId>org.jboss.embedded</groupId>
-         <artifactId>jboss-embedded-assembly</artifactId>
-         <classifier>launcher</classifier>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+         <scope>test</scope>
       </dependency>
-
+      <dependency>
+        <groupId>javax.ejb</groupId>
+        <artifactId>ejb-api</artifactId>
+        <version>3.0</version>
+        <scope>test</scope>
+      </dependency>
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
