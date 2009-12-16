@@ -56,20 +56,8 @@
          <groupId>org.jboss.jbossas</groupId>
          <artifactId>jboss-as-client</artifactId>
          <type>pom</type>
-         <version>6.0.0.M1-SNAPSHOT</version>
+         <version>6.0.0.M1</version>
       </dependency>
-      <!--
-         <dependency> <groupId>org.jboss.jbossas</groupId>
-         <artifactId>jboss-as-profileservice</artifactId>
-         <version>5.1.0.GA</version> <scope>compile</scope>
-         </dependency> <dependency> <groupId>org.jboss.jbossas</groupId>
-         <artifactId>jboss-as-system</artifactId>
-         <version>5.1.0.GA</version> <scope>compile</scope>
-         </dependency> <dependency> <groupId>org.jboss.jbossas</groupId>
-         <artifactId>jboss-as-server</artifactId>
-         <version>5.1.0.GA</version> <scope>compile</scope>
-         </dependency>
-      -->
    </dependencies>
 </project>
 
