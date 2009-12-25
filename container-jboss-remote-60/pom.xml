@@ -16,7 +16,7 @@
    <!-- Artifact Configuration -->
    <artifactId>arquillian-jboss-remote-60</artifactId>
    <name>Arquillian Container Jboss AS Remote 6.0</name>
-   <description>Jboss AS 5.1 Remote Container integration for the Arquillian Project</description>
+   <description>Jboss AS 6.0 Remote Container integration for the Arquillian Project</description>
 
 
    <!-- Properties -->
