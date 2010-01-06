@@ -18,9 +18,7 @@ package org.jboss.arquillian.weld;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
+import java.util.UUID;
 
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -31,14 +29,12 @@ import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.weld.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.weld.BeanManagerImpl;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.bootstrap.api.Environments;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 import org.jboss.weld.bootstrap.spi.Deployment;
-import org.jboss.weld.context.RequestContext;
-import org.jboss.weld.context.SessionContext;
+import org.jboss.weld.context.ContextLifecycle;
 import org.jboss.weld.context.api.helpers.ConcurrentHashMapBeanStore;
 import org.jboss.weld.manager.api.WeldManager;
 
@@ -108,12 +104,9 @@ public class WeldSEContainer implements DeployableContainer
                   .endInitialization();
 
       WeldManager manager = bootstrap.getManager(mainBeanDepArch);
-      // TODO: figure out how to really create the scopes..
-      SessionContext sessionContext = new SessionContext();
-      sessionContext.setActive(true);
-      sessionContext.setBeanStore(new ConcurrentHashMapBeanStore());
       
-      ((BeanManagerImpl)manager).addContext(sessionContext);
+      // start the session lifecycle
+      manager.getServices().get(ContextLifecycle.class).restoreSession(manager.getId(), new ConcurrentHashMapBeanStore());
       
       WELD_MANAGER.set(
             new WeldHolder(
@@ -126,21 +119,17 @@ public class WeldSEContainer implements DeployableContainer
          public TestResult invoke(TestMethodExecutor testMethodExecutor)
          {
             WeldManager manager = WELD_MANAGER.get().getManager();
+            String requestId = UUID.randomUUID().toString();
             try 
             {
-               RequestContext requestContext = new RequestContext();
-               requestContext.setActive(true);
-               requestContext.setBeanStore(new ConcurrentHashMapBeanStore());
-               ((BeanManagerImpl)manager).addContext(requestContext);
-               
-               return super.invoke(testMethodExecutor);
+            	// start the request lifecycle
+            	manager.getServices().get(ContextLifecycle.class).beginRequest(requestId, new ConcurrentHashMapBeanStore());
+            	return super.invoke(testMethodExecutor);
             } 
             finally
             {
-               RequestContext requestContext = (RequestContext)manager.getContext(RequestScoped.class);
-               requestContext.setActive(false);
-               requestContext.destroy();
-               requestContext.cleanup();
+            	// end the request lifecycle 
+            	manager.getServices().get(ContextLifecycle.class).endRequest(requestId, new ConcurrentHashMapBeanStore());
             }
          }
       };
@@ -155,11 +144,10 @@ public class WeldSEContainer implements DeployableContainer
       WeldHolder holder = WELD_MANAGER.get();
       if(holder != null) {
          WeldManager manager = holder.getManager();
-         SessionContext sessionContext = (SessionContext)manager.getContext(SessionScoped.class); 
-         sessionContext.setActive(false);
-         sessionContext.destroy();
-         sessionContext.cleanup();
 
+         // end the session lifecycle
+         manager.getServices().get(ContextLifecycle.class).endSession(manager.getId(), null);
+         
          holder.getBootstrap().shutdown();
       }
       WELD_MANAGER.set(null);
