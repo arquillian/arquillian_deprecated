@@ -88,13 +88,12 @@ public class WeldSEContainer implements DeployableContainer
          }
          
          @Override
-         public BeanDeploymentArchive loadBeanDeploymentArchive(
+         public BeanDeploymentArchive loadBeanDeploymentArchive(	
                Class<?> beanClass)
          {
             return beanArchive;
          }
       };
-      final BeanDeploymentArchive mainBeanDepArch = deployment.getBeanDeploymentArchives().iterator().next();
       
       WeldBootstrap bootstrap = new WeldBootstrap();
       bootstrap.startContainer(Environments.SE, deployment, new ConcurrentHashMapBeanStore())
@@ -103,7 +102,7 @@ public class WeldSEContainer implements DeployableContainer
                   .validateBeans()
                   .endInitialization();
 
-      WeldManager manager = bootstrap.getManager(mainBeanDepArch);
+      WeldManager manager = bootstrap.getManager(beanArchive);
       
       // start the session lifecycle
       manager.getServices().get(ContextLifecycle.class).restoreSession(manager.getId(), new ConcurrentHashMapBeanStore());
