@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.Filters;
-import org.jboss.shrinkwrap.api.Path;
 import org.jboss.shrinkwrap.impl.base.AssignableBase;
 import org.jboss.shrinkwrap.impl.base.Validate;
 import org.jboss.shrinkwrap.impl.base.asset.ArchiveAsset;
@@ -69,8 +69,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<URL> getBeansXml()
    {
       List<URL> beanClasses = new ArrayList<URL>();
-      Map<Path, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
-      for(Map.Entry<Path, Asset> archiveEntry : archives.entrySet()) 
+      Map<ArchivePath, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
+      for(Map.Entry<ArchivePath, Asset> archiveEntry : archives.entrySet()) 
       {
          if(archiveEntry.getValue() instanceof ArchiveAsset) 
          {
@@ -78,8 +78,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
             if(beansArchive.getName().matches("arquillian.*")) {
                continue;
             }
-            Map<Path, Asset> classes = beansArchive.getContent(Filters.include(".*/beans.xml"));
-            for(final Map.Entry<Path, Asset> entry : classes.entrySet()) 
+            Map<ArchivePath, Asset> classes = beansArchive.getContent(Filters.include(".*/beans.xml"));
+            for(final Map.Entry<ArchivePath, Asset> entry : classes.entrySet()) 
             {
                try 
                {
@@ -116,8 +116,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<Class<?>> getBeanClasses()
    {
       List<Class<?>> beanClasses = new ArrayList<Class<?>>();
-      Map<Path, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
-      for(Map.Entry<Path, Asset> archiveEntry : archives.entrySet()) 
+      Map<ArchivePath, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
+      for(Map.Entry<ArchivePath, Asset> archiveEntry : archives.entrySet()) 
       {
          if(archiveEntry.getValue() instanceof ArchiveAsset) 
          {
@@ -125,8 +125,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
             if(beansArchive.getName().matches("arquillian.*")) {
                continue;
             }
-            Map<Path, Asset> classes = beansArchive.getContent(Filters.include(".*\\.class"));
-            for(Map.Entry<Path, Asset> classEntry : classes.entrySet()) 
+            Map<ArchivePath, Asset> classes = beansArchive.getContent(Filters.include(".*\\.class"));
+            for(Map.Entry<ArchivePath, Asset> classEntry : classes.entrySet()) 
             {
                if (classEntry.getValue() instanceof ClassAsset)
                {
