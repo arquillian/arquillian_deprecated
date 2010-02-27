@@ -25,7 +25,7 @@
       <!-- Versioning -->
       <version.weld_api>1.0</version.weld_api>
       <version.weld_spi>1.0</version.weld_spi>
-      <version.weld_core>1.0.0</version.weld_core>
+      <version.weld_core>1.0.1-Final</version.weld_core>
       <version.slf4j>1.5.9.RC1</version.slf4j>
 
    </properties>
