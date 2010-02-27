@@ -72,7 +72,7 @@ public class OpenEJBIntegrationTestCase
     * The EJB proxy used for invocations
     */
    @EJB
-   // TODO Support this injection
+   // TODO Support this injection in ARQ-77
    private EchoLocalBusiness bean;
 
    //-------------------------------------------------------------------------------------||
@@ -81,7 +81,7 @@ public class OpenEJBIntegrationTestCase
 
    /**
     * Looks up the EJB proxy in JNDI
-    * @deprecated Once Arquillian supports injection
+    * @deprecated Once Arquillian supports injection ARQ-77
     */
    @Deprecated
    @Before
