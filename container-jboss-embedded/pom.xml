@@ -39,13 +39,29 @@
       </dependency>
 
       <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+      </dependency>
+
+      <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-protocol-servlet</artifactId>
          <version>${project.version}</version>
       </dependency>
+
       <dependency>
          <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-jboss-testenricher</artifactId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-testenricher-ejb</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-testenricher-resource</artifactId>
          <version>${project.version}</version>
       </dependency>
 
@@ -56,6 +72,16 @@
          <groupId>org.jboss.embedded</groupId>
          <artifactId>jboss-embedded-assembly</artifactId>
          <classifier>launcher</classifier>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jboss.shrinkwrap</groupId>
+               <artifactId>shrinkwrap-api</artifactId>
+            </exclusion>
+            <exclusion>
+               <groupId>org.jboss.shrinkwrap</groupId>
+               <artifactId>shrinkwrap-impl-base</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
