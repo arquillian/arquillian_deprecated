@@ -16,12 +16,10 @@
  */
 package org.jboss.arquillian.weld;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.weld.WeldSEContainer.WeldHolder;
-import org.jboss.weld.manager.api.WeldManager;
 
 /**
  * WeldSETestEnricher
@@ -29,22 +27,16 @@ import org.jboss.weld.manager.api.WeldManager;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldSETestEnricher implements TestEnricher
+public class WeldSETestEnricher extends CDIInjectionEnricher
 {
-   @SuppressWarnings("unchecked")
    @Override
-   public void enrich(Object testCase)
+   protected BeanManager lookupBeanManager()
    {
       WeldHolder holder = WeldSEContainer.WELD_MANAGER.get();
       if (holder != null)
       {
-         WeldManager manager = holder.getManager();
-         CreationalContext<Object> creationalContext = manager.createCreationalContext(null);
-         InjectionTarget<Object> injectionTarget = (InjectionTarget<Object>) manager
-               .createInjectionTarget(
-                     manager.createAnnotatedType(testCase.getClass()));
-         
-         injectionTarget.inject(testCase, creationalContext);
+         return holder.getManager();
       }
+      return null;
    }
 }

@@ -53,6 +53,12 @@
          <artifactId>shrinkwrap-impl-base</artifactId>
       </dependency>
 
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
       <!-- 
     org.jboss.weld
      -->
