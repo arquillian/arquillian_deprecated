@@ -42,7 +42,7 @@ public class JbossDeploymentAppender implements AuxiliaryArchiveAppender
    @Override
    public Archive<?> createAuxiliaryArchive()
    {
-      JavaArchive archive = Archives.create("jboss-testenrichers.jar", JavaArchive.class)
+      JavaArchive archive = Archives.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
                         .addPackages(
                               true, 
                               EJBInjectionEnricher.class.getPackage(),
