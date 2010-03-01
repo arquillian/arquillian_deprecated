@@ -16,13 +16,9 @@
  */
 package org.jboss.arquillian.openejb;
 
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -31,7 +27,6 @@ import org.jboss.arquillian.openejb.ejb.EchoLocalBusiness;
 import org.jboss.shrinkwrap.api.Archives;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -74,23 +69,6 @@ public class OpenEJBIntegrationTestCase
    @EJB
    // TODO Support this injection in ARQ-77
    private EchoLocalBusiness bean;
-
-   //-------------------------------------------------------------------------------------||
-   // Lifecycle --------------------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
-
-   /**
-    * Looks up the EJB proxy in JNDI
-    * @deprecated Once Arquillian supports injection ARQ-77
-    */
-   @Deprecated
-   @Before
-   public void lookupBean() throws NamingException
-   {
-      final Properties properties = new Properties();
-      properties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
-      bean = (EchoLocalBusiness) new InitialContext(properties).lookup(EchoBean.class.getSimpleName() + "Local");
-   }
 
    //-------------------------------------------------------------------------------------||
    // Tests ------------------------------------------------------------------------------||

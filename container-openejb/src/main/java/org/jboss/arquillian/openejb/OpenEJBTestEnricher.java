@@ -16,42 +16,63 @@
  */
 package org.jboss.arquillian.openejb;
 
-import java.util.logging.Logger;
+import java.lang.reflect.Field;
+import java.util.Properties;
+
+import javax.naming.Binding;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingEnumeration;
 
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 
 /**
  * {@link TestEnricher} implementation specific to the OpenEJB
  * Container
  * 
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
+ * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class OpenEJBTestEnricher implements TestEnricher
+public class OpenEJBTestEnricher extends EJBInjectionEnricher 
 {
 
-   //-------------------------------------------------------------------------------------||
-   // Class Members ----------------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
-
-   /**
-    * Logger
-    */
-   private static final Logger log = Logger.getLogger(OpenEJBTestEnricher.class.getName());
-
-   //-------------------------------------------------------------------------------------||
-   // Required Implementations -----------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
-
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.TestEnricher#enrich(java.lang.Object)
-    */
    @Override
-   public void enrich(final Object testCase)
+   protected InitialContext createContext() throws Exception
    {
-      log.fine("Enriching: " + testCase);
-      // NOOP for now
+      final Properties properties = new Properties();
+      properties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
+      return new InitialContext(properties);
    }
 
+   @Override
+   protected Object lookupEJB(Field field) throws Exception 
+   {
+      InitialContext context = createContext();
+      return lookupRecursive(field, context, context.listBindings("/"));
+   }
+   
+   protected Object lookupRecursive(Field field, Context context, NamingEnumeration<Binding> contextNames) throws Exception 
+   {
+      while(contextNames.hasMore())
+      {
+         Binding contextName = contextNames.nextElement();
+         Object value = contextName.getObject();
+         if(Context.class.isInstance(value)) 
+         {
+            Context subContext = (Context)value;
+            return lookupRecursive(field, subContext, subContext.listBindings("/"));
+         }
+         else 
+         {
+            value = context.lookup(contextName.getName());
+            if(field.getType().isInstance(value))
+            {
+               return value;
+            }
+         }
+      }
+      throw new RuntimeException("Could not lookup EJB reference for: " + field);
+   }
 }
