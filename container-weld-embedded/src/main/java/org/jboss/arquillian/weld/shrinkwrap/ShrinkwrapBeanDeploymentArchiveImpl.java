@@ -69,44 +69,33 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<URL> getBeansXml()
    {
       List<URL> beanClasses = new ArrayList<URL>();
-      Map<ArchivePath, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
-      for(Map.Entry<ArchivePath, Asset> archiveEntry : archives.entrySet()) 
+      Map<ArchivePath, Asset> classes = archive.getContent(Filters.include(".*/beans.xml"));
+      for(final Map.Entry<ArchivePath, Asset> entry : classes.entrySet()) 
       {
-         if(archiveEntry.getValue() instanceof ArchiveAsset) 
+         try 
          {
-            Archive<?> beansArchive = (Archive<?>) extractFieldFromAsset(archiveEntry.getValue(), "archive");
-            if(beansArchive.getName().matches("arquillian.*")) {
-               continue;
-            }
-            Map<ArchivePath, Asset> classes = beansArchive.getContent(Filters.include(".*/beans.xml"));
-            for(final Map.Entry<ArchivePath, Asset> entry : classes.entrySet()) 
-            {
-               try 
-               {
-                  beanClasses.add(
-                        new URL(null, "archive://" + entry.getKey().get(), new URLStreamHandler() 
+            beanClasses.add(
+                  new URL(null, "archive://" + entry.getKey().get(), new URLStreamHandler() 
+                  {
+                     protected java.net.URLConnection openConnection(URL u) throws java.io.IOException 
+                     {
+                        return new URLConnection(u)
                         {
-                           protected java.net.URLConnection openConnection(URL u) throws java.io.IOException 
+                           @Override
+                           public void connect() throws IOException { }
+                           
+                           @Override
+                           public InputStream getInputStream()
+                                 throws IOException
                            {
-                              return new URLConnection(u)
-                              {
-                                 @Override
-                                 public void connect() throws IOException { }
-                                 
-                                 @Override
-                                 public InputStream getInputStream()
-                                       throws IOException
-                                 {
-                                    return entry.getValue().openStream();
-                                 }
-                              };
-                           };
-                        }));
-               } 
-               catch (Exception e) {
-                  e.printStackTrace();
-               }
-            }
+                              return entry.getValue().openStream();
+                           }
+                        };
+                     };
+                  }));
+         } 
+         catch (Exception e) {
+            e.printStackTrace();
          }
       }
       return beanClasses;
@@ -116,26 +105,15 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<Class<?>> getBeanClasses()
    {
       List<Class<?>> beanClasses = new ArrayList<Class<?>>();
-      Map<ArchivePath, Asset> archives = archive.getContent(Filters.include(".*\\.jar"));
-      for(Map.Entry<ArchivePath, Asset> archiveEntry : archives.entrySet()) 
+      Map<ArchivePath, Asset> classes = archive.getContent(Filters.include(".*\\.class"));
+      for(Map.Entry<ArchivePath, Asset> classEntry : classes.entrySet()) 
       {
-         if(archiveEntry.getValue() instanceof ArchiveAsset) 
+         if (classEntry.getValue() instanceof ClassAsset)
          {
-            Archive<?> beansArchive = (Archive<?>) extractFieldFromAsset(archiveEntry.getValue(), "archive");
-            if(beansArchive.getName().matches("arquillian.*")) {
-               continue;
-            }
-            Map<ArchivePath, Asset> classes = beansArchive.getContent(Filters.include(".*\\.class"));
-            for(Map.Entry<ArchivePath, Asset> classEntry : classes.entrySet()) 
-            {
-               if (classEntry.getValue() instanceof ClassAsset)
-               {
-                  beanClasses.add(
-                        (Class<?>)extractFieldFromAsset(
-                              classEntry.getValue(),
-                              "clazz"));
-               }
-            }
+            beanClasses.add(
+                  (Class<?>)extractFieldFromAsset(
+                        classEntry.getValue(),
+                        "clazz"));
          }
       }
       return beanClasses;
