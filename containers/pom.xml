@@ -30,7 +30,7 @@
     <module>jbossas-remote-51</module>
     <module>jbossas-remote-60</module>
 
-    <module>glassfish-embedded</module>
+    <module>glassfish-embedded-30</module>
     <module>weld-embedded</module>
     <module>openejb</module>
 
