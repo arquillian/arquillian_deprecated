@@ -35,7 +35,7 @@
     org.jboss.arquillian
      -->
     <dependency>
-      <groupId>org.jboss.arquillian</groupId>
+      <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-local</artifactId>
       <version>${project.version}</version>
     </dependency>

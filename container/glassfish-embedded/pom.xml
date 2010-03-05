@@ -51,7 +51,7 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.arquillian</groupId>
+         <groupId>org.jboss.arquillian.protocol</groupId>
          <artifactId>arquillian-protocol-servlet</artifactId>
          <version>${project.version}</version>
          <exclusions>
