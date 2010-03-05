@@ -67,7 +67,7 @@
       </dependency>
 
       <dependency>
-         <groupId>org.jboss.arquillian</groupId>
+         <groupId>org.jboss.arquillian.packager</groupId>
          <artifactId>arquillian-packager-javaee</artifactId>
          <version>${project.version}</version>
       </dependency>

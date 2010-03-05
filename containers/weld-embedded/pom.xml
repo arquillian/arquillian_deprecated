@@ -56,7 +56,7 @@
 
 
       <dependency>
-         <groupId>org.jboss.arquillian</groupId>
+         <groupId>org.jboss.arquillian.packager</groupId>
          <artifactId>arquillian-packager-applicationarchive</artifactId>
          <version>${project.version}</version>
       </dependency>
