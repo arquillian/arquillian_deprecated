@@ -15,7 +15,7 @@
 
    <!-- Artifact Configuration -->
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-jbossas-embedded</artifactId>
+   <artifactId>arquillian-jbossas-embedded-60</artifactId>
    <name>Arquillian Container Jboss AS Embedded 6.0</name>
    <description>Jboss AS Embedded Container integration for the Arquillian Project</description>
 
