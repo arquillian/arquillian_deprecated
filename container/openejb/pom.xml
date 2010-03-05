@@ -14,7 +14,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- Artifact Configuration -->
-  <artifactId>arquillian-container-openejb</artifactId>
+  <groupId>org.jboss.arquillian.container</groupId>
+  <artifactId>arquillian-openejb</artifactId>
   <name>Arquillian Container OpenEJB</name>
   <description>OpenEJB Integration for the Arquillian Project</description>
 

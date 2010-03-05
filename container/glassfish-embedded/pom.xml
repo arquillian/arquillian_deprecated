@@ -14,6 +14,7 @@
    <modelVersion>4.0.0</modelVersion>
 
    <!-- Artifact Configuration -->
+   <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-glassfish-embedded</artifactId>
    <name>Arquillian Container Glassfish Embedded</name>
    <description>Glassfish Embedded Container integration for the Arquillian Project</description>
