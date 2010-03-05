@@ -27,13 +27,14 @@
   <modules>
     
     <!--    <module>container-jboss-embedded</module> -->
-    <module>jboss-remote-51</module>
-    <module>jboss-remote-60</module>
+    <module>jbossas-remote-51</module>
+    <module>jbossas-remote-60</module>
 
     <module>glassfish-embedded</module>
     <module>weld-embedded</module>
     <module>openejb</module>
 
+    <module>osgi-felix</module>
   </modules>
 
 </project>
