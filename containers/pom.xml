@@ -34,7 +34,6 @@
     <module>weld-embedded</module>
     <module>openejb</module>
 
-    <module>osgi-felix</module>
   </modules>
 
 </project>
