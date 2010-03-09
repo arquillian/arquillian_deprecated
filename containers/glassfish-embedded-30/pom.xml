@@ -54,16 +54,6 @@
          <groupId>org.jboss.arquillian.protocol</groupId>
          <artifactId>arquillian-protocol-servlet</artifactId>
          <version>${project.version}</version>
-         <exclusions>
-            <exclusion>
-               <groupId>javax.servlet</groupId>
-               <artifactId>servlet-api</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>javax</groupId>
-               <artifactId>javaee-api</artifactId>
-            </exclusion>
-         </exclusions>
       </dependency>
 
       <dependency>
