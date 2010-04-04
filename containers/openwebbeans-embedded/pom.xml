@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../build/pom.xml</relativePath>
+   </parent>
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.jboss.arquillian.container</groupId>
+   <artifactId>arquillian-openwebbeans-embedded</artifactId>
+   <name>Arquillian Container OpenWebBeans Embedded</name>
+   <description>OpenWebBeans Embedded Container integration for the Arquillian Project</description>
+
+   <properties>
+      <version.openwebbeans>1.0.0-M4</version.openwebbeans>
+   </properties>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.protocol</groupId>
+         <artifactId>arquillian-protocol-local</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.packager</groupId>
+         <artifactId>arquillian-packager-applicationarchive</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.openwebbeans</groupId>
+         <artifactId>openwebbeans-spi</artifactId>
+         <version>${version.openwebbeans}</version>
+      </dependency>   
+
+      <dependency>
+         <groupId>org.apache.openwebbeans</groupId>
+         <artifactId>openwebbeans-impl</artifactId>
+            <version>${version.openwebbeans}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-el_2.2_spec</artifactId>
+            <version>1.0-beta</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-validation_1.0_spec</artifactId>
+         <version>1.0</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-jta_1.1_spec</artifactId>
+         <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-interceptor_1.1_spec</artifactId>
+         <version>1.0.0-beta</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-jcdi_1.0_spec</artifactId>
+         <version>1.0-beta</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-atinject_1.0_spec</artifactId>
+         <version>1.0-beta</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.apache.geronimo.specs</groupId>
+         <artifactId>geronimo-servlet_2.5_spec</artifactId>
+         <version>1.2</version>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+   </dependencies>
+</project>
