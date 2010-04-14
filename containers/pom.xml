@@ -19,9 +19,9 @@
   <groupId>org.jboss.arquillian.container</groupId>
   <artifactId>arquillian-container-parent</artifactId>
   <packaging>pom</packaging>
-  <name>Arguillian Container Aggregator</name>
+  <name>Arquillian Container Aggregator</name>
   <url>http://www.jboss.org</url>
-  <description>Arguillian Container Aggregator</description>
+  <description>Arquillian Container Aggregator</description>
 
   <!-- Aggregate Modules -->
   <modules>
