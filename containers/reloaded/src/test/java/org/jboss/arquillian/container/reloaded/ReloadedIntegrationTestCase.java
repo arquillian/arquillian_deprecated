@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests that EJB deployments into the {@link MCServer}
+ * Tests that deployments into the {@link MCServer}
  * and Virtual Deployment Framework (ie. JBoss Reloaded)
  * work through the Arquillian lifecycle
  * 
