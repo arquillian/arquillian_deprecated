@@ -33,6 +33,7 @@
     <module>glassfish-embedded-30</module>
     <module>weld-embedded</module>
     <module>openejb</module>
+    <module>reloaded</module>
 
   </modules>
 
