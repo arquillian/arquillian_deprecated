@@ -30,11 +30,10 @@ import java.util.Map;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.Filters;
+import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.impl.base.AssignableBase;
 import org.jboss.shrinkwrap.impl.base.Validate;
-import org.jboss.shrinkwrap.impl.base.asset.ArchiveAsset;
 import org.jboss.shrinkwrap.impl.base.asset.ClassAsset;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.api.helpers.SimpleServiceRegistry;
@@ -69,8 +68,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<URL> getBeansXml()
    {
       List<URL> beanClasses = new ArrayList<URL>();
-      Map<ArchivePath, Asset> classes = archive.getContent(Filters.include(".*/beans.xml"));
-      for(final Map.Entry<ArchivePath, Asset> entry : classes.entrySet()) 
+      Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*/beans.xml"));
+      for(final Map.Entry<ArchivePath, Node> entry : classes.entrySet()) 
       {
          try 
          {
@@ -88,7 +87,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
                            public InputStream getInputStream()
                                  throws IOException
                            {
-                              return entry.getValue().openStream();
+                              return entry.getValue().getAsset().openStream();
                            }
                         };
                      };
@@ -105,8 +104,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<Class<?>> getBeanClasses()
    {
       List<Class<?>> beanClasses = new ArrayList<Class<?>>();
-      Map<ArchivePath, Asset> classes = archive.getContent(Filters.include(".*\\.class"));
-      for(Map.Entry<ArchivePath, Asset> classEntry : classes.entrySet()) 
+      Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
+      for(Map.Entry<ArchivePath, Node> classEntry : classes.entrySet()) 
       {
          if (classEntry.getValue() instanceof ClassAsset)
          {
@@ -143,14 +142,14 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       return serviceRegistry;
    }
    
-   private Object extractFieldFromAsset(Asset asset, String fieldName) 
+   private Object extractFieldFromAsset(Node node, String fieldName) 
    {
       try 
       {
-         Field field = asset.getClass().getDeclaredField(fieldName);
+         Field field = node.getClass().getDeclaredField(fieldName);
          field.setAccessible(true);
          
-         return field.get(asset);
+         return field.get(node);
       } 
       catch (Exception e) 
       {
