@@ -75,7 +75,11 @@ public class ReloadedContainer implements DeployableContainer
     * Put the {@link MCServer} into Thread scope such that we might access it from the 
     * {@link ReloadedTestEnricher}; hacky, but there's no way to create a {@link TestEnricher}
     * with construction arguments.
+    * 
+    * @deprecated Remove when we can 
+    * @see http://community.jboss.org/message/537913 
     */
+   @Deprecated
    static final ThreadLocal<MCServer> MC_SERVER = new ThreadLocal<MCServer>();
 
    //-------------------------------------------------------------------------------------||
