@@ -145,6 +145,7 @@ public class ReloadedContainer implements DeployableContainer
       final List<BootstrapDescriptor> descriptors = server.getConfiguration().getBootstrapDescriptors();
       descriptors.add(ReloadedDescriptors.getClassLoadingDescriptor());
       descriptors.add(ReloadedDescriptors.getVdfDescriptor());
+      descriptors.add(ReloadedDescriptors.getThreadsDescriptor());
       descriptors.add(ShrinkWrapReloadedDescriptors.getTempFileProviderDescriptor());
       descriptors.add(ShrinkWrapReloadedDescriptors.getShrinkWrapDeployerDescriptor());
 

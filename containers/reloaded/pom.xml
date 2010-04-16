@@ -24,6 +24,7 @@
   <properties>
 
     <!-- Versioning -->
+    <version.org.jboss.logging>2.2.0.CR1</version.org.jboss.logging>
     <version.org.jboss.reloaded>0.1.2-SNAPSHOT</version.org.jboss.reloaded>
     <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
 
@@ -79,7 +80,11 @@
       <groupId>org.jboss.threads</groupId>
       <artifactId>jboss-threads</artifactId>
       <version>${version.org.jboss.threads}</version>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads-metadata</artifactId>
+      <version>${version.org.jboss.threads}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
@@ -88,5 +93,15 @@
     </dependency>
 
   </dependencies>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.logging</groupId>
+        <artifactId>jboss-logging-spi</artifactId>
+        <version>${version.org.jboss.logging}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
 
