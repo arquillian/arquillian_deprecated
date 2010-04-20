@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.impl.base.AssignableBase;
@@ -107,11 +108,11 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
       for(Map.Entry<ArchivePath, Node> classEntry : classes.entrySet()) 
       {
-         if (classEntry.getValue() instanceof ClassAsset)
+         if (classEntry.getValue().getAsset() instanceof ClassAsset)
          {
             beanClasses.add(
                   (Class<?>)extractFieldFromAsset(
-                        classEntry.getValue(),
+                        classEntry.getValue().getAsset(),
                         "clazz"));
          }
       }
@@ -142,14 +143,14 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       return serviceRegistry;
    }
    
-   private Object extractFieldFromAsset(Node node, String fieldName) 
+   private Object extractFieldFromAsset(Asset asset, String fieldName) 
    {
       try 
       {
-         Field field = node.getClass().getDeclaredField(fieldName);
+         Field field = asset.getClass().getDeclaredField(fieldName);
          field.setAccessible(true);
          
-         return field.get(node);
+         return field.get(asset);
       } 
       catch (Exception e) 
       {
