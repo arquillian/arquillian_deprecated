@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -47,6 +48,17 @@ import org.jboss.weld.manager.api.WeldManager;
 public class WeldSEContainer implements DeployableContainer
 {
    public final static ThreadLocal<WeldHolder> WELD_MANAGER = new ThreadLocal<WeldHolder>();
+   
+   private WeldSEConfiguration configuration;
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
+    */
+   @Override
+   public void setup(Configuration configuration)
+   {
+      this.configuration = configuration.getContainerConfig(WeldSEConfiguration.class);
+   }
    
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeployableContainer#start()

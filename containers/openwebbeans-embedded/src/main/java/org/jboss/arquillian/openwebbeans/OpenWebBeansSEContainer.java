@@ -31,6 +31,7 @@ import org.apache.webbeans.lifecycle.StandaloneLifeCycle;
 import org.apache.webbeans.spi.ContainerLifecycle;
 
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -67,6 +68,14 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    private static final Logger log = Logger.getLogger(OpenWebBeansSEContainer.class.getName());
 
    public final static ThreadLocal<ContainerInstanceHolder> CONTAINER_INSTANCE_HOLDER = new ThreadLocal<ContainerInstanceHolder>();
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
+    */
+   @Override
+   public void setup(Configuration configuration)
+   {
+   }
    
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#start()

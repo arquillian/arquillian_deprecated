@@ -26,6 +26,7 @@ import org.apache.openejb.assembler.classic.Assembler;
 import org.apache.openejb.assembler.classic.SecurityServiceInfo;
 import org.apache.openejb.assembler.classic.TransactionServiceInfo;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -72,10 +73,21 @@ public class OpenEJBContainer implements DeployableContainer
     */
    private AppInfo deployment;
 
+   private OpenEJBConfiguration configuration;
+   
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
+    */
+   @Override
+   public void setup(Configuration configuration)
+   {
+      this.configuration = configuration.getContainerConfig(OpenEJBConfiguration.class);
+   }
+   
    /**
     * {@inheritDoc}
     * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)

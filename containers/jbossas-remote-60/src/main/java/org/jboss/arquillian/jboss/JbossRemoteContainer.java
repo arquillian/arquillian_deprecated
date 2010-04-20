@@ -30,6 +30,7 @@ import java.util.List;
 import javax.naming.InitialContext;
 
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -65,8 +66,19 @@ public class JbossRemoteContainer implements DeployableContainer
 
    private HttpServer httpFileServer;
    
+   private JBossConfiguration configuration;
+   
    public JbossRemoteContainer()
    {
+   }
+
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
+    */
+   @Override
+   public void setup(Configuration configuration)
+   {
+      this.configuration = configuration.getContainerConfig(JBossConfiguration.class);
    }
    
    @Override

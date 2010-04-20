@@ -21,6 +21,7 @@ import java.security.PrivilegedAction;
 import java.util.List;
 
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -96,10 +97,20 @@ public class ReloadedContainer implements DeployableContainer
     */
    private ShrinkWrapDeployer deployer;
 
+   private JBossReloadedConfiguration configuration;
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
+    */
+   public void setup(Configuration configuration) 
+   {
+      this.configuration = configuration.getContainerConfig(JBossReloadedConfiguration.class);
+   }
+   
    /**
     * {@inheritDoc}
     * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)

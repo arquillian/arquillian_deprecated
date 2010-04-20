@@ -25,6 +25,7 @@ import org.glassfish.api.embedded.EmbeddedContainer;
 import org.glassfish.api.embedded.EmbeddedFileSystem;
 import org.glassfish.api.embedded.Server;
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -42,10 +43,18 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
 {
    private String target = "server";
    private Server server;
-   private int port = 8080;
+
+   private GlassFishConfiguration configuration;
    
    public GlassFishEmbeddedContainer()
    {
+   }
+   
+   @Override
+   public void setup(Configuration configuration)
+   {
+      this.configuration = configuration.getContainerConfig(GlassFishConfiguration.class);
+      
       final Server.Builder builder = new Server.Builder(GlassFishEmbeddedContainer.class.getName());
 
       final EmbeddedFileSystem.Builder embeddedFsBuilder = new EmbeddedFileSystem.Builder();
@@ -64,7 +73,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       try 
       {
          for(EmbeddedContainer contianer : server.getContainers()) {
-            contianer.bind(server.createPort(port), "http");
+            contianer.bind(server.createPort(configuration.getBindPort()), "http");
             contianer.start();
          }
       } 
@@ -113,7 +122,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
                new URL(
                      "http",
                      "localhost",
-                     port, 
+                     configuration.getBindPort(), 
                      "/")
                );
       } 
