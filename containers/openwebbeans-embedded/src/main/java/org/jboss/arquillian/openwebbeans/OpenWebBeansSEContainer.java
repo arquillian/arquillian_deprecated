@@ -22,14 +22,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
+
 import javax.enterprise.inject.spi.BeanManager;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
+
 import org.apache.webbeans.context.ContextFactory;
 import org.apache.webbeans.lifecycle.StandaloneLifeCycle;
 import org.apache.webbeans.spi.ContainerLifecycle;
-
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;

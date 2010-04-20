@@ -95,7 +95,7 @@ public class ShrinkWrapMetaDataDiscovery extends AbstractMetaDataDiscovery
          Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
          for (Map.Entry<ArchivePath, Node> classEntry : classes.entrySet())
          {
-            if (classEntry.getValue() instanceof ClassAsset)
+            if (classEntry.getValue().getAsset() instanceof ClassAsset)
             {
                try
                {

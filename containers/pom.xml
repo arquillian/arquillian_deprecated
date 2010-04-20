@@ -34,7 +34,7 @@
     <module>weld-embedded</module>
     <module>openejb</module>
     <module>reloaded</module>
-
+    <module>openwebbeans-embedded</module>
   </modules>
 
 </project>
