@@ -22,11 +22,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.Map;
+
 import org.apache.webbeans.spi.deployer.AbstractMetaDataDiscovery;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.Filters;
+import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.impl.base.asset.ClassAsset;
 
 /**
@@ -55,9 +57,9 @@ public class ShrinkWrapMetaDataDiscovery extends AbstractMetaDataDiscovery
    @Override
    protected void configure() throws Exception
    {
-      Map<ArchivePath, Asset> beansXmls = archive.getContent(Filters.include("/META-INF/beans.xml"));
+      Map<ArchivePath, Node> beansXmls = archive.getContent(Filters.include("/META-INF/beans.xml"));
 	  boolean beansXmlPresent = false;
-      for (final Map.Entry<ArchivePath, Asset> entry : beansXmls.entrySet())
+      for (final Map.Entry<ArchivePath, Node> entry : beansXmls.entrySet())
       {
          try
          {
@@ -75,7 +77,7 @@ public class ShrinkWrapMetaDataDiscovery extends AbstractMetaDataDiscovery
                            @Override
                            public InputStream getInputStream() throws IOException
                            {
-                              return entry.getValue().openStream();
+                              return entry.getValue().getAsset().openStream();
                            }
                         };
                      };
@@ -90,14 +92,14 @@ public class ShrinkWrapMetaDataDiscovery extends AbstractMetaDataDiscovery
 
 	  if (beansXmlPresent)
 	  {
-         Map<ArchivePath, Asset> classes = archive.getContent(Filters.include(".*\\.class"));
-         for (Map.Entry<ArchivePath, Asset> classEntry : classes.entrySet())
+         Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
+         for (Map.Entry<ArchivePath, Node> classEntry : classes.entrySet())
          {
             if (classEntry.getValue() instanceof ClassAsset)
             {
                try
                {
-                  getAnnotationDB().scanClass(((ClassAsset) classEntry.getValue()).openStream());
+                  getAnnotationDB().scanClass(classEntry.getValue().getAsset().openStream());
                }
                catch (Exception e)
                {
