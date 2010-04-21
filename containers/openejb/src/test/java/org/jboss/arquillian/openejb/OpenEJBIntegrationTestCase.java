@@ -24,7 +24,7 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.openejb.ejb.EchoBean;
 import org.jboss.arquillian.openejb.ejb.EchoLocalBusiness;
-import org.jboss.shrinkwrap.api.Archives;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class OpenEJBIntegrationTestCase
    @Deployment
    public static JavaArchive createDeployment()
    {
-      return Archives.create("slsb.jar", JavaArchive.class).addClasses(EchoLocalBusiness.class, EchoBean.class);
+      return ShrinkWrap.create("slsb.jar", JavaArchive.class).addClasses(EchoLocalBusiness.class, EchoBean.class);
    }
 
    /**

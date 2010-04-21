@@ -21,7 +21,7 @@ import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.Archives;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
@@ -38,7 +38,7 @@ public class JbossDeploymentAppender implements AuxiliaryArchiveAppender
 
    public Archive<?> createAuxiliaryArchive()
    {
-      JavaArchive archive = Archives.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
+      JavaArchive archive = ShrinkWrap.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
                         .addPackages(
                               true, 
                               EJBInjectionEnricher.class.getPackage(),
