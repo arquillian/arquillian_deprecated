@@ -27,10 +27,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class OpenEJBConfiguration implements ContainerConfiguration
 {
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
-    */
-   @Override
+
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.STANDALONE;

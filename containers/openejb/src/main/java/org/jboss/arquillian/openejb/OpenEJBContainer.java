@@ -79,20 +79,11 @@ public class OpenEJBContainer implements DeployableContainer
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
-    */
-   @Override
    public void setup(Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(OpenEJBConfiguration.class);
    }
    
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
    {
       // Deploy as an archive
@@ -119,11 +110,6 @@ public class OpenEJBContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#start()
-    */
-   @Override
    public void start() throws LifecycleException
    {
       final ShrinkWrapConfigurationFactory config = new ShrinkWrapConfigurationFactory();
@@ -144,21 +130,11 @@ public class OpenEJBContainer implements DeployableContainer
       this.config = new ShrinkWrapConfigurationFactory();
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop()
-    */
-   @Override
    public void stop() throws LifecycleException
    {
       assembler.destroy();
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       // Undeploy the archive

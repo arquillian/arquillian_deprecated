@@ -33,11 +33,6 @@ public class EchoBean implements EchoLocalBusiness
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
    
-   /**
-    * {@inheritDoc}
-    * @see org.apache.openejb.assembler.classic.ejb.EchoLocalBusiness#echo(java.lang.String)
-    */
-   @Override
    public String echo(final String value)
    {
       return value;
