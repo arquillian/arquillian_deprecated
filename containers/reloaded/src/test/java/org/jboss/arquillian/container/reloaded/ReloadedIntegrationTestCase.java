@@ -63,7 +63,6 @@ public class ReloadedIntegrationTestCase
       final Asset deploymentXmlAsset = new Asset()
       {
 
-         @Override
          public InputStream openStream()
          {
             return new ByteArrayInputStream(new String(

@@ -48,11 +48,6 @@ public class ReloadedTestEnricher implements TestEnricher
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.TestEnricher#enrich(java.lang.Object)
-    */
-   @Override
    public void enrich(final Object testCase)
    {
       // Obtain the server as set from the container

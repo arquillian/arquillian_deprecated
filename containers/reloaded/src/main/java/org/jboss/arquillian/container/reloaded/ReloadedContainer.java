@@ -103,19 +103,11 @@ public class ReloadedContainer implements DeployableContainer
    //-------------------------------------------------------------------------------------||
 
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
-    */
    public void setup(Configuration configuration) 
    {
       this.configuration = configuration.getContainerConfig(JBossReloadedConfiguration.class);
    }
    
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
    {
       // Deploy
@@ -133,11 +125,6 @@ public class ReloadedContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#start()
-    */
-   @Override
    public void start() throws LifecycleException
    {
       // Set up JBossXB
@@ -181,11 +168,6 @@ public class ReloadedContainer implements DeployableContainer
 
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop()
-    */
-   @Override
    public void stop() throws LifecycleException
    {
       // If we've got a server
@@ -203,11 +185,6 @@ public class ReloadedContainer implements DeployableContainer
       }
    }
 
-   /**
-    * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       //TODO Remove this hack
