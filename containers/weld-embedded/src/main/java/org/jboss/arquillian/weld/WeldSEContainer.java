@@ -28,6 +28,7 @@ import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
+import org.jboss.arquillian.weld.shrinkwrap.ShrinkWrapClassLoader;
 import org.jboss.arquillian.weld.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.weld.bootstrap.WeldBootstrap;
@@ -68,6 +69,10 @@ public class WeldSEContainer implements DeployableContainer
          throws DeploymentException
    {
       final BeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
+
+      ClassLoader cl = new ShrinkWrapClassLoader(archive);
+
+      Thread.currentThread().setContextClassLoader(cl);
 
       Deployment deployment = new Deployment() 
       {
@@ -137,6 +142,7 @@ public class WeldSEContainer implements DeployableContainer
          manager.getServices().get(ContextLifecycle.class).endSession(manager.getId(), null);
          
          holder.getBootstrap().shutdown();
+         Thread.currentThread().setContextClassLoader(Thread.currentThread().getContextClassLoader().getParent());
       }
       WELD_MANAGER.set(null);
    }
