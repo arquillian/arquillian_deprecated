@@ -72,16 +72,11 @@ public class JbossRemoteContainer implements DeployableContainer
    {
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
-    */
-   @Override
    public void setup(Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(JBossConfiguration.class);
    }
    
-   @Override
    public void start() throws LifecycleException
    {
       try 
@@ -98,7 +93,6 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
    
-   @Override
    public void stop() throws LifecycleException
    {
       try 
@@ -112,7 +106,6 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
 
-   @Override
    public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
    {
       if(archive == null) 
@@ -130,7 +123,6 @@ public class JbossRemoteContainer implements DeployableContainer
       {
          httpFileServer.createContext("/" + deploymentName, new HttpHandler()
          {
-            @Override
             public void handle(HttpExchange exchange) throws IOException
             {
                InputStream zip = archive.as(ZipExporter.class).exportZip();
@@ -193,7 +185,6 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
 
-   @Override
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
       if(archive == null) 
