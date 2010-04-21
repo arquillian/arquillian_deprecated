@@ -50,7 +50,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
    {
    }
    
-   @Override
    public void setup(Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(GlassFishConfiguration.class);
@@ -67,7 +66,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       server.addContainer(ContainerBuilder.Type.all);
    }
    
-   @Override
    public void start() throws LifecycleException
    {
       try 
@@ -83,7 +81,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   @Override
    public void stop() throws LifecycleException
    {
       try 
@@ -96,7 +93,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   @Override
    public ContainerMethodExecutor deploy(Archive<?> archive) throws DeploymentException
    {
       try 
@@ -132,7 +128,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   @Override
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
       UndeployCommandParameters params = new UndeployCommandParameters();

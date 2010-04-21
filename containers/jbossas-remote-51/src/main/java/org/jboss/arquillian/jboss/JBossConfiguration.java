@@ -34,7 +34,6 @@ public class JBossConfiguration implements ContainerConfiguration
 
    private String profileName = "default";
 
-   @Override
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;

@@ -30,7 +30,6 @@ public class GlassFishConfiguration implements ContainerConfiguration
 {
    private int bindPort = 8080;
 
-   @Override
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
