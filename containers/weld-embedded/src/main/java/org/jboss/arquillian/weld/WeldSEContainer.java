@@ -51,35 +51,19 @@ public class WeldSEContainer implements DeployableContainer
    
    private WeldSEConfiguration configuration;
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
-    */
-   @Override
    public void setup(Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(WeldSEConfiguration.class);
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#start()
-    */
-   @Override
    public void start() throws LifecycleException
    {
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop()
-    */
-   @Override
    public void stop() throws LifecycleException
    {
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public ContainerMethodExecutor deploy(final Archive<?> archive)
          throws DeploymentException
    {
@@ -87,19 +71,16 @@ public class WeldSEContainer implements DeployableContainer
 
       Deployment deployment = new Deployment() 
       {
-         @Override
          public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()
          {
             return Arrays.asList(beanArchive);
          }
          
-         @Override
          public ServiceRegistry getServices()
          {
             return beanArchive.getServices();
          }
          
-         @Override
          public BeanDeploymentArchive loadBeanDeploymentArchive(	
                Class<?> beanClass)
          {
@@ -146,10 +127,6 @@ public class WeldSEContainer implements DeployableContainer
       };
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
-    */
-   @Override
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
       WeldHolder holder = WELD_MANAGER.get();

@@ -65,7 +65,6 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       return archive;
    }
 
-   @Override
    public Collection<URL> getBeansXml()
    {
       List<URL> beanClasses = new ArrayList<URL>();
@@ -77,6 +76,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
             beanClasses.add(
                   new URL(null, "archive://" + entry.getKey().get(), new URLStreamHandler() 
                   {
+                     @Override
                      protected java.net.URLConnection openConnection(URL u) throws java.io.IOException 
                      {
                         return new URLConnection(u)
@@ -101,7 +101,6 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       return beanClasses;
    }
 
-   @Override
    public Collection<Class<?>> getBeanClasses()
    {
       List<Class<?>> beanClasses = new ArrayList<Class<?>>();
@@ -119,25 +118,21 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       return beanClasses;
    }
 
-   @Override
    public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()
    {
       return Collections.emptySet();
    }
 
-   @Override
    public Collection<EjbDescriptor<?>> getEjbs()
    {
       return Collections.emptySet();
    }
 
-   @Override
    public String getId()
    {
       return archive.getName();
    }
 
-   @Override
    public ServiceRegistry getServices()
    {
       return serviceRegistry;
