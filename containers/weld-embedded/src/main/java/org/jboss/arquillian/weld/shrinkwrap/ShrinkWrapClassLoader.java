@@ -26,8 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
+
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.Asset;
+import org.jboss.shrinkwrap.api.Node;
 
 /**
  * A ClassLoader implementation that can locate resources in a ShrinkWrap archive
@@ -52,7 +53,7 @@ public class ShrinkWrapClassLoader extends SecureClassLoader
    @Override
    protected URL findResource(final String name)
    {
-      final Asset a = archive.get(name).getAsset();
+      final Node a = archive.get(name);
       if (a == null)
       {
          return null;
@@ -75,7 +76,7 @@ public class ShrinkWrapClassLoader extends SecureClassLoader
                   public InputStream getInputStream()
                         throws IOException
                   {
-                     return a.openStream();
+                     return a.getAsset().openStream();
                   }
                };
             }
