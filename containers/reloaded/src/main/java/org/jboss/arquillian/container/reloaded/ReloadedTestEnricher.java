@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.container.reloaded;
 
+import java.lang.reflect.Method;
+
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
 import org.jboss.beans.metadata.spi.builder.BeanMetaDataBuilder;
@@ -48,6 +50,9 @@ public class ReloadedTestEnricher implements TestEnricher
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.TestEnricher#enrich(java.lang.Object)
+    */
    public void enrich(final Object testCase)
    {
       // Obtain the server as set from the container
@@ -68,6 +73,10 @@ public class ReloadedTestEnricher implements TestEnricher
       {
          throw new RuntimeException("Could not enrich " + testCase + " by installing the instance into MC", e);
       }
-
+   }
+   
+   public Object[] resolve(Method method)
+   {
+      return new Object[method.getParameterTypes().length];
    }
 }

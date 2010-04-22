@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.openejb;
 
-import java.lang.reflect.Field;
 import java.util.Properties;
 
 import javax.naming.Binding;
@@ -47,13 +46,13 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
    }
 
    @Override
-   protected Object lookupEJB(Field field) throws Exception 
+   protected Object lookupEJB(Class<?> fieldType) throws Exception
    {
       InitialContext context = createContext();
-      return lookupRecursive(field, context, context.listBindings("/"));
+      return lookupRecursive(fieldType, context, context.listBindings("/"));
    }
    
-   protected Object lookupRecursive(Field field, Context context, NamingEnumeration<Binding> contextNames) throws Exception 
+   protected Object lookupRecursive(Class<?> fieldType, Context context, NamingEnumeration<Binding> contextNames) throws Exception 
    {
       while(contextNames.hasMore())
       {
@@ -62,17 +61,17 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
          if(Context.class.isInstance(value)) 
          {
             Context subContext = (Context)value;
-            return lookupRecursive(field, subContext, subContext.listBindings("/"));
+            return lookupRecursive(fieldType, subContext, subContext.listBindings("/"));
          }
          else 
          {
             value = context.lookup(contextName.getName());
-            if(field.getType().isInstance(value))
+            if(fieldType.isInstance(value))
             {
                return value;
             }
          }
       }
-      throw new RuntimeException("Could not lookup EJB reference for: " + field);
+      throw new RuntimeException("Could not lookup EJB reference for: " + fieldType);
    }
 }
