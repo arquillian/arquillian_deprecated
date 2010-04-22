@@ -102,13 +102,11 @@ public class ShrinkWrapClassLoader extends SecureClassLoader
       final Iterator<URL> i = it;
       return new Enumeration<URL>()
       {
-         @Override
          public boolean hasMoreElements()
          {
             return i.hasNext();
          }
 
-         @Override
          public URL nextElement()
          {
             return i.next();

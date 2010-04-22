@@ -73,7 +73,6 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
     */
-   @Override
    public void setup(Configuration configuration)
    {
    }
@@ -81,7 +80,6 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#start()
     */
-   @Override
    public void start() throws LifecycleException
    {
    }
@@ -89,7 +87,6 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#stop()
     */
-   @Override
    public void stop() throws LifecycleException
    {
    }
@@ -97,7 +94,6 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
     */
-   @Override
    public ContainerMethodExecutor deploy(final Archive<?> archive)
          throws DeploymentException
    {
@@ -162,7 +158,6 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
     */
-   @Override
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
       ContainerInstanceHolder holder = CONTAINER_INSTANCE_HOLDER.get();
@@ -223,73 +218,61 @@ public class OpenWebBeansSEContainer implements DeployableContainer
          attributes = new HashMap<String, Object>();
       }
 
-      @Override
       public long getCreationTime()
       {
          return creationTime;
       }
 
-      @Override
       public String getId()
       {
          return id;
       }
 
-      @Override
       public long getLastAccessedTime()
       {
          return creationTime;
       }
 
-      @Override
       public ServletContext getServletContext()
       {
          throw new UnsupportedOperationException("Not supported.");
       }
 
-      @Override
       public void setMaxInactiveInterval(int i)
       {
          this.maxInactiveInterval = i;
       }
 
-      @Override
       public int getMaxInactiveInterval()
       {
          return maxInactiveInterval;
       }
 
-      @Override
       public HttpSessionContext getSessionContext()
       {
          throw new UnsupportedOperationException("Not supported.");
       }
 
-      @Override
       public Object getAttribute(String string)
       {
          return attributes.get(string);
       }
 
-      @Override
       public Object getValue(String string)
       {
          return getAttribute(string);
       }
 
-      @Override
       public Enumeration getAttributeNames()
       {
          final Iterator<String> nameIt = attributes.keySet().iterator();
          return new Enumeration() {
 
-            @Override
             public boolean hasMoreElements()
             {
                return nameIt.hasNext();
             }
 
-            @Override
             public Object nextElement()
             {
                return nameIt.next();
@@ -297,47 +280,39 @@ public class OpenWebBeansSEContainer implements DeployableContainer
          };
       }
 
-      @Override
       public String[] getValueNames()
       {
          return attributes.keySet().toArray(new String[0]);
       }
 
-      @Override
       public void setAttribute(String string, Object value)
       {
          attributes.put(string, value);
       }
 
-      @Override
       public void putValue(String string, Object value)
       {
          setAttribute(string, value);
       }
 
-      @Override
       public void removeAttribute(String string)
       {
          attributes.remove(string);
       }
 
-      @Override
       public void removeValue(String string)
       {
          removeAttribute(string);
       }
 
-      @Override
       public void invalidate()
       {
          attributes.clear();
       }
 
-      @Override
       public boolean isNew()
       {
          return true;
       }
-
    }
 }
