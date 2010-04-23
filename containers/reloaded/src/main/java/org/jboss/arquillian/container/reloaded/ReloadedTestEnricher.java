@@ -19,6 +19,7 @@ package org.jboss.arquillian.container.reloaded;
 import java.lang.reflect.Method;
 
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.beans.info.spi.BeanAccessMode;
 import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
 import org.jboss.beans.metadata.spi.builder.BeanMetaDataBuilder;
 import org.jboss.bootstrap.api.mc.server.MCServer;
@@ -63,8 +64,8 @@ public class ReloadedTestEnricher implements TestEnricher
       final KernelController controller = server.getKernel().getController();
 
       // Install the test instance itself into MC (so injections may be honored)
-      final BeanMetaDataBuilder bmdb = BeanMetaDataBuilderFactory.createBuilder(BIND_NAME_TEST, testCase.getClass()
-            .getName());
+      final BeanMetaDataBuilder bmdb = BeanMetaDataBuilderFactory.createBuilder(BIND_NAME_TEST,
+            testCase.getClass().getName()).setAccessMode(BeanAccessMode.ALL);
       try
       {
          controller.install(bmdb.getBeanMetaData(), testCase);

@@ -83,6 +83,7 @@ public class ReloadedIntegrationTestCase
    /**
     * POJO to be injected (as installed from MC)
     */
+   @Inject
    private LifecyclePojo pojo;
 
    //-------------------------------------------------------------------------------------||
@@ -98,20 +99,6 @@ public class ReloadedIntegrationTestCase
       Assert.assertNotNull("POJO should have been injected from MC", pojo);
       Assert.assertEquals("MC Should have activated POJO in STARTED state", LifecyclePojo.State.STARTED, pojo.state);
       log.info(pojo + " is in state: " + pojo.state);
-   }
-
-   //-------------------------------------------------------------------------------------||
-   // Accessors / Mutators ---------------------------------------------------------------||
-   //-------------------------------------------------------------------------------------||
-
-   /**
-    * Sets the {@link LifecyclePojo} from MC
-    */
-   @Inject
-   public void setPojo(final LifecyclePojo pojo)
-   {
-      assert pojo != null : "POJO should not be null";
-      this.pojo = pojo;
    }
 
 }
