@@ -26,8 +26,8 @@
       <!-- Versioning -->
       <version.weld_api>1.0</version.weld_api>
       <version.weld_spi>1.0</version.weld_spi>
-      <version.weld_core>1.0.1-Final</version.weld_core>
-      <version.slf4j>1.5.9.RC1</version.slf4j>
+      <version.weld_core>1.0.1-SP1</version.weld_core>
+      <version.slf4j>1.5.10</version.slf4j>
 
    </properties>
 
@@ -103,6 +103,13 @@
          <artifactId>weld-core</artifactId>
          <version>${version.weld_core}</version>
          <scope>compile</scope>
+
+      </dependency>
+      <dependency>
+      	<groupId>org.slf4j</groupId>
+      	<artifactId>slf4j-jdk14</artifactId>
+      	<version>${version.slf4j}</version>
+      	<scope>compile</scope>
       </dependency>
 
       <dependency>
@@ -121,12 +128,6 @@
          <groupId>javax.annotation</groupId>
          <artifactId>jsr250-api</artifactId>
          <version>1.0</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.slf4j</groupId>
-         <artifactId>slf4j-jdk14</artifactId>
-         <version>${version.slf4j}</version>
       </dependency>
 
       <dependency>
