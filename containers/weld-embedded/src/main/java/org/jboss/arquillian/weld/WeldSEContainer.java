@@ -18,16 +18,19 @@ package org.jboss.arquillian.weld;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.TestMethodExecutor;
-import org.jboss.arquillian.spi.TestResult;
+import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
+import org.jboss.arquillian.spi.event.suite.After;
+import org.jboss.arquillian.spi.event.suite.AfterClass;
+import org.jboss.arquillian.spi.event.suite.Before;
+import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.arquillian.weld.shrinkwrap.ShrinkWrapClassLoader;
 import org.jboss.arquillian.weld.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.shrinkwrap.api.Archive;
@@ -36,7 +39,6 @@ import org.jboss.weld.bootstrap.api.Environments;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 import org.jboss.weld.bootstrap.spi.Deployment;
-import org.jboss.weld.context.ContextLifecycle;
 import org.jboss.weld.context.api.helpers.ConcurrentHashMapBeanStore;
 import org.jboss.weld.manager.api.WeldManager;
 
@@ -48,24 +50,22 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSEContainer implements DeployableContainer
 {
-   public final static ThreadLocal<WeldHolder> WELD_MANAGER = new ThreadLocal<WeldHolder>();
-   
    private WeldSEConfiguration configuration;
    
-   public void setup(Configuration configuration)
+   public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(WeldSEConfiguration.class);
    }
    
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
    }
 
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
    }
 
-   public ContainerMethodExecutor deploy(final Archive<?> archive)
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
          throws DeploymentException
    {
       final BeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
@@ -102,70 +102,22 @@ public class WeldSEContainer implements DeployableContainer
 
       WeldManager manager = bootstrap.getManager(beanArchive);
       
-      // start the session lifecycle
-      manager.getServices().get(ContextLifecycle.class).restoreSession(manager.getId(), new ConcurrentHashMapBeanStore());
+      context.add(WeldBootstrap.class, bootstrap);
+      context.add(WeldManager.class, manager);
+      context.register(BeforeClass.class, new SessionLifeCycleController(BeforeUnDeploy.class));
+      context.register(Before.class, new RequestLifeCycleController(After.class));
       
-      WELD_MANAGER.set(
-            new WeldHolder(
-                  bootstrap, 
-                  manager));
-
-      // TODO: replace with a before/after invoke interceptor ?
-      return new LocalMethodExecutor() {
-         @Override
-         public TestResult invoke(TestMethodExecutor testMethodExecutor)
-         {
-            WeldManager manager = WELD_MANAGER.get().getManager();
-            String requestId = UUID.randomUUID().toString();
-            try 
-            {
-            	// start the request lifecycle
-            	manager.getServices().get(ContextLifecycle.class).beginRequest(requestId, new ConcurrentHashMapBeanStore());
-            	return super.invoke(testMethodExecutor);
-            } 
-            finally
-            {
-            	// end the request lifecycle 
-            	manager.getServices().get(ContextLifecycle.class).endRequest(requestId, new ConcurrentHashMapBeanStore());
-            }
-         }
-      };
+      return new LocalMethodExecutor();
    }
 
-   public void undeploy(Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
-      WeldHolder holder = WELD_MANAGER.get();
-      if(holder != null) {
-         WeldManager manager = holder.getManager();
-
-         // end the session lifecycle
-         manager.getServices().get(ContextLifecycle.class).endSession(manager.getId(), null);
-         
-         holder.getBootstrap().shutdown();
-         Thread.currentThread().setContextClassLoader(Thread.currentThread().getContextClassLoader().getParent());
-      }
-      WELD_MANAGER.set(null);
-   }
-   
-   public static class WeldHolder {
-      
-      private WeldBootstrap bootstrap;
-      private WeldManager manager;
-
-      public WeldHolder(WeldBootstrap bootstrap, WeldManager manager)
+      WeldBootstrap bootstrap = context.get(WeldBootstrap.class);
+      if(bootstrap != null)
       {
-         super();
-         this.bootstrap = bootstrap;
-         this.manager = manager;
+         bootstrap.shutdown();
       }
-
-      public WeldBootstrap getBootstrap()
-      {
-         return bootstrap;
-      }
-      public WeldManager getManager()
-      {
-         return manager;
-      }
+      Thread.currentThread().setContextClassLoader(
+            Thread.currentThread().getContextClassLoader().getParent());
    }
 }

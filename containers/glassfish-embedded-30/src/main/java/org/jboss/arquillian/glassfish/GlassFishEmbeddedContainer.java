@@ -27,6 +27,7 @@ import org.glassfish.api.embedded.Server;
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -50,7 +51,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
    {
    }
    
-   public void setup(Configuration configuration)
+   public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(GlassFishConfiguration.class);
       
@@ -66,7 +67,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       server.addContainer(ContainerBuilder.Type.all);
    }
    
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
       try 
       {
@@ -81,7 +82,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
       try 
       {
@@ -93,7 +94,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
       try 
       {
@@ -128,7 +129,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       UndeployCommandParameters params = new UndeployCommandParameters();
       params.target = target;

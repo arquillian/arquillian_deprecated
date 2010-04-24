@@ -18,11 +18,12 @@ package org.jboss.arquillian.openejb;
 
 import java.util.Properties;
 
+
 import javax.naming.Binding;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingEnumeration;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 
@@ -38,29 +39,29 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 {
 
    @Override
-   protected InitialContext createContext() throws Exception
+   protected InitialContext createContext(Context context) throws Exception
    {
       final Properties properties = new Properties();
-      properties.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
+      properties.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
       return new InitialContext(properties);
    }
 
    @Override
-   protected Object lookupEJB(Class<?> fieldType) throws Exception
+   protected Object lookupEJB(Context context, Class<?> fieldType) throws Exception
    {
-      InitialContext context = createContext();
-      return lookupRecursive(fieldType, context, context.listBindings("/"));
+      InitialContext initcontext = createContext(context);
+      return lookupRecursive(fieldType, initcontext, initcontext.listBindings("/"));
    }
    
-   protected Object lookupRecursive(Class<?> fieldType, Context context, NamingEnumeration<Binding> contextNames) throws Exception 
+   protected Object lookupRecursive(Class<?> fieldType, javax.naming.Context context, NamingEnumeration<Binding> contextNames) throws Exception 
    {
       while(contextNames.hasMore())
       {
          Binding contextName = contextNames.nextElement();
          Object value = contextName.getObject();
-         if(Context.class.isInstance(value)) 
+         if(javax.naming.Context.class.isInstance(value)) 
          {
-            Context subContext = (Context)value;
+            javax.naming.Context subContext = (javax.naming.Context)value;
             return lookupRecursive(fieldType, subContext, subContext.listBindings("/"));
          }
          else 

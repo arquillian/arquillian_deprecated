@@ -28,6 +28,7 @@ import org.apache.openejb.assembler.classic.TransactionServiceInfo;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -79,12 +80,12 @@ public class OpenEJBContainer implements DeployableContainer
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   public void setup(Configuration configuration)
+   public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(OpenEJBConfiguration.class);
    }
    
-   public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       // Deploy as an archive
       final AppInfo appInfo;
@@ -110,7 +111,7 @@ public class OpenEJBContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
       final ShrinkWrapConfigurationFactory config = new ShrinkWrapConfigurationFactory();
       final Assembler assembler = new Assembler();
@@ -130,12 +131,12 @@ public class OpenEJBContainer implements DeployableContainer
       this.config = new ShrinkWrapConfigurationFactory();
    }
 
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
       assembler.destroy();
    }
 
-   public void undeploy(final Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       // Undeploy the archive
       try

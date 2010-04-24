@@ -23,6 +23,7 @@ import java.util.List;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -103,12 +104,12 @@ public class ReloadedContainer implements DeployableContainer
    //-------------------------------------------------------------------------------------||
 
    
-   public void setup(Configuration configuration) 
+   public void setup(Context context, Configuration configuration) 
    {
       this.configuration = configuration.getContainerConfig(JBossReloadedConfiguration.class);
    }
    
-   public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       // Deploy
       try
@@ -125,7 +126,7 @@ public class ReloadedContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
       // Set up JBossXB
       AccessController.doPrivileged(new PrivilegedAction<Void>()
@@ -168,7 +169,7 @@ public class ReloadedContainer implements DeployableContainer
 
    }
 
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
       // If we've got a server
       if (server != null && server.getState().equals(LifecycleState.STARTED))
@@ -185,7 +186,7 @@ public class ReloadedContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(final Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       //TODO Remove this hack
       // http://community.jboss.org/thread/150796?tstart=0

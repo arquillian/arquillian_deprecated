@@ -18,6 +18,7 @@ package org.jboss.arquillian.container.reloaded;
 
 import java.lang.reflect.Method;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.beans.info.spi.BeanAccessMode;
 import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
@@ -52,9 +53,9 @@ public class ReloadedTestEnricher implements TestEnricher
    //-------------------------------------------------------------------------------------||
 
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.TestEnricher#enrich(java.lang.Object)
+    * @see org.jboss.arquillian.spi.TestEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
-   public void enrich(final Object testCase)
+   public void enrich(final Context context, final Object testCase)
    {
       // Obtain the server as set from the container
       final MCServer server = ReloadedContainer.MC_SERVER.get();
@@ -76,7 +77,10 @@ public class ReloadedTestEnricher implements TestEnricher
       }
    }
    
-   public Object[] resolve(Method method)
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.TestEnricher#resolve(org.jboss.arquillian.spi.Context, java.lang.reflect.Method)
+    */
+   public Object[] resolve(Context context, Method method)
    {
       return new Object[method.getParameterTypes().length];
    }

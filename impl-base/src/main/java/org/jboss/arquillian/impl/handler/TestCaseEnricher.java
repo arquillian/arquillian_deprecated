@@ -18,10 +18,10 @@ package org.jboss.arquillian.impl.handler;
 
 import java.util.Collection;
 
-import org.jboss.arquillian.impl.context.TestContext;
-import org.jboss.arquillian.impl.event.EventHandler;
-import org.jboss.arquillian.impl.event.type.TestEvent;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.arquillian.spi.event.suite.TestEvent;
 
 /**
  * A Handler for enriching the Test instance.<br/>
@@ -29,15 +29,18 @@ import org.jboss.arquillian.spi.TestEnricher;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class TestCaseEnricher implements EventHandler<TestContext, TestEvent>
+public class TestCaseEnricher implements EventHandler<TestEvent>
 {
    
-   public void callback(TestContext context, TestEvent event) throws Exception
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.impl.event.EventHandler#callback(org.jboss.arquillian.impl.context.Context, java.lang.Object)
+    */
+   public void callback(Context context, TestEvent event) throws Exception
    {
       Collection<TestEnricher> testEnrichers = context.getServiceLoader().all(TestEnricher.class);
       for(TestEnricher enricher : testEnrichers) 
       {
-         enricher.enrich(event.getTestInstance());
+         enricher.enrich(context, event.getTestInstance());
       }
    }
 }

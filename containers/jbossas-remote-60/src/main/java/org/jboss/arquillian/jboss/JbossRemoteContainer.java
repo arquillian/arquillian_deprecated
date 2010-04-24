@@ -32,6 +32,7 @@ import javax.naming.InitialContext;
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -72,12 +73,12 @@ public class JbossRemoteContainer implements DeployableContainer
    {
    }
 
-   public void setup(Configuration configuration)
+   public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(JBossConfiguration.class);
    }
    
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
       try 
       {
@@ -93,7 +94,7 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
    
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
       try 
       {
@@ -106,7 +107,7 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(final Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       if(archive == null) 
       {
@@ -185,7 +186,7 @@ public class JbossRemoteContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       if(archive == null) 
       {

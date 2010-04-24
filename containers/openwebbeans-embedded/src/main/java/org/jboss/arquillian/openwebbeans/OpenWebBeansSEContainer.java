@@ -34,6 +34,7 @@ import org.apache.webbeans.spi.ContainerLifecycle;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -73,28 +74,28 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
     */
-   public void setup(Configuration configuration)
+   public void setup(Context context, Configuration configuration)
    {
    }
    
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#start()
     */
-   public void start() throws LifecycleException
+   public void start(Context context) throws LifecycleException
    {
    }
 
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#stop()
     */
-   public void stop() throws LifecycleException
+   public void stop(Context context) throws LifecycleException
    {
    }
 
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
     */
-   public ContainerMethodExecutor deploy(final Archive<?> archive)
+   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
          throws DeploymentException
    {
       ClassLoader cl = new ShrinkWrapClassLoader(archive);
@@ -158,7 +159,7 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    /**
     * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
     */
-   public void undeploy(Archive<?> archive) throws DeploymentException
+   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       ContainerInstanceHolder holder = CONTAINER_INSTANCE_HOLDER.get();
       if (holder != null) {
