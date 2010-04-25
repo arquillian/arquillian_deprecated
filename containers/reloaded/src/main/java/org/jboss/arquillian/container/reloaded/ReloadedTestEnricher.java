@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
+import org.jboss.arquillian.spi.event.container.ContainerEvent;
+import org.jboss.arquillian.spi.event.suite.EventHandler;
 import org.jboss.beans.info.spi.BeanAccessMode;
 import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
 import org.jboss.beans.metadata.spi.builder.BeanMetaDataBuilder;
@@ -58,7 +61,7 @@ public class ReloadedTestEnricher implements TestEnricher
    public void enrich(final Context context, final Object testCase)
    {
       // Obtain the server as set from the container
-      final MCServer server = ReloadedContainer.MC_SERVER.get();
+      final MCServer server = context.get(MCServer.class);
       assert server != null : "MC Server was not set by the container";
 
       // Get the Controller
@@ -70,6 +73,7 @@ public class ReloadedTestEnricher implements TestEnricher
       try
       {
          controller.install(bmdb.getBeanMetaData(), testCase);
+         context.register(BeforeUnDeploy.class, new TestCaseUnInstaller());
       }
       catch (final Throwable e)
       {
@@ -83,5 +87,19 @@ public class ReloadedTestEnricher implements TestEnricher
    public Object[] resolve(Context context, Method method)
    {
       return new Object[method.getParameterTypes().length];
+   }
+   
+   /**
+    * Uninstall the installed test case from the MCServer before undeploying. 
+    *
+    * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+    * @version $Revision: $
+    */
+   private static class TestCaseUnInstaller implements EventHandler<ContainerEvent> 
+   {
+      public void callback(Context context, ContainerEvent event) throws Exception
+      {
+         context.get(MCServer.class).getKernel().getController().uninstall(ReloadedTestEnricher.BIND_NAME_TEST);
+      }
    }
 }

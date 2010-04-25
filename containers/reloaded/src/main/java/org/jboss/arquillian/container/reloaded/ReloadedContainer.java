@@ -27,7 +27,6 @@ import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
 import org.jboss.bootstrap.api.lifecycle.LifecycleState;
 import org.jboss.bootstrap.api.mc.server.MCServer;
@@ -73,40 +72,17 @@ public class ReloadedContainer implements DeployableContainer
     */
    private static final String VALUE_SYSPROP_JBOSSXB_IGNORE_ORDER = "true";
 
-   /**
-    * Put the {@link MCServer} into Thread scope such that we might access it from the 
-    * {@link ReloadedTestEnricher}; hacky, but there's no way to create a {@link TestEnricher}
-    * with construction arguments.
-    * 
-    * @deprecated Remove when we can 
-    * @see http://community.jboss.org/message/537913 
-    */
-   @Deprecated
-   static final ThreadLocal<MCServer> MC_SERVER = new ThreadLocal<MCServer>();
-
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   /**
-    * Microcontainer Server into which deployments will be made
-    */
-   private MCServer server;
-
-   /**
-    * Deployer capable of processing ShrinkWrap {@link Archive}s
-    */
-   private ShrinkWrapDeployer deployer;
-
-   private JBossReloadedConfiguration configuration;
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   
    public void setup(Context context, Configuration configuration) 
    {
-      this.configuration = configuration.getContainerConfig(JBossReloadedConfiguration.class);
+      //configuration.getContainerConfig(JBossReloadedConfiguration.class);
    }
    
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
@@ -114,7 +90,7 @@ public class ReloadedContainer implements DeployableContainer
       // Deploy
       try
       {
-         deployer.deploy(archive);
+         context.get(ShrinkWrapDeployer.class).deploy(archive);
       }
       catch (org.jboss.deployers.spi.DeploymentException e)
       {
@@ -141,8 +117,6 @@ public class ReloadedContainer implements DeployableContainer
 
       // Create the Server
       final MCServer server = MCServerFactory.createServer();
-      this.server = server;
-      MC_SERVER.set(server);
 
       // Add the required bootstrap descriptors
       final List<BootstrapDescriptor> descriptors = server.getConfiguration().getBootstrapDescriptors();
@@ -165,12 +139,14 @@ public class ReloadedContainer implements DeployableContainer
       // Get the ShrinkWrapDeployer
       final ShrinkWrapDeployer deployer = (ShrinkWrapDeployer) server.getKernel().getController().getInstalledContext(
             NAME_MC_SHRINKWRAP_DEPLOYER).getTarget();
-      this.deployer = deployer;
 
+      context.add(MCServer.class, server);
+      context.add(ShrinkWrapDeployer.class, deployer);
    }
 
    public void stop(Context context) throws LifecycleException
    {
+      MCServer server = context.get(MCServer.class);
       // If we've got a server
       if (server != null && server.getState().equals(LifecycleState.STARTED))
       {
@@ -188,19 +164,10 @@ public class ReloadedContainer implements DeployableContainer
 
    public void undeploy(Context context, final Archive<?> archive) throws DeploymentException
    {
-      //TODO Remove this hack
-      // http://community.jboss.org/thread/150796?tstart=0
-      /*
-       * Here we have to remove the test instance which was installed into MC during enrichment.
-       * Should instead be done during a test enricher teardown (a la the opposite lifecycle event
-       * in the same component).
-       */
-      server.getKernel().getController().uninstall(ReloadedTestEnricher.BIND_NAME_TEST);
-
       // Undeploy
       try
       {
-         deployer.undeploy(archive);
+         context.get(ShrinkWrapDeployer.class).undeploy(archive);
       }
       catch (org.jboss.deployers.spi.DeploymentException e)
       {
