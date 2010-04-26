@@ -80,12 +80,12 @@ public class ReloadedContainer implements DeployableContainer
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   public void setup(Context context, Configuration configuration) 
+   public void setup(final Context context,final  Configuration configuration) 
    {
       //configuration.getContainerConfig(JBossReloadedConfiguration.class);
    }
    
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   public ContainerMethodExecutor deploy(final Context context, final Archive<?> archive) throws DeploymentException
    {
       // Deploy
       try
@@ -144,9 +144,9 @@ public class ReloadedContainer implements DeployableContainer
       context.add(ShrinkWrapDeployer.class, deployer);
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop(final Context context) throws LifecycleException
    {
-      MCServer server = context.get(MCServer.class);
+      final MCServer server = context.get(MCServer.class);
       // If we've got a server
       if (server != null && server.getState().equals(LifecycleState.STARTED))
       {

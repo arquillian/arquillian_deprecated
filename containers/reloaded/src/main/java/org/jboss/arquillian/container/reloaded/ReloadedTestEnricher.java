@@ -55,7 +55,8 @@ public class ReloadedTestEnricher implements TestEnricher
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   /* (non-Javadoc)
+   /**
+    * {@inheritDoc}
     * @see org.jboss.arquillian.spi.TestEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
    public void enrich(final Context context, final Object testCase)
@@ -73,31 +74,32 @@ public class ReloadedTestEnricher implements TestEnricher
       try
       {
          controller.install(bmdb.getBeanMetaData(), testCase);
-         context.register(BeforeUnDeploy.class, new TestCaseUnInstaller());
+         context.getParentContext().register(BeforeUnDeploy.class, new TestCaseUnInstaller());
       }
       catch (final Throwable e)
       {
          throw new RuntimeException("Could not enrich " + testCase + " by installing the instance into MC", e);
       }
    }
-   
-   /* (non-Javadoc)
+
+   /**
+    * {@inheritDoc}
     * @see org.jboss.arquillian.spi.TestEnricher#resolve(org.jboss.arquillian.spi.Context, java.lang.reflect.Method)
     */
-   public Object[] resolve(Context context, Method method)
+   public Object[] resolve(final Context context, final Method method)
    {
       return new Object[method.getParameterTypes().length];
    }
-   
+
    /**
     * Uninstall the installed test case from the MCServer before undeploying. 
     *
     * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
     * @version $Revision: $
     */
-   private static class TestCaseUnInstaller implements EventHandler<ContainerEvent> 
+   private static class TestCaseUnInstaller implements EventHandler<ContainerEvent>
    {
-      public void callback(Context context, ContainerEvent event) throws Exception
+      public void callback(final Context context, final ContainerEvent event) throws Exception
       {
          context.get(MCServer.class).getKernel().getController().uninstall(ReloadedTestEnricher.BIND_NAME_TEST);
       }
