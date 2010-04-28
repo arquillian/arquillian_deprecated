@@ -124,7 +124,7 @@ public class OpenEJBArquillianContextTestCase
 
    /**
     * Ensures we can create an OpenEJB-specific JNDI {@link Context} via the 
-    * {@link OpenEJBArquillianContext} which supports/respects context propreties
+    * {@link OpenEJBArquillianContext} which supports/respects context properties
     */
    @Test
    public void programmaticNamingContextWithProperties() throws NamingException
