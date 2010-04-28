@@ -16,13 +16,20 @@
  */
 package org.jboss.arquillian.openejb;
 
-import java.util.Properties;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.List;
 
-
+import javax.inject.Inject;
 import javax.naming.Binding;
 import javax.naming.InitialContext;
 import javax.naming.NamingEnumeration;
 
+import org.apache.openejb.assembler.classic.AppInfo;
+import org.jboss.arquillian.prototyping.context.api.ArquillianContext;
+import org.jboss.arquillian.prototyping.context.impl.openejb.OpenEJBArquillianContextImpl;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
@@ -35,15 +42,69 @@ import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class OpenEJBTestEnricher extends EJBInjectionEnricher 
+public class OpenEJBTestEnricher extends EJBInjectionEnricher
 {
 
+   private ArquillianContext arquillianContext = null;
+   
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
+    */
    @Override
-   protected InitialContext createContext(Context context) throws Exception
+   public void enrich(Context context, Object testCase)
    {
-      final Properties properties = new Properties();
-      properties.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "org.apache.openejb.client.LocalInitialContextFactory");
-      return new InitialContext(properties);
+      // Call the super implementation to handle @EJB
+      super.enrich(context, testCase);
+      
+      
+
+      // Handle Typesafe @Inject (ie. ask Arquillian for a an instance of the field type with no additional context properties)
+      final Class<? extends Annotation> inject = (Class<? extends Annotation>) Inject.class;
+      List<Field> fieldsWithInject = this.getFieldsWithAnnotation(testCase.getClass(), inject);
+      for (final Field field : fieldsWithInject)
+      {
+         // Set accessible if it's not
+         if (!field.isAccessible())
+         {
+            AccessController.doPrivileged(new PrivilegedAction<Void>()
+            {
+
+               @Override
+               public Void run()
+               {
+                  field.setAccessible(true);
+
+                  // Return
+                  return null;
+               }
+            });
+         }
+         try
+         {
+            field.set(testCase, this.getArquillianContext(context).get(field.getType()));
+         }
+         catch (final IllegalAccessException e)
+         {
+            throw new RuntimeException("Could not inject into " + field.getName() + " of test case: " + testCase, e);
+         }
+      }
+
+   }
+
+   protected ArquillianContext getArquillianContext(final Context context){
+      if(arquillianContext==null)
+      {
+      // Make a context
+         final AppInfo deployment = context.get(AppInfo.class);
+         arquillianContext = new OpenEJBArquillianContextImpl(deployment);  
+      }return arquillianContext;
+   }
+   
+   @Override
+   protected InitialContext createContext(final Context context) throws Exception
+   {
+      return this.getArquillianContext(context).get(InitialContext.class);
    }
 
    @Override
@@ -52,22 +113,24 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
       InitialContext initcontext = createContext(context);
       return lookupRecursive(fieldType, initcontext, initcontext.listBindings("/"));
    }
-   
-   protected Object lookupRecursive(Class<?> fieldType, javax.naming.Context context, NamingEnumeration<Binding> contextNames) throws Exception 
+
+   //TODO No, no no: we must look up a known location from metadata, not search for a matching type in the whole JNDI tree
+   protected Object lookupRecursive(Class<?> fieldType, javax.naming.Context context,
+         NamingEnumeration<Binding> contextNames) throws Exception
    {
-      while(contextNames.hasMore())
+      while (contextNames.hasMore())
       {
          Binding contextName = contextNames.nextElement();
          Object value = contextName.getObject();
-         if(javax.naming.Context.class.isInstance(value)) 
+         if (javax.naming.Context.class.isInstance(value))
          {
-            javax.naming.Context subContext = (javax.naming.Context)value;
+            javax.naming.Context subContext = (javax.naming.Context) value;
             return lookupRecursive(fieldType, subContext, subContext.listBindings("/"));
          }
-         else 
+         else
          {
             value = context.lookup(contextName.getName());
-            if(fieldType.isInstance(value))
+            if (fieldType.isInstance(value))
             {
                return value;
             }

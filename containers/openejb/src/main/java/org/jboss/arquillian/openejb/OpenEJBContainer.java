@@ -92,6 +92,7 @@ public class OpenEJBContainer implements DeployableContainer
       try
       {
          appInfo = config.configureApplication(archive);
+         context.add(AppInfo.class, appInfo);
          this.deployment = appInfo;
       }
       catch (final OpenEJBException e)

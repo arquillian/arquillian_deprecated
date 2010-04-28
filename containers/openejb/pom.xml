@@ -25,6 +25,7 @@
 
     <!-- Versioning -->
     <version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
+    <version.javax.inject_javax.inject>1</version.javax.inject_javax.inject>
 
   </properties>
 
@@ -71,6 +72,14 @@
       <artifactId>openejb-core</artifactId>
       <version>${version.org.apache.openejb_openejb.core}</version>
     </dependency>
+
+
+   <!-- Part of prototyping, extract when ready -->
+   <dependency>
+    <groupId>javax.inject</groupId>
+    <artifactId>javax.inject</artifactId>
+    <version>${version.javax.inject_javax.inject}</version>
+   </dependency>
 
   </dependencies>
 </project>
