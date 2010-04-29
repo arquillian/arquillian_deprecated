@@ -25,7 +25,7 @@
 
     <!-- Versioning -->
     <version.org.jboss.logging>2.2.0.CR1</version.org.jboss.logging>
-    <version.org.jboss.reloaded>0.1.2-SNAPSHOT</version.org.jboss.reloaded>
+    <version.org.jboss.reloaded>0.1.2</version.org.jboss.reloaded>
     <version.org.jboss.threads>2.0.0.CR4</version.org.jboss.threads>
 
   </properties>
