@@ -16,8 +16,13 @@
  */
 package org.jboss.arquillian.openejb.ejb;
 
+import javax.annotation.Resource;
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Local;
-import javax.ejb.Stateless;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateful;
 
 /**
  * Implementation class of an EJB which returns request parameters
@@ -25,14 +30,49 @@ import javax.ejb.Stateless;
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-@Stateless
+@Stateful
 @Local(EchoLocalBusiness.class)
+@RolesAllowed(
+{})
+@DeclareRoles(
+{EchoBean.ROLE_ADMIN, "another"})
 public class EchoBean implements EchoLocalBusiness
 {
    //-------------------------------------------------------------------------------------||
+   // Constants --------------------------------------------------------------------------||
+   //-------------------------------------------------------------------------------------||
+
+   /**
+    * Admin role
+    */
+   public static final String ROLE_ADMIN = "Administrator";
+
+   @Resource
+   private SessionContext context;
+
+   //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
-   
+
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.openejb.ejb.EchoLocalBusiness#securedEcho(java.lang.String)
+    */
+   @RolesAllowed(
+   {ROLE_ADMIN})
+   @Override
+   public String securedEcho(final String value)
+   {
+      System.out.println(context.getCallerPrincipal().getName());
+      return this.echo(value);
+   }
+
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.openejb.ejb.EchoLocalBusiness#echo(java.lang.String)
+    */
+   @Override
+   @PermitAll
    public String echo(final String value)
    {
       return value;

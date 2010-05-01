@@ -64,4 +64,22 @@ public interface ArquillianContext
     */
    <T> T get(Class<T> type, Map<String, Object> properties) throws IllegalArgumentException;
 
+   /**
+    * Obtains an instance of the requested type from Arquillian
+    * or the underlying target container.  The supplied properties
+    * may be used to define additional context used to resolve
+    * the correct instance to be returned: for instance @EJB injection
+    * by type may also require a beanName to be deterministic.  This method is 
+    * functionally equivalent to {@link ArquillianContext#get(Class, Map)}
+    * where the supplied properties are converted to a {@link Map} view.
+    * 
+    * @return An instance of the type requested, or null if none is supported
+    *   by the container for the given arguments
+    * @param type The type of object to be returned from the container
+    * @param properties Additional context used to determine object resolution.
+    *   The keys and values contained herein may be container-specific
+    * @throws IllegalArgumentException If either argument is not specified
+    */
+   <T> T get(Class<T> type, Properties properties) throws IllegalArgumentException;
+
 }

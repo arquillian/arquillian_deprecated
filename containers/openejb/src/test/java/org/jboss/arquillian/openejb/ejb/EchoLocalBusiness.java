@@ -29,9 +29,19 @@ public interface EchoLocalBusiness
    //-------------------------------------------------------------------------------------||
 
    /**
-    * Returns the specified reference unaltered
+    * Returns the specified reference unaltered.  Anyone, even unauthenticated callers,
+    * may invoke this method
     * @param value
     * @return
     */
    String echo(String value);
+
+   /**
+    * Returns the specified reference unaltered, but
+    * only if the caller has been authenticated and authorized
+    * w/ EJB security
+    * @param value
+    * @return
+    */
+   String securedEcho(String value);
 }

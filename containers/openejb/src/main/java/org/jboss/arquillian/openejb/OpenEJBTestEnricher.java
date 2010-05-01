@@ -29,6 +29,9 @@ import javax.naming.NamingEnumeration;
 
 import org.apache.openejb.assembler.classic.AppInfo;
 import org.jboss.arquillian.prototyping.context.api.ArquillianContext;
+import org.jboss.arquillian.prototyping.context.api.Properties;
+import org.jboss.arquillian.prototyping.context.api.Property;
+import org.jboss.arquillian.prototyping.context.impl.PropertiesImpl;
 import org.jboss.arquillian.prototyping.context.impl.openejb.OpenEJBArquillianContextImpl;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
@@ -46,7 +49,7 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 {
 
    private ArquillianContext arquillianContext = null;
-   
+
    /**
     * {@inheritDoc}
     * @see org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
@@ -56,8 +59,6 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
    {
       // Call the super implementation to handle @EJB
       super.enrich(context, testCase);
-      
-      
 
       // Handle Typesafe @Inject (ie. ask Arquillian for a an instance of the field type with no additional context properties)
       final Class<? extends Annotation> inject = (Class<? extends Annotation>) Inject.class;
@@ -82,7 +83,35 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
          }
          try
          {
-            field.set(testCase, this.getArquillianContext(context).get(field.getType()));
+            /*
+             *  Resolve (based on contextual properties if specified)
+             */
+            final Object resolvedVaue;
+            final ArquillianContext arquillianContext = this.getArquillianContext(context);
+            final Class<?> type = field.getType();
+
+            // If Properties are defined
+            if (field.isAnnotationPresent(Properties.class))
+            {
+               final Properties properties = field.getAnnotation(Properties.class);
+               resolvedVaue = arquillianContext.get(type, properties);
+            }
+            // If just one property is defined
+            else if (field.isAnnotationPresent(Property.class))
+            {
+               final Property property = field.getAnnotation(Property.class);
+               final Properties properties = new PropertiesImpl(new Property[]
+               {property});
+               resolvedVaue = arquillianContext.get(type, properties);
+            }
+            // No properties defined; do type-based resolution only
+            else
+            {
+               resolvedVaue = arquillianContext.get(type);
+            }
+
+            // Inject
+            field.set(testCase, resolvedVaue);
          }
          catch (final IllegalAccessException e)
          {
@@ -92,15 +121,17 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 
    }
 
-   protected ArquillianContext getArquillianContext(final Context context){
-      if(arquillianContext==null)
+   protected ArquillianContext getArquillianContext(final Context context)
+   {
+      if (arquillianContext == null)
       {
-      // Make a context
+         // Make a context
          final AppInfo deployment = context.get(AppInfo.class);
-         arquillianContext = new OpenEJBArquillianContextImpl(deployment);  
-      }return arquillianContext;
+         arquillianContext = new OpenEJBArquillianContextImpl(deployment);
+      }
+      return arquillianContext;
    }
-   
+
    @Override
    protected InitialContext createContext(final Context context) throws Exception
    {

@@ -17,9 +17,12 @@
 package org.jboss.arquillian.prototyping.context.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.arquillian.prototyping.context.api.ArquillianContext;
+import org.jboss.arquillian.prototyping.context.api.Properties;
+import org.jboss.arquillian.prototyping.context.api.Property;
 
 /**
  * Base for implementations of {@link ArquillianContext}.
@@ -44,6 +47,30 @@ public abstract class BaseContext implements ArquillianContext
    {
       final Map<String, Object> properties = Collections.emptyMap();
       return this.get(type, properties);
+   }
+
+   /**
+    * @see org.jboss.arquillian.prototyping.context.api.ArquillianContext#get(java.lang.Class,org.jboss.arquillian.prototyping.context.api.Properties)
+    */
+   @Override
+   public <T> T get(final Class<T> type, final Properties properties) throws IllegalArgumentException
+   {
+      // Precondition checks
+      if (properties == null)
+      {
+         throw new IllegalArgumentException("properties must be specified");
+      }
+      // The class argument will be checked for null when delegated
+
+      // Map properties to a java.util.Map
+      final Map<String, Object> map = new HashMap<String, Object>();
+      for (final Property property : properties.value())
+      {
+         map.put(property.key(), property.value());
+      }
+
+      // Delegate
+      return this.get(type, map);
    }
 
 }

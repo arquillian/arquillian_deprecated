@@ -17,8 +17,11 @@
 package org.jboss.arquillian.prototyping.context.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.jboss.arquillian.prototyping.context.api.Properties;
+import org.jboss.arquillian.prototyping.context.api.Property;
 import org.jboss.arquillian.prototyping.context.spi.ContextualResolver;
 
 /**
@@ -37,12 +40,37 @@ public abstract class BaseContextualResolver implements ContextualResolver
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.prototyping.context.spi.ContextualResolver#get(java.lang.Class)
+    * @see org.jboss.arquillian.prototyping.context.spi.ContextualResolver#resolve(java.lang.Class)
     */
    @Override
-   public <T> T get(final Class<T> type) throws IllegalArgumentException
+   public <T> T resolve(final Class<T> type) throws IllegalArgumentException
    {
       final Map<String, Object> properties = Collections.emptyMap();
       return this.resolve(type, properties);
+   }
+
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.prototyping.context.spi.ContextualResolver#resolve(java.lang.Class, org.jboss.arquillian.prototyping.context.api.Properties)
+    */
+   @Override
+   public <T> T resolve(final Class<T> type, final Properties properties) throws IllegalArgumentException
+   {
+      // Precondition checks
+      if (properties == null)
+      {
+         throw new IllegalArgumentException("properties must be specified");
+      }
+      // The class argument will be checked for null when delegated
+
+      // Map properties to a java.util.Map
+      final Map<String, Object> map = new HashMap<String, Object>();
+      for (final Property property : properties.value())
+      {
+         map.put(property.key(), property.value());
+      }
+
+      // Delegate
+      return this.resolve(type, map);
    }
 }

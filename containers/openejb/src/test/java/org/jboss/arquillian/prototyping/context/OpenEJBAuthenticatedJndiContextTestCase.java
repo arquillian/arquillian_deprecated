@@ -16,22 +16,19 @@
  */
 package org.jboss.arquillian.prototyping.context;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ejb.EJBAccessException;
 import javax.inject.Inject;
-import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
-
-import junit.framework.TestCase;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.openejb.ejb.EchoBean;
 import org.jboss.arquillian.openejb.ejb.EchoLocalBusiness;
-import org.jboss.arquillian.prototyping.context.api.ArquillianContext;
+import org.jboss.arquillian.prototyping.context.api.Properties;
+import org.jboss.arquillian.prototyping.context.api.Property;
 import org.jboss.arquillian.prototyping.context.api.openejb.OpenEJBArquillianContext;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -47,7 +44,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-public class OpenEJBArquillianContextTestCase
+public class OpenEJBAuthenticatedJndiContextTestCase
 {
 
    //-------------------------------------------------------------------------------------||
@@ -57,19 +54,29 @@ public class OpenEJBArquillianContextTestCase
    /**
     * Logger
     */
-   private static final Logger log = Logger.getLogger(OpenEJBArquillianContextTestCase.class.getName());
+   private static final Logger log = Logger.getLogger(OpenEJBAuthenticatedJndiContextTestCase.class.getName());
 
    /**
     * JNDI Name that OpenEJB will assign to our deployment
     */
    private static final String JNDI_NAME = "EchoBeanLocal";
 
+   /**
+    * User who is in role "Administrator"
+    */
+   private static final String ADMIN_USER_NAME = "admin";
+
+   /**
+    * Password of an admin user
+    */
+   private static final String ADMIN_PASSWORD = "adminPassword";
+
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
    /**
-    * TODO: We don't really need a deployment
+    * Define the SLSB Deployment for this test
     */
    @Deployment
    public static JavaArchive createDeployment()
@@ -78,72 +85,44 @@ public class OpenEJBArquillianContextTestCase
    }
 
    /**
-    * The hook to the ARQ container, and by extension, OpenEJB
+    * Here we test typesafe injection coupled with some context properties;
+    * OpenEJB has been configured with security in users.properties and 
+    * groups.properties on the test classpath.  If this doesn't work, we'll either get
+    * an error during injection (during login) or when we try to get at a privileged 
+    * method in the test EJB.
     */
+   @Properties(
+   {@Property(key = Context.SECURITY_PRINCIPAL, value = ADMIN_USER_NAME),
+         @Property(key = Context.SECURITY_CREDENTIALS, value = ADMIN_PASSWORD)})
    @Inject
-   private OpenEJBArquillianContext arquillianContext;
+   private Context namingContext;
 
    //-------------------------------------------------------------------------------------||
    // Tests ------------------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
    /**
-    * Ensures that we may inject an {@link ArquillianContext}
-    * into the test
+    * Ensures that we can invoke upon a bean obtained via a secured logic
+    * and access restricted methods
     */
    @Test
-   public void injectArquillianContext()
+   public void authenticatedInvocation() throws NamingException
    {
-      Assert.assertNotNull("Arquillian context should have been injected", arquillianContext);
-   }
+      // Look up the EJB though the authenticated Context
+      final EchoLocalBusiness bean = (EchoLocalBusiness) namingContext.lookup(JNDI_NAME);
 
-   /**
-    * Ensures we can get at OpenEJB deployment metadata
-    * from the {@link OpenEJBArquillianContext} 
-    */
-   @Test
-   public void deploymentMetadata()
-   {
-      final String ejbName = arquillianContext.getDeploymentMetadata().ejbJars.get(0).enterpriseBeans.get(0).ejbName;
-      log.info("Got EJB Name: " + ejbName);
-      Assert.assertEquals("Did not obtain correct EJB name from deployment metadata", EchoBean.class.getSimpleName(),
-            ejbName);
-   }
-
-   /**
-    * Ensures we can create an OpenEJB-specific JNDI {@link Context} via the 
-    * {@link OpenEJBArquillianContext} 
-    */
-   @Test
-   public void programmaticNamingContext() throws NamingException
-   {
-      final Context context = arquillianContext.get(Context.class);
-      Assert.assertNotNull("Should be able to look up EJB via naming context obtained from Arquillian context", context
-            .lookup(JNDI_NAME));
-   }
-
-   /**
-    * Ensures we can create an OpenEJB-specific JNDI {@link Context} via the 
-    * {@link OpenEJBArquillianContext} which supports/respects context properties
-    */
-   @Test
-   public void programmaticNamingContextWithProperties() throws NamingException
-   {
-      final Map<String, Object> props = new HashMap<String, Object>();
-      props.put(Context.SECURITY_PRINCIPAL, "testuser");
-      props.put(Context.SECURITY_CREDENTIALS, "testpassword");
+      // Invoke and test
+      final String expected = "Authenticated Invocation";
+      final String actual;
       try
       {
-         // This should fail on construction, because we haven't a matching user/pass configured in OpenEJB
-         arquillianContext.get(Context.class, props);
+         actual = bean.securedEcho(expected);
       }
-      catch (final RuntimeException re)
+      catch (final EJBAccessException e)
       {
-         // Validates that the props we passed in were respected when making the naming context
-         Assert.assertEquals(AuthenticationException.class, re.getCause().getClass());
+         Assert.fail("Should have been able to access secured method via authenticated JNDI Context, but got: " + e);
          return;
       }
-      TestCase.fail("Should have obtained exception on logging in with bad user/pass config");
-
+      Assert.assertSame("Value was not as expected", expected, actual);
    }
 }
