@@ -43,7 +43,6 @@ import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.virtual.VFS;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -224,7 +223,6 @@ public class JbossRemoteContainer implements DeployableContainer
       deploymentManager = ps.getDeploymentManager();
       ProfileKey defaultKey = new ProfileKey(profileName);
       deploymentManager.loadProfile(defaultKey);
-      VFS.init();
    }
    
    private URL createFileServerURL(String archiveName) 
