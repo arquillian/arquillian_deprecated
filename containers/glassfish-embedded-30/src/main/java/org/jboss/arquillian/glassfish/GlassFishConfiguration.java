@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.glassfish;
 
+import java.util.UUID;
+
 import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
 
@@ -29,7 +31,9 @@ import org.jboss.arquillian.spi.ContainerProfile;
 public class GlassFishConfiguration implements ContainerConfiguration
 {
    private int bindPort = 8080;
-
+   private String instanceRoot = "target/glassfish_" + UUID.randomUUID().toString();
+   private boolean autoDelete = true;
+   
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
@@ -44,5 +48,24 @@ public class GlassFishConfiguration implements ContainerConfiguration
    {
       this.bindPort = bindPort;
    }
+
+   public String getInstanceRoot() 
+   {
+      return instanceRoot;
+   }
    
+   public void setInstanceRoot(String instanceRoot)
+   {
+      this.instanceRoot = instanceRoot;
+   }
+   
+   public boolean getAutoDelete() 
+   {
+      return autoDelete;
+   }
+   
+   public void setAutoDelete(boolean autoDelete)
+   {
+      this.autoDelete = autoDelete;
+   }
 }

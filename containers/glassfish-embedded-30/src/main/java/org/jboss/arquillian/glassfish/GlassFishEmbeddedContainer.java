@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.glassfish;
 
+import java.io.File;
 import java.net.URL;
 
 import org.glassfish.api.deployment.DeployCommandParameters;
@@ -58,12 +59,16 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       final Server.Builder builder = new Server.Builder(GlassFishEmbeddedContainer.class.getName());
 
       final EmbeddedFileSystem.Builder embeddedFsBuilder = new EmbeddedFileSystem.Builder();
-      final EmbeddedFileSystem embeddedFs = embeddedFsBuilder.build();
+      final EmbeddedFileSystem embeddedFs = embeddedFsBuilder
+               .instanceRoot(
+                     new File(
+                           this.configuration.getInstanceRoot()))
+               .autoDelete(this.configuration.getAutoDelete())
+               .build();
       builder.embeddedFileSystem(embeddedFs);
       
       server = builder.build();
-      
-      //final ContainerBuilder<EmbeddedContainer> containerBuilder = server.createConfig(ContainerBuilder.Type.all);
+
       server.addContainer(ContainerBuilder.Type.all);
    }
    
@@ -101,8 +106,8 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
          DeployCommandParameters params = new DeployCommandParameters();
          params.enabled = true;
          params.target = target;
-         params.name = archive.getName();
-
+         params.name = createDeploymentName(archive.getName());
+         
          server.getDeployer().deploy(
                archive.as(ShrinkwrapReadableArchive.class),
                params);
@@ -133,15 +138,19 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
    {
       UndeployCommandParameters params = new UndeployCommandParameters();
       params.target = target;
-      params.name = archive.getName();
-      
+      params.name = createDeploymentName(archive.getName());
       try 
       {
-         server.getDeployer().undeploy(archive.getName(), params);
+         server.getDeployer().undeploy(params.name, params);
       }
       catch (Exception e) 
       {
          throw new DeploymentException("Could not undeploy " + archive.getName(), e);
       }
+   }
+   
+   private String createDeploymentName(String archiveName) 
+   {
+      return archiveName.substring(0, archiveName.lastIndexOf("."));
    }
 }
