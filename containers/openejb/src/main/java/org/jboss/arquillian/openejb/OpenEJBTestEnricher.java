@@ -71,7 +71,6 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
             AccessController.doPrivileged(new PrivilegedAction<Void>()
             {
 
-               @Override
                public Void run()
                {
                   field.setAccessible(true);
