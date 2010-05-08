@@ -83,6 +83,7 @@
 	      <artifactId>jboss-as-depchain</artifactId>
 	      <version>${version.org.jboss.jbossas}</version>
 	      <type>pom</type>
+        <scope>import</scope>
 	    </dependency>
 
       <dependency>
