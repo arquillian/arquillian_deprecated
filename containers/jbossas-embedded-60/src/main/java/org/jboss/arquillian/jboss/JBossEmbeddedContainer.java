@@ -26,7 +26,7 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
-import org.jboss.embedded.core.server.JBossASEmbeddedServerImpl;
+import org.jboss.embedded.api.server.JBossASEmbeddedServerFactory;
 import org.jboss.shrinkwrap.api.Archive;
 
 /**
@@ -37,21 +37,17 @@ import org.jboss.shrinkwrap.api.Archive;
  */
 public class JBossEmbeddedContainer implements DeployableContainer
 {
-   private JBossASEmbeddedServer server;
-   
-   public JBossEmbeddedContainer()
-   {
-      server = new JBossASEmbeddedServerImpl();
-      server.getConfiguration().bindAddress("localhost");
-   }
-   
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
     */
    public void setup(Context context, Configuration configuration)
    {
-      // TODO Auto-generated method stub
+      JBossContainerConfiguration containerConfiguration = configuration.getContainerConfig(JBossContainerConfiguration.class);
+
+      JBossASEmbeddedServer server = JBossASEmbeddedServerFactory.createServer();
+      server.getConfiguration().bindAddress(containerConfiguration.getBindAddress());
       
+      context.add(JBossASEmbeddedServer.class, server);
    }
 
    /* (non-Javadoc)
@@ -61,7 +57,7 @@ public class JBossEmbeddedContainer implements DeployableContainer
    {
       try 
       {
-         server.start();
+         context.get(JBossASEmbeddedServer.class).start();
       }
       catch (Exception e) 
       {
@@ -76,7 +72,7 @@ public class JBossEmbeddedContainer implements DeployableContainer
    {
       try 
       {
-         server.stop();
+         context.get(JBossASEmbeddedServer.class).stop();
       }
       catch (Exception e) 
       {
@@ -91,12 +87,12 @@ public class JBossEmbeddedContainer implements DeployableContainer
    {
       try 
       {
-         server.deploy(archive);
+         context.get(JBossASEmbeddedServer.class).deploy(archive);
          
          return new ServletMethodExecutor(
                new URL(
                      "http",
-                     server.getConfiguration().getBindAddress(),
+                     context.get(Configuration.class).getContainerConfig(JBossContainerConfiguration.class).getBindAddress(),
                      8080,
                      "/")
                );
@@ -114,7 +110,7 @@ public class JBossEmbeddedContainer implements DeployableContainer
    {
       try 
       {
-         server.undeploy(archive);
+         context.get(JBossASEmbeddedServer.class).undeploy(archive);
       }
       catch (Exception e) 
       {
