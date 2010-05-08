@@ -29,6 +29,7 @@
     <!--    <module>container-jboss-embedded</module> -->
     <module>jbossas-remote-51</module>
     <module>jbossas-remote-60</module>
+    <module>jbossas-embedded-60</module>
 
     <module>glassfish-embedded-30</module>
     <module>weld-embedded</module>
