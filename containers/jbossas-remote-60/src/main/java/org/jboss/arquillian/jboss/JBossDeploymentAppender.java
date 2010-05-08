@@ -22,7 +22,7 @@ import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.Archives;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
@@ -34,16 +34,12 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossDeploymentAppender implements AuxiliaryArchiveAppender
+public class JBossDeploymentAppender implements AuxiliaryArchiveAppender
 {
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeploymentAppender#createArchive()
-    */
-   @Override
    public Archive<?> createAuxiliaryArchive()
    {
-      JavaArchive archive = Archives.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
+      JavaArchive archive = ShrinkWrap.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
                         .addPackages(
                               true, 
                               EJBInjectionEnricher.class.getPackage(),

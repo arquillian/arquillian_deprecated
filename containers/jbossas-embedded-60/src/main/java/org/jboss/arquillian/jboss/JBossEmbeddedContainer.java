@@ -19,7 +19,9 @@ package org.jboss.arquillian.jboss;
 import java.net.URL;
 
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -33,18 +35,29 @@ import org.jboss.shrinkwrap.api.Archive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossEmbeddedContainer implements DeployableContainer
+public class JBossEmbeddedContainer implements DeployableContainer
 {
    private JBossASEmbeddedServer server;
    
-   public JbossEmbeddedContainer()
+   public JBossEmbeddedContainer()
    {
       server = new JBossASEmbeddedServerImpl();
       server.getConfiguration().bindAddress("localhost");
    }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+    */
+   public void setup(Context context, Configuration configuration)
+   {
+      // TODO Auto-generated method stub
+      
+   }
 
-   @Override
-   public void start() throws LifecycleException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+    */
+   public void start(Context context) throws LifecycleException
    {
       try 
       {
@@ -56,8 +69,10 @@ public class JbossEmbeddedContainer implements DeployableContainer
       }
    }
    
-   @Override
-   public void stop() throws LifecycleException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+    */
+   public void stop(Context context) throws LifecycleException
    {
       try 
       {
@@ -69,8 +84,10 @@ public class JbossEmbeddedContainer implements DeployableContainer
       }
    }
    
-   @Override
-   public ContainerMethodExecutor deploy(Archive<?> archive) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
+   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
       try 
       {
@@ -90,8 +107,10 @@ public class JbossEmbeddedContainer implements DeployableContainer
       }
    }
    
-   @Override
-   public void undeploy(Archive<?> archive) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
+   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       try 
       {

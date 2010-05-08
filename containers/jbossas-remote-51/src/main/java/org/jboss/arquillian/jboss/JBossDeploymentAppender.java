@@ -33,7 +33,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossDeploymentAppender implements AuxiliaryArchiveAppender
+public class JBossDeploymentAppender implements AuxiliaryArchiveAppender
 {
 
    public Archive<?> createAuxiliaryArchive()

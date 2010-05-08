@@ -34,9 +34,12 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossDeploymentAppender implements AuxiliaryArchiveAppender
+public class JBossDeploymentAppender implements AuxiliaryArchiveAppender
 {
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeploymentAppender#createArchive()
+    */
    public Archive<?> createAuxiliaryArchive()
    {
       JavaArchive archive = ShrinkWrap.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)

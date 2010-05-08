@@ -55,7 +55,7 @@ import com.sun.net.httpserver.HttpServer;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JbossRemoteContainer implements DeployableContainer
+public class JBossRemoteContainer implements DeployableContainer
 {
    // TODO: replace by configuration
    private static final String HOST_ADDRESS = "localhost";
@@ -124,7 +124,7 @@ public class JbossRemoteContainer implements DeployableContainer
             {
                InputStream zip = archive.as(ZipExporter.class).exportZip();
                ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-               JbossRemoteContainer.copy(zip, zipStream);
+               JBossRemoteContainer.copy(zip, zipStream);
                zip.close();
 
                byte[] zipArray = zipStream.toByteArray();
