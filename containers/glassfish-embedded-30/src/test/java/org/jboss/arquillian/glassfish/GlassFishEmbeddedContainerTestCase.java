@@ -19,18 +19,18 @@ package org.jboss.arquillian.glassfish;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Logger;
 
-import org.jboss.arquillian.impl.DynamicServiceLoader;
-import org.jboss.arquillian.impl.XmlConfigurationBuilder;
-import org.jboss.arquillian.impl.context.SuiteContext;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
+import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.RunMode;
+import org.jboss.arquillian.api.RunModeType;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 
 /**
  * GlassFishEmbeddedContainerTestCase
@@ -38,30 +38,29 @@ import org.junit.Test;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
+@RunWith(Arquillian.class)
+@RunMode(RunModeType.LOCAL)
 public class GlassFishEmbeddedContainerTestCase 
 {
-   private DeployableContainer container;
-   
-   private Context context = new SuiteContext(new DynamicServiceLoader());
-   
-   private WebArchive war = ShrinkWrap.create("test.war", WebArchive.class)
-                              .addClass(TestServlet.class);
 
-   @Before
-   public void startup() throws Exception
+   /**
+    * Logger
+    */
+   private static final Logger log = Logger.getLogger(GlassFishEmbeddedContainerTestCase.class.getName());
+   
+   /**
+    * Deployment for the test
+    * @return
+    */
+   @Deployment
+   public static WebArchive getDeployment()
    {
-      container = new GlassFishEmbeddedContainer();
-      container.setup(context, new XmlConfigurationBuilder().build());
-      container.start(context);
-      container.deploy(context, war);
+      final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class).addClass(TestServlet.class);
+      log.info(war.toString(true));
+      return war;
+
    }
 
-   @After
-   public void shutdown() throws Exception
-   {
-      container.undeploy(context, war);
-      container.stop(context);
-   }
 
    @Test
    public void shouldBeAbleToDeployWebArchive() throws Exception
