@@ -28,7 +28,6 @@ import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
 import org.jboss.arquillian.spi.event.suite.After;
-import org.jboss.arquillian.spi.event.suite.AfterClass;
 import org.jboss.arquillian.spi.event.suite.Before;
 import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.arquillian.weld.shrinkwrap.ShrinkWrapClassLoader;
@@ -50,21 +49,38 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSEContainer implements DeployableContainer
 {
-   private WeldSEConfiguration configuration;
-   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+    */
    public void setup(Context context, Configuration configuration)
    {
-      this.configuration = configuration.getContainerConfig(WeldSEConfiguration.class);
+      //configuration.getContainerConfig(WeldSEConfiguration.class);
+
+        /*
+         *  TODO: make this work ? these handlers will be fired. 
+         *  Not with the needed ClassContext but with the SuiteContext the event was fired from..  
+         */
+//      context.register(AfterDeploy.class, new SessionLifeCycleController(BeforeUnDeploy.class));
+//      context.register(Before.class, new RequestLifeCycleController(After.class));
    }
    
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+    */
    public void start(Context context) throws LifecycleException
    {
    }
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+    */
    public void stop(Context context) throws LifecycleException
    {
    }
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
          throws DeploymentException
    {
@@ -110,6 +126,9 @@ public class WeldSEContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       WeldBootstrap bootstrap = context.get(WeldBootstrap.class);

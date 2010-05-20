@@ -130,11 +130,19 @@
          <version>1.0</version>
       </dependency>
 
+	<!-- Test dependencies -->
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
          <scope>test</scope>
       </dependency>
-   </dependencies>
-</project>
 
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-junit</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+</project>
