@@ -1,118 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-   <!-- Parent -->
-   <parent>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-build</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-      <relativePath>../../build/pom.xml</relativePath>
-   </parent>
+	<!-- Parent -->
+	<parent>
+		<groupId>org.jboss.arquillian</groupId>
+		<artifactId>arquillian-build</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../build/pom.xml</relativePath>
+	</parent>
 
-   <!-- Model Version -->
-   <modelVersion>4.0.0</modelVersion>
+	<!-- Model Version -->
+	<modelVersion>4.0.0</modelVersion>
 
-   <!-- Artifact Configuration -->
-   
-   <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-jbossas-embedded-60</artifactId>
-   <name>Arquillian Container Jboss AS Embedded 6.0</name>
-   <description>Jboss AS Embedded Container integration for the Arquillian Project</description>
+	<!-- Artifact Configuration -->
+
+	<groupId>org.jboss.arquillian.container</groupId>
+	<artifactId>arquillian-jbossas-embedded-60</artifactId>
+	<name>Arquillian Container Jboss AS Embedded 6.0</name>
+	<description>Jboss AS Embedded Container integration for the Arquillian Project</description>
 
 
-   <!-- Properties -->
-   <properties>
+	<!-- Properties -->
+	<properties>
 
-      <!-- Versioning -->
-	<version.org.jboss.jbossas>6.0.0.20100429-M3</version.org.jboss.jbossas>
+		<!-- Versioning -->
+		<version.org.jboss.jbossas>6.0.0.20100429-M3</version.org.jboss.jbossas>
 
-   </properties>
+	</properties>
 
-   <!-- Dependencies -->
-   <dependencies>
+	<!-- Dependencies -->
+	<dependencies>
 
-      <!-- 
+		<!-- 
     org.jboss.arquillian
      -->
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-spi</artifactId>
-         <version>${project.version}</version>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-spi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-impl-base</artifactId>
+		</dependency>
 
-      <dependency>
-         <groupId>org.jboss.arquillian.protocol</groupId>
-         <artifactId>arquillian-protocol-servlet-ee6</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.jboss.embedded</groupId>
-        <artifactId>jboss-embedded-api</artifactId>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.protocol</groupId>
+			<artifactId>arquillian-protocol-servlet-ee6</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-      <dependency>
-         <groupId>org.jboss.arquillian.packager</groupId>
-         <artifactId>arquillian-packager-javaee</artifactId>
-         <version>${project.version}</version>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.embedded</groupId>
+			<artifactId>jboss-embedded-api</artifactId>
+		</dependency>
 
-      <dependency>
-         <groupId>org.jboss.arquillian.testenricher</groupId>
-         <artifactId>arquillian-testenricher-cdi</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-         <groupId>org.jboss.arquillian.testenricher</groupId>
-         <artifactId>arquillian-testenricher-ejb</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-         <groupId>org.jboss.arquillian.testenricher</groupId>
-         <artifactId>arquillian-testenricher-resource</artifactId>
-         <version>${project.version}</version>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.packager</groupId>
+			<artifactId>arquillian-packager-javaee</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-      <!-- 
-    org.jboss.embedded
-     -->
-    <!-- org.jboss.jbossas -->
-	    <dependency>
-	      <groupId>org.jboss.jbossas</groupId>
-	      <artifactId>jboss-as-depchain</artifactId>
-	      <version>${version.org.jboss.jbossas}</version>
-	      <type>pom</type>
-        <scope>import</scope>
-	    </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.testenricher</groupId>
+			<artifactId>arquillian-testenricher-cdi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.testenricher</groupId>
+			<artifactId>arquillian-testenricher-ejb</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.testenricher</groupId>
+			<artifactId>arquillian-testenricher-resource</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <scope>test</scope>
-      </dependency>
-   </dependencies>
+		<!-- org.jboss.jbossas -->
+		<dependency>
+			<groupId>org.jboss.jbossas</groupId>
+			<artifactId>jboss-as-depchain</artifactId>
+			<version>${version.org.jboss.jbossas}</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
 
-  <dependencyManagement>
-    <dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-      <!-- org.jboss.jbossas -->
-      <dependency>
-        <groupId>org.jboss.jbossas</groupId>
-        <artifactId>jboss-as-depchain</artifactId>
-        <version>${version.org.jboss.jbossas}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-junit</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-  </dependencyManagement>
-  
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- org.jboss.jbossas -->
+			<dependency>
+				<groupId>org.jboss.jbossas</groupId>
+				<artifactId>jboss-as-depchain</artifactId>
+				<version>${version.org.jboss.jbossas}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<additionalClasspathElements>
+						<additionalClasspathElement>${project.build.directory}/jboss-6.0.0.20100429-M3/client/jbossws-native-client.jar</additionalClasspathElement>
+						<!--
+							Because jbossweb.sar contains shared web.xml, which must be
+							visible from same CL as TomcatDeployer.class.getClassLoader
+						-->
+						<additionalClasspathElement>${project.build.directory}/jboss-6.0.0.20100429-M3/server/default/deploy/jbossweb.sar</additionalClasspathElement>
+					</additionalClasspathElements>
+
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<trimStackTrace>false</trimStackTrace>
+					<printSummary>true</printSummary>
+					<forkMode>once</forkMode>
+
+					<!--
+						MaxPermSize Required to bump the space for relective data like
+						classes, methods, etc. EMB-41. Endorsed required for things like
+						WS support (EMB-61)
+					-->
+					<argLine>-Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Djava.endorsed.dirs=${project.build.directory}/jboss-6.0.0.20100429-M3/lib/endorsed -Djboss.home=${project.build.directory}/jboss-6.0.0.20100429-M3 -Djboss.boot.server.log.dir=${project.build.directory}/jboss-6.0.0.20100429-M3</argLine>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>process-test-classes</phase> <!-- So run before testing -->
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.jboss.jbossas</groupId>
+									<artifactId>jboss-as-distribution</artifactId>
+									<version>6.0.0.20100429-M3</version>
+									<type>zip</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
 
