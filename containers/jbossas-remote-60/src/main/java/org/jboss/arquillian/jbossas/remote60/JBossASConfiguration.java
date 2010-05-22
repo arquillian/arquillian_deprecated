@@ -24,49 +24,91 @@ import org.jboss.arquillian.spi.ContainerProfile;
  * the JBoss AS container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
 public class JBossASConfiguration implements ContainerConfiguration
 {
-   private String bindAddress = "localhost";
-
-   private int bindPort = 8181;
-
+   /**
+    * ProfileService profileKey. Used to load the correct profile into the DeploymentManager.  
+    */
    private String profileName = "default";
+      
+   /**
+    * Used by Servlet Protocol to connect to deployment.
+    * // TODO: these belongs to the configuration of Servlet Protocol. Extract out. 
+    */
+   private String remoteServerAddress = "localhost";
 
+   /**
+    * Used by Servlet Protocol to connect to deployment.
+    */
+   private int remoteServerHttpPort = 8080;
+
+   /**
+    * Bind Address for HTTP server for serving deployments to the remote server.
+    * Address should be reachable from remote server. 
+    */
+   private String localDeploymentBindAddress = "localhost";
+   
+   /**
+    * Bind Port for HTTP server for serving deployments to remote server.
+    * Port must be reachable from remote server.
+    */
+   private int localDeploymentBindPort = 9999;
+   
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
    }
    
-   public String getBindAddress()
-   {
-      return bindAddress;
-   }
-
-   public void setBindAddress(String bindAddress)
-   {
-      this.bindAddress = bindAddress;
-   }
-
-   public int getBindPort()
-   {
-      return bindPort;
-   }
-
-   public void setBindPort(int bindPort)
-   {
-      this.bindPort = bindPort;
-   }
-
    public String getProfileName()
    {
       return profileName;
    }
-
+   
    public void setProfileName(String profileName)
    {
       this.profileName = profileName;
    }
 
+   public String getRemoteServerAddress()
+   {
+      return remoteServerAddress;
+   }
+
+   public void setRemoteServerAddress(String remoteServerAddress)
+   {
+      this.remoteServerAddress = remoteServerAddress;
+   }
+
+   public int getRemoteServerHttpPort()
+   {
+      return remoteServerHttpPort;
+   }
+
+   public void setRemoteServerHttpPort(int remoteServerHttpPort)
+   {
+      this.remoteServerHttpPort = remoteServerHttpPort;
+   }
+   
+   public String getLocalDeploymentBindAddress()
+   {
+      return localDeploymentBindAddress;
+   }
+   
+   public void setLocalDeploymentBindAddress(String localDeploymentBindAddress)
+   {
+      this.localDeploymentBindAddress = localDeploymentBindAddress;
+   }
+   
+   public int getLocalDeploymentBindPort()
+   {
+      return localDeploymentBindPort;
+   }
+   
+   public void setLocalDeploymentBindPort(int localDeploymentBindPort)
+   {
+      this.localDeploymentBindPort = localDeploymentBindPort;
+   }
 }

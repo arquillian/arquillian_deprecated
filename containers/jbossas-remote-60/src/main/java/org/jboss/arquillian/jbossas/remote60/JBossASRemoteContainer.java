@@ -56,11 +56,6 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class JBossASRemoteContainer implements DeployableContainer
 {
-   // TODO: replace by configuration
-   private static final String HOST_ADDRESS = "localhost";
-   
-   //private static final Logger log = Logger.getLogger(JbossRemoteContainer.class.getName());
-   
    private final List<String> failedUndeployments = new ArrayList<String>();
    private DeploymentManager deploymentManager;
 
@@ -68,10 +63,6 @@ public class JBossASRemoteContainer implements DeployableContainer
    
    private JBossASConfiguration configuration;
    
-   public JBossASRemoteContainer()
-   {
-   }
-
    public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
@@ -83,7 +74,11 @@ public class JBossASRemoteContainer implements DeployableContainer
       {
          // TODO: configure http bind address
          httpFileServer = HttpServer.create();
-         httpFileServer.bind(new InetSocketAddress(InetAddress.getByName(HOST_ADDRESS), 9000), -1);
+         httpFileServer.bind(
+               new InetSocketAddress(
+                     InetAddress.getByName(configuration.getLocalDeploymentBindAddress()), 
+                     configuration.getLocalDeploymentBindPort()), 
+               -1);
          httpFileServer.start();
          initDeploymentManager();
       } 
@@ -174,8 +169,8 @@ public class JBossASRemoteContainer implements DeployableContainer
          return new ServletMethodExecutor(
                new URL(
                      "http",
-                     findRemoteServerHostAddress(),
-                     8080, 
+                     configuration.getRemoteServerAddress(),
+                     configuration.getRemoteServerHttpPort(), 
                      "/")
                );
       } 
@@ -217,7 +212,7 @@ public class JBossASRemoteContainer implements DeployableContainer
 
    private void initDeploymentManager() throws Exception 
    {
-      String profileName = "default";
+      String profileName = configuration.getProfileName();
       InitialContext ctx = new InitialContext();
       ProfileService ps = (ProfileService) ctx.lookup("ProfileService");
       deploymentManager = ps.getDeploymentManager();
@@ -270,29 +265,15 @@ public class JBossASRemoteContainer implements DeployableContainer
       failedUndeployments.clear();
    }
 
-   private String findRemoteServerHostAddress() {
-      try 
-      {
-         String providerURL = (String)new InitialContext().getEnvironment().get(
-               InitialContext.PROVIDER_URL);
-         
-         return providerURL.substring(0, providerURL.indexOf(":"));
-      } 
-      catch (Exception e) 
-      {
-         throw new RuntimeException("Could not determine host address", e);
-      }
-   }
-   
    private static void copy(InputStream source, OutputStream destination) throws IOException
    {
       if (source == null)
       {
-         throw new IllegalArgumentException("source cannot be null");
+         throw new IllegalArgumentException("source must be specified");
       }
       if (destination == null)
       {
-         throw new IllegalArgumentException("destination cannot be null");
+         throw new IllegalArgumentException("destination must be specified");
       }
       byte[] readBuffer = new byte[2156]; 
       int bytesIn = 0; 
