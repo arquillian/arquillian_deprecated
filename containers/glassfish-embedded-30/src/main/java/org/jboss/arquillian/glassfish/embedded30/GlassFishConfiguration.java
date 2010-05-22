@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.glassfish;
+package org.jboss.arquillian.glassfish.embedded30;
 
 import java.util.UUID;
 

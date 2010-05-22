@@ -1,1 +1,1 @@
-org.jboss.arquillian.glassfish.GlassFishConfiguration
+org.jboss.arquillian.glassfish.embedded30.GlassFishConfiguration
