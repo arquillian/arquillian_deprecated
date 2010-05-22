@@ -26,7 +26,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
  * @version $Revision: $
  */
-public class JBossConfiguration implements ContainerConfiguration
+public class JBossASConfiguration implements ContainerConfiguration
 {
    private String bindAddress = "localhost";
 

@@ -54,7 +54,7 @@ import com.sun.net.httpserver.HttpServer;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossRemoteContainer implements DeployableContainer
+public class JBossASRemoteContainer implements DeployableContainer
 {
    // TODO: replace by configuration
    private static final String HOST_ADDRESS = "localhost";
@@ -66,15 +66,15 @@ public class JBossRemoteContainer implements DeployableContainer
 
    private HttpServer httpFileServer;
    
-   private JBossConfiguration configuration;
+   private JBossASConfiguration configuration;
    
-   public JBossRemoteContainer()
+   public JBossASRemoteContainer()
    {
    }
 
    public void setup(Context context, Configuration configuration)
    {
-      this.configuration = configuration.getContainerConfig(JBossConfiguration.class);
+      this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
    }
    
    public void start(Context context) throws LifecycleException
@@ -127,7 +127,7 @@ public class JBossRemoteContainer implements DeployableContainer
             {
                InputStream zip = archive.as(ZipExporter.class).exportZip();
                ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-               JBossRemoteContainer.copy(zip, zipStream);
+               JBossASRemoteContainer.copy(zip, zipStream);
                zip.close();
 
                byte[] zipArray = zipStream.toByteArray();

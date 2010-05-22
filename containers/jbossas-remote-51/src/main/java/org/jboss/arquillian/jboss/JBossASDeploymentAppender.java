@@ -18,7 +18,6 @@ package org.jboss.arquillian.jboss;
 
 import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestEnricher;
-import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
 import org.jboss.shrinkwrap.api.Archive;
@@ -34,7 +33,7 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossDeploymentAppender implements AuxiliaryArchiveAppender
+public class JBossASDeploymentAppender implements AuxiliaryArchiveAppender
 {
 
    public Archive<?> createAuxiliaryArchive()
@@ -43,13 +42,11 @@ public class JBossDeploymentAppender implements AuxiliaryArchiveAppender
                         .addPackages(
                               true, 
                               EJBInjectionEnricher.class.getPackage(),
-                              ResourceInjectionEnricher.class.getPackage(),
-                              CDIInjectionEnricher.class.getPackage())
+                              ResourceInjectionEnricher.class.getPackage())
                         .addServiceProvider(
                               TestEnricher.class, 
                               EJBInjectionEnricher.class,
-                              ResourceInjectionEnricher.class,
-                              CDIInjectionEnricher.class);
+                              ResourceInjectionEnricher.class);
       return archive;
    }
 

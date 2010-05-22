@@ -35,14 +35,14 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-public class JBossEmbeddedIntegrationTestCase
+public class JBossASEmbeddedIntegrationTestCase
 {
    @Deployment
    public static JavaArchive createDeployment() throws Exception 
    {
       return ShrinkWrap.create("test.jar", JavaArchive.class)
                .addClasses(
-                     JBossEmbeddedIntegrationTestCase.class,
+                     JBossASEmbeddedIntegrationTestCase.class,
                      MyEjb.class);
    }
    

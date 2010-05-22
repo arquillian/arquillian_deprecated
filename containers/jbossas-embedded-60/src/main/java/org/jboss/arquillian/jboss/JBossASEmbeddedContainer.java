@@ -35,14 +35,14 @@ import org.jboss.shrinkwrap.api.Archive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossEmbeddedContainer implements DeployableContainer
+public class JBossASEmbeddedContainer implements DeployableContainer
 {
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
     */
    public void setup(Context context, Configuration configuration)
    {
-      JBossContainerConfiguration containerConfiguration = configuration.getContainerConfig(JBossContainerConfiguration.class);
+      JBossASContainerConfiguration containerConfiguration = configuration.getContainerConfig(JBossASContainerConfiguration.class);
 
       JBossASEmbeddedServer server = JBossASEmbeddedServerFactory.createServer();
       server.getConfiguration().bindAddress(containerConfiguration.getBindAddress());
@@ -92,7 +92,7 @@ public class JBossEmbeddedContainer implements DeployableContainer
          return new ServletMethodExecutor(
                new URL(
                      "http",
-                     context.get(Configuration.class).getContainerConfig(JBossContainerConfiguration.class).getBindAddress(),
+                     context.get(Configuration.class).getContainerConfig(JBossASContainerConfiguration.class).getBindAddress(),
                      8080,
                      "/")
                );
