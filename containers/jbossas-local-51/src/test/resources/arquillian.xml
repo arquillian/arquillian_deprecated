@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<arquillian xmlns="http://jboss.com/arquillian"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:jboss="urn:arq:org.jboss.arquillian.jboss">
+
+	<jboss:container>
+		<jbossHome>/home/aslak/dev/servers/jboss-5.1.0.GA/</jbossHome>
+		<javaHome>/usr/lib/jvm/java-6-openjdk</javaHome>
+		<bindAddress>127.0.0.1</bindAddress>
+		<httpPort>8181</httpPort> <!-- WARN: this is not the bind port, but connect port. Bind port must be set in jboss xml config -->
+	</jboss:container>	
+
+</arquillian>
