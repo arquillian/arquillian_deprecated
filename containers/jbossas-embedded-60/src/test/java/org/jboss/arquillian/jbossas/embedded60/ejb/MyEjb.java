@@ -14,37 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
+package org.jboss.arquillian.jbossas.embedded60.ejb;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import javax.ejb.Stateless;
 
 /**
- * JBossContainerConfiguration
+ * MyEjb
  *
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossASContainerConfiguration implements ContainerConfiguration
+@Stateless
+public class MyEjb
 {
-   private String bindAddress = "localhost";
-   
-   
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
-    */
-   public ContainerProfile getContainerProfile()
+   public String getName() 
    {
-      return ContainerProfile.STANDALONE;
-   }
-
-   public String getBindAddress()
-   {
-      return bindAddress;
-   }
-   
-   public void setBindAddress(String bindAddress)
-   {
-      this.bindAddress = bindAddress;
+      return "aslak";
    }
 }
