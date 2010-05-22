@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   vi:ts=2:sw=2:expandtab:
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- Parent -->
   <parent>
@@ -29,8 +27,9 @@
     <!--    <module>container-jboss-embedded</module> -->
     <module>jbossas-remote-51</module>
     <module>jbossas-remote-60</module>
+    <module>jbossas-local-51</module>
+    <module>jbossas-local-60</module>
     <module>jbossas-embedded-60</module>
-
     <module>glassfish-embedded-30</module>
     <module>weld-embedded</module>
     <module>openejb</module>
