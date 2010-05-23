@@ -27,8 +27,20 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class JBossASContainerConfiguration implements ContainerConfiguration
 {
+   /**
+    * The profile to start. 
+    */
+   private String profileName = "default";
+
+   /**
+    * Address the server should bind to. 
+    */
    private String bindAddress = "localhost";
    
+   /**
+    * Used by Servlet Protocol to connect to the server. 
+    */
+   private int httpPort = 8080;
    
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
@@ -38,6 +50,16 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
       return ContainerProfile.STANDALONE;
    }
 
+   public String getProfileName()
+   {
+      return profileName;
+   }
+   
+   public void setProfileName(String profileName)
+   {
+      this.profileName = profileName;
+   }
+   
    public String getBindAddress()
    {
       return bindAddress;
@@ -46,5 +68,15 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
    public void setBindAddress(String bindAddress)
    {
       this.bindAddress = bindAddress;
+   }
+   
+   public int getHttpPort()
+   {
+      return httpPort;
+   }
+   
+   public void setHttpPort(int httpPort)
+   {
+      this.httpPort = httpPort;
    }
 }

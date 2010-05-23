@@ -45,8 +45,10 @@ public class JBossASEmbeddedContainer implements DeployableContainer
       JBossASContainerConfiguration containerConfiguration = configuration.getContainerConfig(JBossASContainerConfiguration.class);
 
       JBossASEmbeddedServer server = JBossASEmbeddedServerFactory.createServer();
-      server.getConfiguration().bindAddress(containerConfiguration.getBindAddress());
-      
+      server.getConfiguration()
+               .bindAddress(containerConfiguration.getBindAddress())
+               .serverName(containerConfiguration.getProfileName());
+
       context.add(JBossASEmbeddedServer.class, server);
    }
 
@@ -85,6 +87,8 @@ public class JBossASEmbeddedContainer implements DeployableContainer
     */
    public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
+      JBossASContainerConfiguration containerConfiguration = context.get(Configuration.class)
+                                                         .getContainerConfig(JBossASContainerConfiguration.class);
       try 
       {
          context.get(JBossASEmbeddedServer.class).deploy(archive);
@@ -92,8 +96,8 @@ public class JBossASEmbeddedContainer implements DeployableContainer
          return new ServletMethodExecutor(
                new URL(
                      "http",
-                     context.get(Configuration.class).getContainerConfig(JBossASContainerConfiguration.class).getBindAddress(),
-                     8080,
+                     containerConfiguration.getBindAddress(),
+                     containerConfiguration.getHttpPort(),
                      "/")
                );
       }
