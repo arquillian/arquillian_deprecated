@@ -66,7 +66,7 @@ public class GlassFishEmbeddedContainerTestCase
    @Test
    public void shouldBeAbleToDeployWebArchive() throws Exception
    {
-      String body = readAllAndClose(new URL("http://localhost:8080/test/Test").openStream());
+      String body = readAllAndClose(new URL("http://localhost:8181/test/Test").openStream());
       
       Assert.assertEquals(
             "Verify that the servlet was deployed and returns expected result",
