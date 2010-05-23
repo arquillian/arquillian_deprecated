@@ -30,7 +30,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class GlassFishConfiguration implements ContainerConfiguration
 {
-   private int bindPort = 8080;
+   private int bindPort = 8181;
    private String instanceRoot = "target/glassfish_" + UUID.randomUUID().toString();
    private boolean autoDelete = true;
    
