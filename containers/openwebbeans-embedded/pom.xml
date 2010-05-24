@@ -20,6 +20,18 @@
 		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.openwebbeans</groupId>
+				<artifactId>openwebbeans</artifactId>	
+				<version>${version.openwebbeans}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<dependencies>
 
 		<dependency>
@@ -35,11 +47,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jboss.shrinkwrap</groupId>
-			<artifactId>shrinkwrap-impl-base</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.jboss.arquillian.packager</groupId>
 			<artifactId>arquillian-packager-applicationarchive</artifactId>
 			<version>${project.version}</version>
@@ -52,59 +59,58 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.openwebbeans</groupId>
-			<artifactId>openwebbeans-spi</artifactId>
-			<version>${version.openwebbeans}</version>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-impl-base</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
+		<!-- org.apache.openwebbeans -->
+		<dependency>
+			<groupId>org.apache.openwebbeans</groupId>
+			<artifactId>openwebbeans-spi</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.openwebbeans</groupId>
 			<artifactId>openwebbeans-impl</artifactId>
-			<version>${version.openwebbeans}</version>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-el_2.2_spec</artifactId>
-			<version>1.0-beta</version>
+			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-validation_1.0_spec</artifactId>
-			<version>1.0</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jta_1.1_spec</artifactId>
-			<version>1.1.1</version>
+			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-validation_1.0_spec</artifactId>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-interceptor_1.1_spec</artifactId>
-			<version>1.0.0-beta</version>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jcdi_1.0_spec</artifactId>
-			<version>1.0-beta</version>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-atinject_1.0_spec</artifactId>
-			<version>1.0-beta</version>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-servlet_2.5_spec</artifactId>
-			<version>1.2</version>
+			<scope>provided</scope>
 		</dependency>
-
+ 
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>

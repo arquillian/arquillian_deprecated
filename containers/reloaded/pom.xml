@@ -41,12 +41,6 @@
       <artifactId>arquillian-protocol-local</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-junit</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.jboss.arquillian.packager</groupId>
@@ -71,21 +65,32 @@
     </dependency>
 
     <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads</artifactId>
+      <version>${version.org.jboss.threads}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.threads</groupId>
+      <artifactId>jboss-threads-metadata</artifactId>
+      <version>${version.org.jboss.threads}</version>
+      <scope>provided</scope>
+    </dependency>
+
+	<!-- Test Dependencies -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.threads</groupId>
-      <artifactId>jboss-threads</artifactId>
-      <version>${version.org.jboss.threads}</version>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-junit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.threads</groupId>
-      <artifactId>jboss-threads-metadata</artifactId>
-      <version>${version.org.jboss.threads}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-extension-vfs3</artifactId>

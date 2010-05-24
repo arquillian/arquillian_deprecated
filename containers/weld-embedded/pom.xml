@@ -24,12 +24,22 @@
    <properties>
 
       <!-- Versioning -->
-      <version.weld_api>1.0</version.weld_api>
-      <version.weld_spi>1.0</version.weld_spi>
       <version.weld_core>1.0.1-SP1</version.weld_core>
-      <version.slf4j>1.5.10</version.slf4j>
 
    </properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- org.jboss.weld -->
+			<dependency>
+			   <groupId>org.jboss.weld</groupId>
+			   <artifactId>weld-core-bom</artifactId>
+			   <version>${version.weld_core}</version>
+			   <type>pom</type>
+			   <scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>			
 
    <!-- Dependencies -->
    <dependencies>
@@ -47,13 +57,6 @@
          <artifactId>arquillian-protocol-local</artifactId>
          <version>${project.version}</version>
       </dependency>
-
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
-      </dependency>
-
 
       <dependency>
          <groupId>org.jboss.arquillian.packager</groupId>
@@ -73,64 +76,34 @@
       <dependency>
          <groupId>org.jboss.weld</groupId>
          <artifactId>weld-api</artifactId>
-         <version>${version.weld_api}</version>
-         <scope>compile</scope>
+         <scope>provided</scope>
       </dependency>
-
-      <dependency>
-         <groupId>org.jboss.weld</groupId>
-         <artifactId>weld-spi</artifactId>
-         <exclusions>
-            <exclusion>
-               <groupId>javax.jms</groupId>
-               <artifactId>jms</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>javax.ejb</groupId>
-               <artifactId>ejb-api</artifactId>
-            </exclusion>
-            <exclusion>
-               <groupId>javax.jta</groupId>
-               <artifactId>transaction-api</artifactId>
-            </exclusion>
-         </exclusions>
-         <version>${version.weld_spi}</version>
-         <scope>compile</scope>
-      </dependency>
-
       <dependency>
          <groupId>org.jboss.weld</groupId>
          <artifactId>weld-core</artifactId>
-         <version>${version.weld_core}</version>
-         <scope>compile</scope>
-
-      </dependency>
-      <dependency>
-      	<groupId>org.slf4j</groupId>
-      	<artifactId>slf4j-jdk14</artifactId>
-      	<version>${version.slf4j}</version>
-      	<scope>compile</scope>
+         <scope>provided</scope>
       </dependency>
 
       <dependency>
-         <groupId>javax.enterprise</groupId>
-         <artifactId>cdi-api</artifactId>
-         <version>1.0</version>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+         <scope>provided</scope>
       </dependency>
 
       <dependency>
          <groupId>javax.el</groupId>
          <artifactId>el-api</artifactId>
          <version>1.2</version>
-      </dependency>
-
-      <dependency>
-         <groupId>javax.annotation</groupId>
-         <artifactId>jsr250-api</artifactId>
-         <version>1.0</version>
+         <scope>provided</scope>
       </dependency>
 
 	<!-- Test dependencies -->
+      <dependency>
+      	<groupId>org.slf4j</groupId>
+      	<artifactId>slf4j-simple</artifactId>
+      	<scope>test</scope>
+      </dependency>
+      
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>

@@ -74,13 +74,15 @@
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-server-manager</artifactId>
             <version>1.0.3.GA</version>
+            <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
             <version>6.0.0.20100429-M3</version>
+            <type>pom</type>
+            <scope>provided</scope>
         </dependency>
         
 
@@ -97,6 +99,7 @@
            <version>3.1.0</version>
            <scope>test</scope>
         </dependency>
+
 		<!-- TODO: needed by the CDIInjectionEnricher, ShrinkWrap fail to package the AuxiliaryArchive without it -->
 		<dependency>
 		   <groupId>javax.enterprise</groupId> 

@@ -65,18 +65,19 @@
     org.jboss
      -->
 
-
-        <dependency>
-            <groupId>org.jboss.jbossas</groupId>
-            <artifactId>jboss-as-client</artifactId>
-            <type>pom</type>
-            <version>5.1.0.GA</version>
-        </dependency>
-
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-server-manager</artifactId>
             <version>1.0.3.GA</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>5.1.0.GA</version>
+            <type>pom</type>
+            <scope>provided</scope>
         </dependency>
 
 	<!-- Testing -->

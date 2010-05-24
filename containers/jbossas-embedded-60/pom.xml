@@ -80,12 +80,13 @@
 		</dependency>
 
 		<!-- org.jboss.jbossas -->
+
 		<dependency>
 			<groupId>org.jboss.jbossas</groupId>
 			<artifactId>jboss-as-depchain</artifactId>
 			<version>${version.org.jboss.jbossas}</version>
 			<type>pom</type>
-			<scope>import</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

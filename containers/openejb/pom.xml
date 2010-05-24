@@ -40,12 +40,6 @@
       <artifactId>arquillian-protocol-local</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-junit</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
 
       <dependency>
          <groupId>org.jboss.arquillian.packager</groupId>
@@ -71,6 +65,15 @@
       <groupId>org.apache.openejb</groupId>
       <artifactId>openejb-core</artifactId>
       <version>${version.org.apache.openejb_openejb.core}</version>
+      <scope>provided</scope>
+    </dependency>
+
+	<!-- test -->
+    <dependency>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-junit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
 
@@ -79,6 +82,7 @@
     <groupId>javax.inject</groupId>
     <artifactId>javax.inject</artifactId>
     <version>${version.javax.inject_javax.inject}</version>
+    <scope>provided</scope>
    </dependency>
 
   </dependencies>

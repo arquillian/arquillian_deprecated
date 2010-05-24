@@ -73,8 +73,9 @@
       <dependency>
          <groupId>org.jboss.jbossas</groupId>
          <artifactId>jboss-as-client</artifactId>
-         <type>pom</type>
          <version>6.0.0.20100429-M3</version>
+         <type>pom</type>
+         <scope>provided</scope>
       </dependency>
    </dependencies>
 </project>
