@@ -28,10 +28,15 @@ import java.util.Map;
  */
 public class PerformanceSuiteResult implements Serializable
 {
+   /** The serialVersionUID */
+   private static final long serialVersionUID = 1487390574111894654L;
+   
+   private String name;
    private Map<String, PerformanceClassResult> classResults;
 
-   public PerformanceSuiteResult()
+   public PerformanceSuiteResult(String name)
    {
+      setName(name);
       classResults = new HashMap<String, PerformanceClassResult>();
    }
    
@@ -48,6 +53,16 @@ public class PerformanceSuiteResult implements Serializable
    public void addClassResult(String className, PerformanceClassResult result)
    {
       classResults.put(className, result);
+   }
+
+   public String getName()
+   {
+      return name;
+   }
+
+   private void setName(String name)
+   {
+      this.name = name;
    }
 
 }

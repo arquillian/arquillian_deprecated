@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.performance.meta;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
@@ -24,18 +25,21 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
-public class PerformanceMethodResult
+public class PerformanceMethodResult implements Serializable
 {
 
+   /** The serialVersionUID */
+   private static final long serialVersionUID = 1249191155205920067L;
+   
    private double maxTime;
    private double actualTime;
-   private Method testMethod;
+   private String testMethod;
    
    public PerformanceMethodResult(double maxTime, double actualTime, Method testMethod)
    {
       setMaxTime(maxTime);
       setActualTime(actualTime);
-      setTestMethod(testMethod);
+      setTestMethod(testMethod.getName());
    }
    public double getMaxTime()
    {
@@ -53,11 +57,11 @@ public class PerformanceMethodResult
    {
       this.actualTime = actualTime;
    }
-   public Method getTestMethod()
+   public String getTestMethod()
    {
       return testMethod;
    }
-   private void setTestMethod(Method testMethod)
+   private void setTestMethod(String testMethod)
    {
       this.testMethod = testMethod;
    }

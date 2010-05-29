@@ -66,11 +66,14 @@ public class TestPerformanceVerifier implements EventHandler<Test>
             // fetch suiteResult, get the correct classResult and append the test to that
             // classResult.
             PerformanceSuiteResult suiteResult = context.getParentContext().getParentContext().get(PerformanceSuiteResult.class);
-            suiteResult.getResult(event.getTestClass().getName()).addMethodResult(
-                  new PerformanceMethodResult(
-                        performance.time(), 
-                        (result.getEnd()-result.getStart()), 
-                        event.getTestMethod()));
+            if(suiteResult != null)
+               suiteResult.getResult(event.getTestClass().getName()).addMethodResult(
+                     new PerformanceMethodResult(
+                           performance.time(), 
+                           (result.getEnd()-result.getStart()), 
+                           event.getTestMethod()));
+            else
+               System.out.println("PerformanceVerifier didnt get PerformanceSuiteResult!");
          }
       }
    }

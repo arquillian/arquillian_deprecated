@@ -45,7 +45,8 @@ public class WorkHardCdiTestCase
     * @throws Exception
     */
    @Test
-   @Performance(time=0.01)
+   //@Performance(time=0.01)
+   @Performance(time=10)
    public void doHardWorkThatFails() throws Exception
    {
       Assert.assertEquals(21, hardWorker, 0d);

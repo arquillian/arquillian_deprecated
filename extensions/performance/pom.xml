@@ -24,7 +24,14 @@
 
    <!-- Properties -->
    <properties>
-
+      	<!-- Versioning -->
+		<version.weld_core>1.0.1-SP1</version.weld_core>
+		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
+		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
+		<version.jboss_60>6.0.0.20100429-M3</version.jboss_60>
+		<version.jboss_51>5.1.0.GA</version.jboss_51>
+		<version.glassfish_30>3.0.1-b02</version.glassfish_30>
+		<version.jboss_ejb3>3.1.0</version.jboss_ejb3>
 
    </properties>
 
@@ -38,7 +45,7 @@
             <dependency> <!-- Need on all profiles except Glassfish to compile, api is not 100% up to date with final spec -->
                <groupId>org.jboss.ejb3</groupId> 
                <artifactId>jboss-ejb3-api</artifactId> 
-               <version>3.1.0</version>
+               <version>${version.jboss_ejb3}</version>
                <scope>test</scope>
             </dependency>
          </dependencies>
@@ -66,10 +73,39 @@
             <dependency> 
                <groupId>org.jboss.ejb3</groupId> 
                <artifactId>jboss-ejb3-api</artifactId> 
-               <version>3.1.0</version>
+               <version>${version.jboss_ejb3}</version>
                <scope>test</scope>
             </dependency>
+            <dependency>
+              <groupId>org.jboss.weld</groupId>
+              <artifactId>weld-core</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>org.jboss.weld</groupId>
+              <artifactId>weld-api</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-simple</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>javax.el</groupId>
+              <artifactId>el-api</artifactId>
+              <version>1.2</version>
+            </dependency>
          </dependencies>
+         <dependencyManagement>
+           <dependencies>
+             <!-- org.jboss.weld -->
+             <dependency>
+               <groupId>org.jboss.weld</groupId>
+               <artifactId>weld-core-bom</artifactId>
+               <version>${version.weld_core}</version>
+               <type>pom</type>
+               <scope>import</scope>
+             </dependency>
+           </dependencies>
+         </dependencyManagement>
          <build>
             <plugins>
                <plugin>
@@ -95,7 +131,7 @@
             <dependency> <!-- Need on all profiles except Glassfish to compile, api is not 100% up to date with final spec -->
                <groupId>org.jboss.ejb3</groupId> 
                <artifactId>jboss-ejb3-api</artifactId> 
-               <version>3.1.0</version>
+               <version>${version.jboss_ejb3}</version>
                <scope>test</scope>
             </dependency>
          </dependencies>
@@ -138,7 +174,7 @@
       <dependency> 
          <groupId>org.jboss.ejb3</groupId> 
          <artifactId>jboss-ejb3-api</artifactId> 
-         <version>3.1.0</version>
+         <version>${version.jboss_ejb3}</version>
          <scope>test</scope>
       </dependency>
       <dependency>
@@ -167,18 +203,6 @@
          <scope>test</scope>
       </dependency>
 
-            <dependency>
-               <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-weld-embedded</artifactId>
-               <version>${project.version}</version>
-            </dependency>
-            <dependency> 
-               <groupId>org.jboss.ejb3</groupId> 
-               <artifactId>jboss-ejb3-api</artifactId> 
-               <version>3.1.0</version>
-               <scope>test</scope>
-            </dependency>
- 
       <!-- External Projects -->
       <dependency>
          <groupId>org.mockito</groupId>

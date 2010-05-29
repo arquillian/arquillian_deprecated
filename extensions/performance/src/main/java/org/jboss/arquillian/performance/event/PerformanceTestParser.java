@@ -52,7 +52,8 @@ public class PerformanceTestParser implements EventHandler<ClassEvent>
             context.getParentContext().get(PerformanceSuiteResult.class);
          if(suitePerformance == null)
          {
-            suitePerformance = new PerformanceSuiteResult();
+            suitePerformance = new PerformanceSuiteResult(classPerformance.getTestClassName());
+            System.out.println("adding performancesuiteresult to context");
             context.getParentContext().add(PerformanceSuiteResult.class, suitePerformance);
          }
          

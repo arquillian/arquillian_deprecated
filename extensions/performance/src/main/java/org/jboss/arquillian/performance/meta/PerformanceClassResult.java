@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.performance.meta;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +28,15 @@ import org.jboss.arquillian.performance.annotation.PerformanceTest;
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
-public class PerformanceClassResult
+public class PerformanceClassResult implements Serializable
 {
+   /** The serialVersionUID */
+   private static final long serialVersionUID = 6743015614324029428L;
+   
    private List<PerformanceMethodResult> methodResults;
    private PerformanceTest performanceSpecs;
    private String testClassName;
+   
    public PerformanceClassResult(PerformanceTest performanceSpecs, String testClassName)
    {
       setPerformanceSpecs(performanceSpecs);
