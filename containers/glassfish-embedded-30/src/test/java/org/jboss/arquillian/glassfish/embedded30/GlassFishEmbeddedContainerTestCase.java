@@ -59,9 +59,7 @@ public class GlassFishEmbeddedContainerTestCase
       final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class).addClass(TestServlet.class);
       log.info(war.toString(true));
       return war;
-
    }
-
 
    @Test
    public void shouldBeAbleToDeployWebArchive() throws Exception
