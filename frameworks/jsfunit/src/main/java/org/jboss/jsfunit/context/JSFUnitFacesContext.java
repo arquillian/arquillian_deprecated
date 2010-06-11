@@ -73,13 +73,11 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       setCurrentInstance(this);
    }
 
-   @Override
    public boolean isProjectStage(ProjectStage projectStage)
    {
       return delegate.isProjectStage(projectStage);
    }
    
-   @Override
    public Iterator getMessages(String clientId)
    {
       if (!isJSFRequestDone()) return delegate.getMessages(clientId);
@@ -90,7 +88,6 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       return messages.iterator();
    }
    
-   @Override
    public void addMessage(String clientId, FacesMessage facesMessage)
    {
       delegate.addMessage(clientId, facesMessage);
@@ -103,49 +100,41 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       messagesByClientId.put(clientId, messageList);
    }
    
-   @Override
    public void setResponseWriter(ResponseWriter responseWriter)
    {
       delegate.setResponseWriter(responseWriter);
    }
    
-   @Override
    public void setResponseStream(ResponseStream responseStream)
    {
       delegate.setResponseStream(responseStream);
    }
    
-   @Override
    public void setViewRoot(UIViewRoot uIViewRoot)
    {
       delegate.setViewRoot(uIViewRoot);
    }
    
-   @Override
    public void responseComplete()
    {
       delegate.responseComplete();
    }
    
-   @Override
    public void renderResponse()
    {
       delegate.renderResponse();
    }
    
-   @Override
    public Application getApplication()
    {
       return delegate.getApplication();
    }
    
-   @Override
    public Iterator getClientIdsWithMessages()
    {
       return delegate.getClientIdsWithMessages();
    }
    
-   @Override
    public ExternalContext getExternalContext()
    {
       if (!isJSFRequestDone())
@@ -156,13 +145,11 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       return this.extContext;
    }
    
-   @Override
    public FacesMessage.Severity getMaximumSeverity()
    {
       return delegate.getMaximumSeverity();
    }
    
-   @Override
    public Iterator getMessages()
    {
       if (!isJSFRequestDone()) return delegate.getMessages();
@@ -170,37 +157,31 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       return this.allMessages.iterator();
    }
    
-   @Override
    public RenderKit getRenderKit()
    {
       return delegate.getRenderKit();
    }
    
-   @Override
    public boolean getRenderResponse()
    {
       return delegate.getRenderResponse();
    }
    
-   @Override
    public boolean getResponseComplete()
    {
       return delegate.getResponseComplete();
    }
    
-   @Override
    public ResponseStream getResponseStream()
    {
       return delegate.getResponseStream();
    }
    
-   @Override
    public ResponseWriter getResponseWriter()
    {
       return delegate.getResponseWriter();
    }
    
-   @Override
    public UIViewRoot getViewRoot()
    {
       return delegate.getViewRoot();
@@ -214,7 +195,6 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
     * This method does not call release() on the wrapped FacesContext.  So, all
     * of its state is retained for use by JSFUnit tests.
     */
-   @Override
    public void release()
    {
       // Make the FacesContext available to JSFUnit, if and only if a new
@@ -234,79 +214,66 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
    }
    
    //-------- JSF 2.0 -----------------------------------------
-   @Override
    public Map<Object, Object> getAttributes() 
    {
       return this.delegate.getAttributes();
    }
 
-   @Override
    public PhaseId getCurrentPhaseId() 
    {
       return this.delegate.getCurrentPhaseId();
    }
 
-   @Override
    public boolean isPostback() 
    {
       return this.delegate.isPostback();
    }
 
-   @Override
    public void setCurrentPhaseId(PhaseId phaseId) 
    {
       this.delegate.setCurrentPhaseId(phaseId);
    }
 
-   @Override
    public ExceptionHandler getExceptionHandler()
    {
       return delegate.getExceptionHandler();
    }
 
-   @Override
    public List<FacesMessage> getMessageList()
    {
       return delegate.getMessageList();
    }
 
-   @Override
    public List<FacesMessage> getMessageList(String clientId)
    {
       return delegate.getMessageList(clientId);
    }
 
-   @Override
    public PartialViewContext getPartialViewContext()
    {
       return delegate.getPartialViewContext();
    }
 
-   @Override
    public boolean isProcessingEvents()
    {
       return delegate.isProcessingEvents();
    }
 
-   @Override
    public boolean isValidationFailed()
    {
       return delegate.isValidationFailed();
    }
 
-   @Override
    public void setExceptionHandler(ExceptionHandler exceptionHandler)
    {
       delegate.setExceptionHandler(exceptionHandler);
    }
 
-   @Override
    public void setProcessingEvents(boolean processingEvents)
    {
       delegate.setProcessingEvents(processingEvents);
    }
 
-   @Override
    public void validationFailed()
    {
       delegate.validationFailed();
@@ -334,7 +301,6 @@ public class JSFUnitFacesContext extends FacesContext implements HttpSessionBind
       return this.extContext != null;
    }
    
-   @Override
    public ELContext getELContext()
    {
       ELContext elContext = delegate.getELContext();

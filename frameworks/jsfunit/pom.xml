@@ -20,7 +20,8 @@
 	<groupId>org.jboss.arquillian.framework</groupId>
 	<artifactId>arquillian-framework-jsfunit</artifactId>
 	<name>Arquillian Framework JSFUnit</name>
-	<description>JSFUnit integration for the Arquillian project</description>
+	<description>JSFUnit integration for the Arquillian project
+	</description>
 
 
 	<!-- Properties -->
@@ -108,11 +109,19 @@
 			<scope>test</scope>
 		</dependency>
 
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<version>2.2</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>jsf-api</artifactId>
 			<version>2.0.2-FCS</version>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>
