@@ -50,9 +50,9 @@ public class JBossASDeploymentAppender implements AuxiliaryArchiveAppender
                               CDIInjectionEnricher.class.getPackage())
                         .addServiceProvider(
                               TestEnricher.class, 
+                              CDIInjectionEnricher.class,
                               EJBInjectionEnricher.class,
-                              ResourceInjectionEnricher.class,
-                              CDIInjectionEnricher.class);
+                              ResourceInjectionEnricher.class);
       return archive;
    }
 
