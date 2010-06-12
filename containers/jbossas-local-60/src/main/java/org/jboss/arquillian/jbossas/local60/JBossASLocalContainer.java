@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.jboss.arquillian.jbossas.local60.utils.AsLifecycleDelegate;
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
@@ -33,7 +34,6 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
-import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
@@ -45,7 +45,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  */
 public class JBossASLocalContainer implements DeployableContainer
 {
-   private static Logger log = Logger.getLogger(JBossASLocalContainer.class);
+   private static Logger log = Logger.getLogger(JBossASLocalContainer.class.getName());
 
    private static AsLifecycleDelegate delegate;
 
@@ -214,7 +214,7 @@ public class JBossASLocalContainer implements DeployableContainer
       }
       if (remainingDeployments.size() > 0)
       {
-         log.error("Failed to undeploy these artifacts: " + remainingDeployments);
+         log.severe("Failed to undeploy these artifacts: " + remainingDeployments);
       }
       failedUndeployments.clear();
    }
