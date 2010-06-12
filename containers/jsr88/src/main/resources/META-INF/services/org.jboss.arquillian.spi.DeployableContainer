@@ -1,0 +1,2 @@
+# Defining the DeployableContainer here breaks container extension because Arquillian forbids multiple implementations
+#org.jboss.arquillian.container.jsr88.JSR88RemoteContainer

@@ -1,0 +1,10 @@
+<arquillian xmlns="http://jboss.com/arquillian"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:jsr88="urn:arq:org.jboss.arquillian.container.jsr88">
+
+   <jsr88:container>
+      <jsr88:deploymentUri>deployer:Sun:AppServer::localhost:4848</jsr88:deploymentUri>
+      <jsr88:deploymentFactoryClass>org.glassfish.deployapi.SunDeploymentFactory</jsr88:deploymentFactoryClass>
+   </jsr88:container>
+
+</arquillian>

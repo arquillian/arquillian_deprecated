@@ -1,0 +1,2 @@
+# Defining the DeployableContainer here locks the JSR 88 support into a specific EE version
+#org.jboss.arquillian.container.jsr88.EE6DeploymentAppender
