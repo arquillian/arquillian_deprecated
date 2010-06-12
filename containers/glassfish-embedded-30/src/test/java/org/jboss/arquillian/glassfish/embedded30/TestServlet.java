@@ -17,12 +17,14 @@
 package org.jboss.arquillian.glassfish.embedded30;
 
 import java.io.IOException;
+import javax.annotation.Resource;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
  * TestServlet
@@ -30,14 +32,20 @@ import javax.servlet.http.HttpServletResponse;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-@WebServlet(urlPatterns = "/Test")
+@WebServlet(urlPatterns = TestServlet.URL_PATTERN)
 public class TestServlet extends HttpServlet
 {
    private static final long serialVersionUID = 1L;
 
+   public static final String URL_PATTERN = "/Test";
+
+   public static final String MESSAGE = "hello";
+
+   @Resource(name = "jdbc/arquillian") private DataSource arquillianDS;
+
    @Override
    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
    {
-      response.getWriter().append("hello");
+      response.getWriter().append(arquillianDS != null ? MESSAGE : "#fail");
    }
 }

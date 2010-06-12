@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 /**
  * GlassFishEmbeddedContainerTestCase
  *
@@ -43,7 +42,6 @@ import org.junit.runner.RunWith;
 @Run(AS_CLIENT)
 public class GlassFishEmbeddedContainerTestCase 
 {
-
    /**
     * Logger
     */
@@ -64,11 +62,12 @@ public class GlassFishEmbeddedContainerTestCase
    @Test
    public void shouldBeAbleToDeployWebArchive() throws Exception
    {
-      String body = readAllAndClose(new URL("http://localhost:8181/test/Test").openStream());
+      String body = readAllAndClose(
+            new URL("http://localhost:7070/test" + TestServlet.URL_PATTERN).openStream());
       
       Assert.assertEquals(
             "Verify that the servlet was deployed and returns expected result",
-            "hello",
+            TestServlet.MESSAGE,
             body);
    }
    

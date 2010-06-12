@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.glassfish.admin.cli.resources.AddResources;
 import org.glassfish.api.ActionReport;
+import org.glassfish.api.ActionReport.MessagePart;
 import org.glassfish.api.admin.CommandRunner;
 import org.glassfish.api.admin.ParameterMap;
 
@@ -92,12 +93,12 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
 
       server.addContainer(ContainerBuilder.Type.all);
 
-      if (containerConfig.getResourcesXml() != null)
+      if (containerConfig.getSunResourcesXml() != null)
       {
-         File resourcesXmlFile = new File(containerConfig.getResourcesXml());
+         File resourcesXmlFile = new File(containerConfig.getSunResourcesXml());
          if (!resourcesXmlFile.exists() || !resourcesXmlFile.isFile())
          {
-            throw new RuntimeException("File specified in resourcesXml configuration property does not exist: " +
+            throw new RuntimeException("File specified in sunResourcesXml configuration property does not exist: " +
                   resourcesXmlFile.getAbsolutePath());
          }
          try
@@ -111,7 +112,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
                      new FileOutputStream(resourcesDtd));
             }
             ParameterMap params = new ParameterMap();
-            params.add(DEFAULT_ASADMIN_PARAM, containerConfig.getResourcesXml());
+            params.add(DEFAULT_ASADMIN_PARAM, containerConfig.getSunResourcesXml());
             {
                executeCommand(AddResources.class.getAnnotation(Service.class).name(), server, params);
             }
@@ -216,10 +217,19 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
 
       invocation.execute();
-      
+
       if (report.hasFailures())
       {
          throw report.getFailureCause();
+      }
+      else
+      {
+         int i = 1;
+         for (MessagePart part : report.getTopMessagePart().getChildren())
+         {
+            log.info(command + " command result (" + i++ + "): " + part.getMessage());
+
+         }
       }
    }
 

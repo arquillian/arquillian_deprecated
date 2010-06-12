@@ -35,7 +35,7 @@ public class GlassFishConfiguration implements ContainerConfiguration
    private String instanceRoot = "target/glassfish_" + UUID.randomUUID().toString();
    private boolean autoDelete = true;
    private String domainXml;
-   private String resourcesXml;
+   private String sunResourcesXml;
    
    public ContainerProfile getContainerProfile()
    {
@@ -82,13 +82,13 @@ public class GlassFishConfiguration implements ContainerConfiguration
       this.domainXml = domainXml;
    }
 
-   public String getResourcesXml()
+   public String getSunResourcesXml()
    {
-      return resourcesXml;
+      return sunResourcesXml;
    }
 
-   public void setResourcesXml(String resourcesXml)
+   public void setSunResourcesXml(String sunResourcesXml)
    {
-      this.resourcesXml = resourcesXml;
+      this.sunResourcesXml = sunResourcesXml;
    }
 }
