@@ -26,27 +26,30 @@ import org.jboss.arquillian.spi.ContainerProfile;
  * the GlassFish Embedded container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 public class GlassFishConfiguration implements ContainerConfiguration
 {
-   private int bindPort = 8181;
+   private int bindHttpPort = 8181;
    private String instanceRoot = "target/glassfish_" + UUID.randomUUID().toString();
    private boolean autoDelete = true;
+   private String domainXml;
+   private String resourcesXml;
    
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
    }
    
-   public int getBindPort()
+   public int getBindHttpPort()
    {
-      return bindPort;
+      return bindHttpPort;
    }
 
-   public void setBindPort(int bindPort)
+   public void setBindHttpPort(int bindHttpPort)
    {
-      this.bindPort = bindPort;
+      this.bindHttpPort = bindHttpPort;
    }
 
    public String getInstanceRoot() 
@@ -59,7 +62,7 @@ public class GlassFishConfiguration implements ContainerConfiguration
       this.instanceRoot = instanceRoot;
    }
    
-   public boolean getAutoDelete() 
+   public boolean isAutoDelete()
    {
       return autoDelete;
    }
@@ -67,5 +70,25 @@ public class GlassFishConfiguration implements ContainerConfiguration
    public void setAutoDelete(boolean autoDelete)
    {
       this.autoDelete = autoDelete;
+   }
+
+   public String getDomainXml()
+   {
+      return domainXml;
+   }
+
+   public void setDomainXml(String domainXml)
+   {
+      this.domainXml = domainXml;
+   }
+
+   public String getResourcesXml()
+   {
+      return resourcesXml;
+   }
+
+   public void setResourcesXml(String resourcesXml)
+   {
+      this.resourcesXml = resourcesXml;
    }
 }
