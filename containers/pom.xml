@@ -32,6 +32,7 @@
     <module>jbossas-embedded-60</module>
     <module>glassfish-embedded-30</module>
     <module>weld-embedded</module>    
+    <module>weld-ee-embedded</module>
     <module>openejb</module>
     <module>reloaded</module>
     <module>openwebbeans-embedded</module>
