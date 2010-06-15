@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
+package org.jboss.arquillian.jbossas.local51;
 
 import javax.ejb.EJB;
 
 import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.jboss.ejb.MyEjb;
-import org.jboss.arquillian.jboss.ejb.MyEjbBean;
+import org.jboss.arquillian.jbossas.local51.ejb.MyEjb;
+import org.jboss.arquillian.jbossas.local51.ejb.MyEjbBean;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;

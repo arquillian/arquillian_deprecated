@@ -14,26 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss.ejb;
-
-import javax.ejb.Local;
-import javax.ejb.Stateless;
+package org.jboss.arquillian.jbossas.local51.ejb;
 
 /**
- * MyEjb
  *
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-@Stateless
-@Local(MyEjb.class)
-public class MyEjbBean implements MyEjb
+public interface MyEjb
 {
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.jboss.ejb.MyEjb#getName()
-    */
-   public String getName() 
-   {
-      return "aslak";
-   }
+
+   public String getName();
+
 }

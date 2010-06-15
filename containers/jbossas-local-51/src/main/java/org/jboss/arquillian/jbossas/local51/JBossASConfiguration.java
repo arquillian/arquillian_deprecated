@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jboss;
+package org.jboss.arquillian.jbossas.local51;
 
 import java.io.File;
 
