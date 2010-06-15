@@ -24,14 +24,14 @@
   <!-- Aggregate Modules -->
   <modules>
     
-    <!--    <module>container-jboss-embedded</module> -->
+    <module>jbossas-remote-50</module>
     <module>jbossas-remote-51</module>
     <module>jbossas-remote-60</module>
     <module>jbossas-local-51</module>
     <module>jbossas-local-60</module>
     <module>jbossas-embedded-60</module>
     <module>glassfish-embedded-30</module>
-    <module>weld-embedded</module>
+    <module>weld-embedded</module>    
     <module>openejb</module>
     <module>reloaded</module>
     <module>openwebbeans-embedded</module>
