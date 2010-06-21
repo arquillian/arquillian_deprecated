@@ -16,11 +16,7 @@
  */
 package org.jboss.arquillian.container.jsr88;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +40,6 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
 /**
@@ -135,25 +130,25 @@ public class JSR88RemoteContainer implements DeployableContainer
          throw new DeploymentException("Could not deploy since deployment manager was not loaded");
       }
 
-      String moduleId = null;
+      TargetModuleID moduleInfo = null;
       try {
          PROGRESS_BARRIER.reset();
          resetModuleStatus();
          ProgressObject progress = deploymentManager.distribute(
                deploymentManager.getTargets(), moduleTypeMapper.getModuleType(archive),
                archive.as(ZipExporter.class).exportZip(), null);
-         // QUESTION when is getResultTargetModuleIDs() > 0?
          progress.addProgressListener(new JSR88DeploymentListener(this, progress.getResultTargetModuleIDs(), CommandType.DISTRIBUTE));
          waitForModuleToStart();
-         moduleId = progress.getResultTargetModuleIDs()[0].getModuleID();
-         storeModuleIdInArchive(archive, moduleId);
+         // QUESTION when is getResultTargetModuleIDs() > 0?
+         moduleInfo =  progress.getResultTargetModuleIDs()[0];
+         context.add(TargetModuleID.class, moduleInfo);
       }
       catch (Exception e)
       {
          throw new DeploymentException("Could not deploy archive", e);
       }
 
-      if (moduleId == null)
+      if (moduleInfo == null || moduleInfo.getModuleID() == null)
       {
          throw new DeploymentException("Could not determine module id, likely because module did not deploy");
       }
@@ -191,32 +186,28 @@ public class JSR88RemoteContainer implements DeployableContainer
       try
       {
          PROGRESS_BARRIER.reset();
-         String moduleId = null;
-         try
+         TargetModuleID moduleInfo = context.get(TargetModuleID.class);
+         if (moduleInfo == null || moduleInfo.getModuleID() == null)
          {
-            moduleId = retrieveModuleIdFromArchive(archive);
-         }
-         catch (IOException ioe)
-         {
-            log.log(Level.INFO, "Skipping undeploy since module ID could not be determined", ioe);
+            log.log(Level.INFO, "Skipping undeploy since module ID could not be determined");
             return;
          }
          
          TargetModuleID[] availableModuleIDs = deploymentManager.getAvailableModules(
                moduleTypeMapper.getModuleType(archive), getDeploymentManager().getTargets());
-         TargetModuleID targetModuleID = null;
+         TargetModuleID moduleInfoMatch = null;
          for (TargetModuleID candidate : availableModuleIDs)
          {
-            if (candidate.getModuleID().equals(moduleId))
+            if (candidate.getModuleID().equals(moduleInfo.getModuleID()))
             {
-               targetModuleID = candidate;
+               moduleInfoMatch = candidate;
                break;
             }
          }
 
-         if (targetModuleID != null)
+         if (moduleInfoMatch != null)
          {
-            TargetModuleID[] targetModuleIDs = { targetModuleID };
+            TargetModuleID[] targetModuleIDs = { moduleInfoMatch };
             ProgressObject progress = deploymentManager.undeploy(targetModuleIDs);
             progress.addProgressListener(new JSR88DeploymentListener(this, targetModuleIDs, CommandType.UNDEPLOY));
             waitForModuleToUndeploy();
@@ -317,44 +308,6 @@ public class JSR88RemoteContainer implements DeployableContainer
          {
             throw new RuntimeException("Module undeployment was interrupted or timed out", e);
          }
-      }
-   }
-
-   private void storeModuleIdInArchive(Archive<?> archive, String moduleId)
-   {
-      archive.add(new StringAsset(moduleId), MODULE_ID_STORE_PATH);
-   }
-
-   private String retrieveModuleIdFromArchive(Archive<?> archive) throws IOException
-   {
-      if (!archive.contains(MODULE_ID_STORE_PATH)) {
-         throw new IOException("Module ID store file not found in archive");
-      }
-
-      String moduleId = new BufferedReader(new InputStreamReader(
-            archive.get(MODULE_ID_STORE_PATH).getAsset().openStream(), "UTF-8")).readLine();
-      
-      if (moduleId == null || moduleId.trim().length() == 0) {
-         throw new IOException("Module ID store file was empty");
-      }
-      archive.delete(MODULE_ID_STORE_PATH);
-
-      return moduleId.trim();
-   }
-
-   // required as StringAsset is in ShrinkWrap impl-base
-   static class StringAsset implements Asset
-   {
-      private String content;
-      
-      StringAsset(String content)
-      {
-         this.content = content;
-      }
-
-      public InputStream openStream()
-      {
-         return new ByteArrayInputStream(content.getBytes());
       }
    }
 }
