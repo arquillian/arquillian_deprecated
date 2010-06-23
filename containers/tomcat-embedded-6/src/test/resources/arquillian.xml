@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<arquillian xmlns="http://jboss.com/arquillian"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:tomcat="urn:arq:org.jboss.arquillian.container.tomcat.embedded">
+
+	<tomcat:container>
+		<!--tomcat:tomcatHome>/home/deruelle/servers/apache-tomcat-6.0.20</tomcat:tomcatHome-->
+		<!--tomcat:tomcatHome>${env.CATALINA_HOME}</tomcat:tomcatHome-->
+		<tomcat:workDir>target/work</tomcat:workDir> 
+		<tomcat:appBase>target/webapps</tomcat:appBase> 
+		<tomcat:bindAddress>127.0.0.1</tomcat:bindAddress>
+		<tomcat:httpPort>8080</tomcat:httpPort>
+	</tomcat:container>	
+
+</arquillian>
