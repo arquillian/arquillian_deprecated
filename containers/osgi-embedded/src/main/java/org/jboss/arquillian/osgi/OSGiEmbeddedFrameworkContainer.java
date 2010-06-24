@@ -17,7 +17,7 @@
 package org.jboss.arquillian.osgi;
 
 import org.jboss.arquillian.packager.osgi.BundleArchive;
-import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
+import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
@@ -107,7 +107,7 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       {
          throw new DeploymentException("Cannot deploy: " + archive, ex);
       }
-      return new LocalMethodExecutor();
+      return new JMXMethodExecutor();
    }
 
    @Override

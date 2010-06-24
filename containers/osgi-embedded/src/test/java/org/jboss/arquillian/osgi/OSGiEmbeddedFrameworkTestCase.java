@@ -45,6 +45,11 @@ import org.osgi.framework.launch.Framework;
 @RunWith(Arquillian.class)
 public class OSGiEmbeddedFrameworkTestCase
 {
+   public OSGiEmbeddedFrameworkTestCase()
+   {
+      System.out.println("new OSGiEmbeddedFrameworkTestCase");
+   }
+
    @Deployment
    public static JavaArchive createdeployment()
    {
