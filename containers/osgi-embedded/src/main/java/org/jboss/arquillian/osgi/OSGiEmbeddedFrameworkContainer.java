@@ -35,15 +35,15 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 
 /**
- * [TODO] OSGiEmbeddedContainer
+ * OSGiEmbeddedFrameworkContainer
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedContainer implements DeployableContainer
+public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiEmbeddedContainer.class);
+   private static final Logger log = Logger.getLogger(OSGiEmbeddedFrameworkContainer.class);
 
    private Framework framework;
 

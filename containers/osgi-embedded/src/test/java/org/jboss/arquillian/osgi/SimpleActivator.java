@@ -16,20 +16,41 @@
  */
 package org.jboss.arquillian.osgi;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 /**
- * OSGiEmbeddedConfiguration
+ * A BundleActivator that registers a {@ SimpleService}
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedConfiguration implements ContainerConfiguration
+public class SimpleActivator implements BundleActivator
 {
-   public ContainerProfile getContainerProfile()
+   @Override
+   public void start(BundleContext context) throws Exception
    {
-      return ContainerProfile.STANDALONE;
+      SimpleService service = new SimpleService()
+      {
+         @Override
+         public Integer sum(Integer... values)
+         {
+            Integer result = 0;
+            if (values != null)
+            {
+               for (Integer i : values)
+               {
+                  result += i;
+               }
+            }
+            return result;
+         }
+      };
+      context.registerService(SimpleService.class.getName(), service, null);
    }
 
+   @Override
+   public void stop(BundleContext context) throws Exception
+   {
+   }
 }

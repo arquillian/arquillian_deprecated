@@ -16,7 +16,7 @@
  */
 package org.jboss.arquillian.osgi;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
@@ -32,16 +32,18 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.launch.Framework;
 
 /**
- * WeldEmbeddedIntegrationTestCase
+ * Test the embedded OSGi framework
  *
- * @author Thomas.Diesler@jboss.com
+ * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-public class OSGiEmbeddedIntegrationTestCase
+public class OSGiEmbeddedFrameworkTestCase
 {
    @Deployment
    public static JavaArchive createdeployment()
@@ -54,10 +56,13 @@ public class OSGiEmbeddedIntegrationTestCase
             OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
             builder.addBundleSymbolicName(archive.getName());
             builder.addBundleManifestVersion(2);
+            builder.addBundleActivator(SimpleActivator.class.getName());
             return builder.openStream();
          }
       });
-      return archive.addClasses(OSGiEmbeddedIntegrationTestCase.class);
+      archive.addClasses(SimpleActivator.class, SimpleService.class);
+      archive.addClasses(OSGiEmbeddedFrameworkTestCase.class);
+      return archive;
    }
 
    @Inject
@@ -73,14 +78,33 @@ public class OSGiEmbeddedIntegrationTestCase
    Bundle bundle;
    
    @Test
-   public void testbundleInjection() throws Exception
+   public void testBundleInjection() throws Exception
    {
+      // Assert that the bundle is injected and in state INSTALLED
       assertNotNull("Bundle injected", bundle);
       assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
       
+      // Start the bundle
       bundle.start();
       assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
       
+      // Assert the bundle context
+      BundleContext context = bundle.getBundleContext();
+      assertNotNull("BundleContext available", context);
+      
+      // Get the service reference
+      ServiceReference sref = context.getServiceReference(SimpleService.class.getName());
+      assertNotNull("ServiceReference not null", sref);
+      
+      // Get the service for the reference
+      //SimpleService service = (SimpleService)context.getService(sref);
+      //assertNotNull("Service not null", service);
+      
+      // Invoke the service 
+      //int sum = service.sum(1, 2, 3);
+      //assertEquals(6, sum);
+      
+      // Stop the bundle
       bundle.stop();
       assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
    }

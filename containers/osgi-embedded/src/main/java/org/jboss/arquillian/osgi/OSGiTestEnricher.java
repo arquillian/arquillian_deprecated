@@ -27,8 +27,18 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.launch.Framework;
 
 /**
- * [TODO] OSGiTestEnricher
- *
+ * The OSGi TestEnricher
+ * 
+ * The enricher supports the injection of the Framework and the Bundle under test.
+ * 
+ * <pre><code>
+ *    @Inject
+ *    Framework framework;
+ * 
+ *    @Inject
+ *    Bundle bundle;
+ * </code></pre>
+ * 
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */

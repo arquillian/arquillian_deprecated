@@ -25,7 +25,6 @@
 
     <!-- Versioning -->
     <version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
-    <version.javax.inject_javax.inject>1</version.javax.inject_javax.inject>
 
   </properties>
 
@@ -81,7 +80,6 @@
    <dependency>
     <groupId>javax.inject</groupId>
     <artifactId>javax.inject</artifactId>
-    <version>${version.javax.inject_javax.inject}</version>
     <scope>provided</scope>
    </dependency>
 

@@ -16,20 +16,14 @@
  */
 package org.jboss.arquillian.osgi;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * OSGiEmbeddedConfiguration
+ * A simple service.
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedConfiguration implements ContainerConfiguration
+public interface SimpleService 
 {
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.STANDALONE;
-   }
-
+   Integer sum(Integer... values);
 }
