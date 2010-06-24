@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.launch.Framework;
 
 /**
  * Test the embedded OSGi framework
@@ -45,9 +44,10 @@ import org.osgi.framework.launch.Framework;
 @RunWith(Arquillian.class)
 public class OSGiEmbeddedFrameworkTestCase
 {
+   
    public OSGiEmbeddedFrameworkTestCase()
    {
-      System.out.println("new OSGiEmbeddedFrameworkTestCase");
+      super();
    }
 
    @Deployment
@@ -62,6 +62,9 @@ public class OSGiEmbeddedFrameworkTestCase
             builder.addBundleSymbolicName(archive.getName());
             builder.addBundleManifestVersion(2);
             builder.addBundleActivator(SimpleActivator.class.getName());
+            // [TODO] generate a separate bundle the contains the test case
+            builder.addExportPackages(OSGiEmbeddedFrameworkTestCase.class);
+            builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.spec", "javax.inject", "org.junit");
             return builder.openStream();
          }
       });
@@ -71,23 +74,28 @@ public class OSGiEmbeddedFrameworkTestCase
    }
 
    @Inject
-   Framework framework;
+   public static BundleContext context;
    
    @Test
-   public void testFrameworkInjection() throws Exception
+   public void testBundleContextInjection() throws Exception
    {
-      assertNotNull("Framework injected", framework);
+      assertNotNull("BundleContext injected", context);
+      assertEquals("System Bundle ID", 0, context.getBundle().getBundleId());
    }
 
    @Inject
-   Bundle bundle;
+   public static Bundle bundle;
    
    @Test
    public void testBundleInjection() throws Exception
    {
-      // Assert that the bundle is injected and in state INSTALLED
+      // Assert that the bundle is injected
       assertNotNull("Bundle injected", bundle);
-      assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
+      
+      // Assert that the bundle is in state RESOLVED
+      // Note when the test bundle contains the test case it 
+      // must be resolved already when this test method is called
+      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
       
       // Start the bundle
       bundle.start();
@@ -102,12 +110,12 @@ public class OSGiEmbeddedFrameworkTestCase
       assertNotNull("ServiceReference not null", sref);
       
       // Get the service for the reference
-      //SimpleService service = (SimpleService)context.getService(sref);
-      //assertNotNull("Service not null", service);
+      SimpleService service = (SimpleService)context.getService(sref);
+      assertNotNull("Service not null", service);
       
       // Invoke the service 
-      //int sum = service.sum(1, 2, 3);
-      //assertEquals(6, sum);
+      int sum = service.sum(1, 2, 3);
+      assertEquals(6, sum);
       
       // Stop the bundle
       bundle.stop();

@@ -34,4 +34,18 @@
     </constructor>
   </bean>
   
+  <bean name="OSGiAutoInstallPlugin" class="org.jboss.osgi.framework.plugins.internal.AutoInstallPluginImpl">
+    <constructor><parameter><inject bean="OSGiBundleManager" /></parameter></constructor>
+    <property name="autoInstall">
+     <list elementClass="java.net.URL">
+      <value>./target/test-libs/bundles/org.osgi.compendium.jar</value>
+     </list>
+    </property>
+    <property name="autoStart">
+     <list elementClass="java.net.URL">
+      <value>./target/test-libs/bundles/arquillian-bundle.jar</value>
+     </list>
+    </property>
+  </bean>
+  
 </deployment>

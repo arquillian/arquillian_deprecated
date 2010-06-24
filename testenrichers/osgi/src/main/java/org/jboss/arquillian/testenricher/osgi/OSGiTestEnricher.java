@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.osgi;
+package org.jboss.arquillian.testenricher.osgi;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.launch.Framework;
+import org.osgi.framework.BundleContext;
 
 /**
  * The OSGi TestEnricher
@@ -33,7 +33,7 @@ import org.osgi.framework.launch.Framework;
  * 
  * <pre><code>
  *    @Inject
- *    Framework framework;
+ *    BundleContext sysctx;
  * 
  *    @Inject
  *    Bundle bundle;
@@ -48,13 +48,26 @@ public class OSGiTestEnricher implements TestEnricher
    public void enrich(Context context, Object testCase)
    {
       Class<? extends Object> testClass = testCase.getClass();
+      enrichInternal(context, testClass, testCase);
+   }
+
+   /**
+    * Enrich the static fields on the test case
+    */
+   public void enrich(Context context, Class<?> testClass)
+   {
+      enrichInternal(context, testClass, null);
+   }
+
+   private void enrichInternal(Context context, Class<?> testClass, Object testCase)
+   {
       for (Field field : testClass.getDeclaredFields())
       {
          if (field.isAnnotationPresent(Inject.class))
          {
-            if (field.getType().isAssignableFrom(Framework.class))
+            if (field.getType().isAssignableFrom(BundleContext.class))
             {
-               injectFramework(context, testCase, field);
+               injectBundleContext(context, testCase, field);
             }
             if (field.getType().isAssignableFrom(Bundle.class))
             {
@@ -64,16 +77,16 @@ public class OSGiTestEnricher implements TestEnricher
       }
    }
 
-   private void injectFramework(Context context, Object testCase, Field field) 
+   private void injectBundleContext(Context context, Object testCase, Field field) 
    {
       try
       {
-         Framework framework = context.get(Framework.class);
-         field.set(testCase, framework);
+         BundleContext sysctx = context.get(BundleContext.class);
+         field.set(testCase, sysctx);
       }
       catch (IllegalAccessException ex)
       {
-         throw new IllegalStateException("Cannot inject Framework", ex);
+         throw new IllegalStateException("Cannot inject BundleContext", ex);
       }
    }
 

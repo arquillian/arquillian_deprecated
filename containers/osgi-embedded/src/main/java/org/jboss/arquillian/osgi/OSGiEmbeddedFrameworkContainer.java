@@ -61,6 +61,7 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       try
       {
          framework.start();
+         context.add(BundleContext.class, framework.getBundleContext());
       }
       catch (BundleException ex)
       {
@@ -107,6 +108,8 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       {
          throw new DeploymentException("Cannot deploy: " + archive, ex);
       }
+      
+      //return new LocalMethodExecutor(); 
       return new JMXMethodExecutor();
    }
 
