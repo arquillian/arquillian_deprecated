@@ -14,27 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.spi;
+package org.jboss.arquillian.osgi;
 
-import java.util.Collection;
-
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.arquillian.spi.ContainerConfiguration;
+import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * Extension point for the {@link DeployableContainer} to prepare the Archives for deployment.
- * 
- * Example:
- * - Create a EAR, WAR
+ * [TODO] OSGiEmbeddedConfiguration
  *
- * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author Thomas.Diesler@jboss.com
  * @version $Revision: $
  */
-public interface DeploymentPackager
+public class OSGiEmbeddedConfiguration implements ContainerConfiguration
 {
-   /**
-    * @param applicationArchive The user defined deployment archive
-    * @param auxiliaryArchives All found system defined deployment archives
-    * @return A archive to deploy
-    */
-   Archive<?> generateDeployment(Archive<?> applicationArchive, Collection<Archive<?>> auxiliaryArchives);
+   public ContainerProfile getContainerProfile()
+   {
+      return ContainerProfile.STANDALONE;
+   }
+
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Parent -->
+  <parent>
+    <groupId>org.jboss.arquillian</groupId>
+    <artifactId>arquillian-build</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../../build/pom.xml</relativePath>
+  </parent>
+
+  <!-- Model Version -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Artifact Configuration -->
+  <groupId>org.jboss.arquillian.container</groupId>
+  <artifactId>arquillian-osgi-embedded</artifactId>
+  <name>Arquillian Container OSGi Embedded</name>
+  <description>OSGi Embedded Container integration for the Arquillian Project</description>
+
+
+  <!-- Properties -->
+  <properties>
+
+    <!-- Versioning -->
+    <version.jboss_osgi_framework>1.0.0.Alpha5-SNAPSHOT</version.jboss_osgi_framework>
+
+  </properties>
+
+  <!-- Dependencies -->
+  <dependencies>
+
+    <!-- org.jboss.arquillian -->
+    <dependency>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-local</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- 
+    <dependency>
+      <groupId>org.jboss.arquillian.packager</groupId>
+      <artifactId>arquillian-packager-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    -->
+
+    <!-- org.jboss.osgi -->
+    <dependency>
+      <groupId>org.jboss.osgi</groupId>
+      <artifactId>jboss-osgi-spi</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-impl-base</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.osgi.framework</groupId>
+      <artifactId>jboss-osgi-framework-core</artifactId>
+      <version>${version.jboss_osgi_framework}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-junit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

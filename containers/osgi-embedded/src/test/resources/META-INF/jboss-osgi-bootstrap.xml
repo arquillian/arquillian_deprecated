@@ -1,0 +1,37 @@
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+
+  <bean name="OSGiFrameworkProperties" class="org.jboss.osgi.framework.plugins.internal.FrameworkPropertiesImpl">
+    <constructor>
+      <parameter>
+        <map keyClass="java.lang.String" valueClass="java.lang.String">
+          <entry><key>org.osgi.framework.storage</key><value>target/osgi-store</value></entry>
+          <entry><key>org.osgi.framework.storage.clean</key><value>onFirstInit</value></entry>
+          <entry><key>org.osgi.framework.system.packages.extra</key><value>
+          
+            <!-- logging -->
+            org.apache.log4j;version=1.2,
+            org.jboss.logging;version=2.1,
+            
+            <!-- jboss - ->
+            org.jboss.beans.metadata.plugins;version=2.2,
+            org.jboss.beans.metadata.plugins.builder;version=2.2,
+            org.jboss.beans.metadata.spi;version=2.2,
+            org.jboss.beans.metadata.spi.builder;version=2.2,
+            org.jboss.dependency.spi;version=2.2,
+            org.jboss.kernel.spi.dependency;version=2.2,
+            
+            <!- - jboss-osgi - ->
+            org.jboss.osgi.spi;version=1.0,
+            org.jboss.osgi.spi.capability;version=1.0,
+            org.jboss.osgi.spi.framework;version=1.0,
+            org.jboss.osgi.spi.service;version=1.0,
+            org.jboss.osgi.spi.util;version=1.0,
+            org.jboss.osgi.testing;version=1.0
+            -->
+          </value></entry>
+        </map>
+      </parameter>
+    </constructor>
+  </bean>
+  
+</deployment>
