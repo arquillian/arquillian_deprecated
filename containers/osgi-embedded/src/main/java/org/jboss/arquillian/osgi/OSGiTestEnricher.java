@@ -16,15 +16,20 @@
  */
 package org.jboss.arquillian.osgi;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import javax.inject.Inject;
 
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.launch.Framework;
 
 /**
  * [TODO] OSGiTestEnricher
  *
- * @author Thomas.Diesler@jboss.com
+ * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
 public class OSGiTestEnricher implements TestEnricher
@@ -32,6 +37,47 @@ public class OSGiTestEnricher implements TestEnricher
    @Override
    public void enrich(Context context, Object testCase)
    {
+      Class<? extends Object> testClass = testCase.getClass();
+      for (Field field : testClass.getDeclaredFields())
+      {
+         if (field.isAnnotationPresent(Inject.class))
+         {
+            if (field.getType().isAssignableFrom(Framework.class))
+            {
+               injectFramework(context, testCase, field);
+            }
+            if (field.getType().isAssignableFrom(Bundle.class))
+            {
+               injectBundle(context, testCase, field);
+            }
+         }
+      }
+   }
+
+   private void injectFramework(Context context, Object testCase, Field field) 
+   {
+      try
+      {
+         Framework framework = context.get(Framework.class);
+         field.set(testCase, framework);
+      }
+      catch (IllegalAccessException ex)
+      {
+         throw new IllegalStateException("Cannot inject Framework", ex);
+      }
+   }
+
+   private void injectBundle(Context context, Object testCase, Field field) 
+   {
+      try
+      {
+         Bundle bundle = context.get(Bundle.class);
+         field.set(testCase, bundle);
+      }
+      catch (IllegalAccessException ex)
+      {
+         throw new IllegalStateException("Cannot inject Bundle", ex);
+      }
    }
 
    @Override

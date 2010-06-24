@@ -22,7 +22,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
 /**
  * [TODO] OSGiEmbeddedConfiguration
  *
- * @author Thomas.Diesler@jboss.com
+ * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
 public class OSGiEmbeddedConfiguration implements ContainerConfiguration

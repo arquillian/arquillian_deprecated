@@ -42,13 +42,11 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- 
     <dependency>
       <groupId>org.jboss.arquillian.packager</groupId>
       <artifactId>arquillian-packager-osgi</artifactId>
       <version>${project.version}</version>
     </dependency>
-    -->
 
     <!-- org.jboss.osgi -->
     <dependency>

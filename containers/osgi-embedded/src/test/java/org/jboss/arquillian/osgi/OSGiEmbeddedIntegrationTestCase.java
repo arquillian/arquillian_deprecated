@@ -16,7 +16,12 @@
  */
 package org.jboss.arquillian.osgi;
 
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.InputStream;
+
+import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -26,6 +31,8 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.launch.Framework;
 
 /**
  * WeldEmbeddedIntegrationTestCase
@@ -53,8 +60,28 @@ public class OSGiEmbeddedIntegrationTestCase
       return archive.addClasses(OSGiEmbeddedIntegrationTestCase.class);
    }
 
+   @Inject
+   Framework framework;
+   
    @Test
-   public void shouldBeAbleToInjectBeanAsInstanceVariable() throws Exception
+   public void testFrameworkInjection() throws Exception
    {
+      assertNotNull("Framework injected", framework);
+   }
+
+   @Inject
+   Bundle bundle;
+   
+   @Test
+   public void testbundleInjection() throws Exception
+   {
+      assertNotNull("Bundle injected", bundle);
+      assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
+      
+      bundle.start();
+      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
+      
+      bundle.stop();
+      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
    }
 }
