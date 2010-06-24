@@ -64,7 +64,8 @@ public class OSGiEmbeddedFrameworkTestCase
             builder.addBundleActivator(SimpleActivator.class.getName());
             // [TODO] generate a separate bundle the contains the test case
             builder.addExportPackages(OSGiEmbeddedFrameworkTestCase.class);
-            builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.spec", "javax.inject", "org.junit");
+            builder.addImportPackages("org.jboss.arquillian.junit", "org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.spec");
+            builder.addImportPackages("javax.inject", "org.junit", "org.junit.runner");
             return builder.openStream();
          }
       });
@@ -74,7 +75,7 @@ public class OSGiEmbeddedFrameworkTestCase
    }
 
    @Inject
-   public static BundleContext context;
+   public BundleContext context;
    
    @Test
    public void testBundleContextInjection() throws Exception
@@ -84,7 +85,7 @@ public class OSGiEmbeddedFrameworkTestCase
    }
 
    @Inject
-   public static Bundle bundle;
+   public Bundle bundle;
    
    @Test
    public void testBundleInjection() throws Exception
