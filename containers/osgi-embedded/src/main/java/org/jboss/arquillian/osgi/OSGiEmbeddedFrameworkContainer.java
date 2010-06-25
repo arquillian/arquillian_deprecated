@@ -16,7 +16,9 @@
  */
 package org.jboss.arquillian.osgi;
 
-import org.jboss.arquillian.packager.osgi.BundleArchive;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -27,8 +29,8 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
-import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -92,12 +94,15 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
    {
       try
       {
-         if ((archive instanceof BundleArchive) == false)
-            throw new IllegalStateException("Archive is not a bundle archive: " + archive);
+         // Export the bundle bytes
+         ZipExporter exporter = archive.as(ZipExporter.class);
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         exporter.exportZip(baos);
+         
+         ByteArrayInputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
          
          BundleContext sysContext = framework.getBundleContext();
-         VirtualFile virtualFile = ((BundleArchive)archive).getBundleInfo().getRoot();
-         Bundle bundle = sysContext.installBundle(archive.getName(), virtualFile.openStream());
+         Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
          context.add(Bundle.class, bundle);
       }
       catch (RuntimeException rte)
