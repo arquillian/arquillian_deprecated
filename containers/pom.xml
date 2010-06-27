@@ -31,6 +31,7 @@
     <module>jbossas-local-60</module>
     <module>jbossas-embedded-60</module>
     <module>glassfish-embedded-30</module>
+    <module>tomcat-embedded-6</module>
     <module>weld-embedded</module>    
     <module>weld-ee-embedded</module>
     <module>openejb</module>
