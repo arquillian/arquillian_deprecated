@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Parent -->
+  <parent>
+    <groupId>org.jboss.arquillian</groupId>
+    <artifactId>arquillian-build</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <!-- Model Version -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Artifact Configuration -->
+  <groupId>org.jboss.arquillian.container</groupId>
+  <artifactId>arquillian-tomcat-embedded-6</artifactId>
+  <name>Arquillian Container Tomcat Embedded 6.x</name>
+  <description>Tomcat Embedded Container Integration for the Arquillian Project</description>
+
+
+  <!-- Properties -->
+  <properties>
+
+    <!-- Versioning -->
+    <version.org.apache.tomcat>6.0.26</version.org.apache.tomcat>
+    <version.javax.inject_javax.inject>1</version.javax.inject_javax.inject>
+
+  </properties>
+
+  <!-- Dependencies -->
+  <dependencies>
+
+    <!-- 
+    org.jboss.arquillian
+     -->
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-local</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.packager</groupId>
+         <artifactId>arquillian-packager-applicationarchive</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+    
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-ejb</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+    <!-- 
+    External Projects
+     -->
+     <!--dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-openejb</artifactId>
+      <version>${version.shrinkwrap_shrinkwrap}</version>
+    </dependency-->
+   <!-- Tomcat dependencies -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>catalina</artifactId>
+			<version>${version.org.apache.tomcat}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>coyote</artifactId>
+			<version>${version.org.apache.tomcat}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>jasper</artifactId>
+			<version>${version.org.apache.tomcat}</version>
+			<scope>provided</scope>
+		</dependency>
+
+	<!-- test -->
+    <dependency>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-junit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+       <groupId>junit</groupId>
+       <artifactId>junit</artifactId>
+       <scope>test</scope>
+    </dependency>
+
+   <!-- Part of prototyping, extract when ready -->
+   <dependency>
+    <groupId>javax.inject</groupId>
+    <artifactId>javax.inject</artifactId>
+    <version>${version.javax.inject_javax.inject}</version>
+    <scope>provided</scope>
+   </dependency>
+
+  </dependencies>
+
+   <repositories>
+		<repository>
+		  <id>jboss-public-repository-group</id>
+		  <name>JBoss Public Maven Repository Group</name>
+		  <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+		  <layout>default</layout>
+		  <releases>
+		    <enabled>true</enabled>
+		    <updatePolicy>never</updatePolicy>
+		  </releases>
+		  <snapshots>
+		    <enabled>true</enabled>
+		    <updatePolicy>never</updatePolicy>
+		  </snapshots>
+		</repository>
+   </repositories>
+</project>
+
