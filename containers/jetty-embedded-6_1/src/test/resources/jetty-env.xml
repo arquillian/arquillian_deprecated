@@ -15,6 +15,7 @@
       <Arg type="java.lang.Integer">6</Arg>
       <Arg type="boolean">true</Arg>
    </New>
+   <!-- I can't figure out why org.mortbay.jetty.plus.naming.Resource doesn't work here, but it doesn't -->
    <New class="org.mortbay.jetty.plus.naming.EnvEntry">
       <Arg><Ref id="webAppCtx"/></Arg>
       <Arg>BeanManager</Arg>

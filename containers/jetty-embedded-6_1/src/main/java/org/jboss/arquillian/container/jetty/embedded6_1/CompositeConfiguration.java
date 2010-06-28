@@ -8,7 +8,10 @@ import org.mortbay.resource.Resource;
 /**
  * A Jetty {@link Configuration} object that gathers configuration from
  * WEB-INF/web.xml, annotations, an override descriptor, an exactly one
- * META-INF/web-fragment.xml.
+ * META-INF/web-fragment.xml. Most of the code is copied from
+ * the standard and plus configurations, augmented to search for
+ * a META-INF/web-fragment.xml resource (though multiple entries
+ * should be supported in the future).
  *
  * @author Dan Allen
  */
@@ -45,6 +48,7 @@ public class CompositeConfiguration extends Configuration
          configure(orideResource.getURL().toString());
       }
 
+      // FIXME support multiple web-fragment.xml files
       Resource webFragment = Resource.newSystemResource("META-INF/web-fragment.xml");
       if (webFragment != null)
       {
