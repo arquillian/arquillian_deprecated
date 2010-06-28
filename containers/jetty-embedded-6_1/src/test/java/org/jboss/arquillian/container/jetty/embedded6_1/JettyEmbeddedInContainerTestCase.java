@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.container.jetty.embedded6_1;
 
-import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
