@@ -37,9 +37,9 @@ import org.mortbay.jetty.webapp.WebAppContext;
  * <p>Jetty Embedded 6.1.x container for the Arquillian project.</p>
  *
  * <p>This container only supports a WebArchive deployment. The context path of the
- * deployed application is always set to "/test", which is expected by the servlet protocol.</p>
+ * deployed application is always set to "/test", which is expected by the servlet protocol (SHRINKWRAP-196).</p>
  *
- * <p>A known issue is that you cannot deploy two archives with the same name (i.e., test.war).
+ * <p>A known issue (SHRINKWRAP-197) is that you cannot deploy two archives with the same name (i.e., test.war).
  * The ShrinkWrap Jetty extension always uses the same temporary file and doesn't delete
  * it until the JVM exists. Therefore, two successive Arquillian tests will collide trying
  * to write to the same file. The workaround is to give your archive a unique name in the
