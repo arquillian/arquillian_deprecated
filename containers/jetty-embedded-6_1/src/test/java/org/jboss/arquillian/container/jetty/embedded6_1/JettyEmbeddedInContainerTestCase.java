@@ -103,6 +103,6 @@ public class JettyEmbeddedInContainerTestCase
          }
       }
       Assert.assertNotNull(testBean);
-      Assert.assertEquals("value", testBean.getValue());
+      Assert.assertEquals("Jetty", testBean.getName());
    }
 }

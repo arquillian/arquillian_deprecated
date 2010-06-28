@@ -16,12 +16,15 @@
  */
 package org.jboss.arquillian.container.jetty.embedded6_1;
 
+import javax.annotation.Resource;
+
 public class TestBean
 {
-   private String value = "value";
+   @Resource(name = "name")
+   private String name;
 
-   public String getValue()
+   public String getName()
    {
-      return value;
+      return name;
    }
 }
