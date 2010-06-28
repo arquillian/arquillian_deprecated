@@ -12,7 +12,7 @@
    <modelVersion>4.0.0</modelVersion>
 
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-jetty-embedded-6_1</artifactId>
+   <artifactId>arquillian-jetty-embedded-6.1</artifactId>
    <name>Arquillian Container Jetty Embedded 6.1.x</name>
    <description>Jetty Embedded 6.1.x Container integration for the Arquillian project</description>
 
