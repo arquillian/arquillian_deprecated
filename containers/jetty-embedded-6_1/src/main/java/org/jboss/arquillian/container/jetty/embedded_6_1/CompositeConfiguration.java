@@ -1,4 +1,4 @@
-package org.jboss.arquillian.container.jetty.embedded6_1;
+package org.jboss.arquillian.container.jetty.embedded_6_1;
 
 import java.net.URL;
 import org.mortbay.jetty.plus.webapp.Configuration;

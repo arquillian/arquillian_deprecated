@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.jetty.embedded6_1;
+package org.jboss.arquillian.container.jetty.embedded_6_1;
 
 import java.net.URL;
 import java.util.logging.Logger;
@@ -66,7 +66,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
        "org.mortbay.jetty.webapp.WebInfConfiguration",
        "org.mortbay.jetty.plus.webapp.EnvConfiguration",
        //"org.mortbay.jetty.plus.webapp.Configuration",
-       "org.jboss.arquillian.container.jetty.embedded6_1.CompositeConfiguration",
+       CompositeConfiguration.class.getName(),
        "org.mortbay.jetty.webapp.JettyWebXmlConfiguration"
    };
 

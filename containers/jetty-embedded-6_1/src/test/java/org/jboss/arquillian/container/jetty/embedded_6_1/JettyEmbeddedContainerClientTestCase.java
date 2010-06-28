@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.jetty.embedded6_1;
+package org.jboss.arquillian.container.jetty.embedded_6_1;
 
 import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
 

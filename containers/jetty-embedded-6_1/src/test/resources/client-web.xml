@@ -6,7 +6,7 @@
 
    <servlet>
       <servlet-name>Test</servlet-name>
-      <servlet-class>org.jboss.arquillian.container.jetty.embedded6_1.TestServlet</servlet-class>
+      <servlet-class>org.jboss.arquillian.container.jetty.embedded_6_1.TestServlet</servlet-class>
    </servlet>
 
    <servlet-mapping>
