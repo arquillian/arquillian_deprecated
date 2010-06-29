@@ -21,7 +21,7 @@
 
   <!-- Properties -->
   <properties>
-    <version.jboss_osgi_framework>1.0.0.Alpha5-SNAPSHOT</version.jboss_osgi_framework>
+    <version.jboss_osgi_framework>1.0.0.Alpha5</version.jboss_osgi_framework>
   </properties>
 
   <!-- Build -->
