@@ -23,21 +23,24 @@
 
   <!-- Aggregate Modules -->
   <modules>
-    <module>osgi-embedded</module>    
-    <module>jbossas-remote-50</module>
-    <module>jbossas-remote-51</module>
-    <module>jbossas-remote-60</module>
-    <module>jbossas-local-51</module>
-    <module>jbossas-local-60</module>
-    <module>jbossas-embedded-60</module>
-    <module>glassfish-embedded-30</module>
+    <module>jsr88</module>
+    <module>osgi-embedded-4.2</module> 
+<!--    <module>jbossas-remote-4_2</module> -->
+    <module>jbossas-remote-5</module>
+    <module>jbossas-remote-5.1</module>
+    <module>jbossas-remote-6</module>
+    <module>jbossas-managed-5.1</module>
+    <module>jbossas-managed-6</module>
+    <module>jbossas-embedded-6</module>
+    <module>glassfish-remote-3</module>
+    <module>glassfish-embedded-3</module>
     <module>jetty-embedded-6.1</module>
     <module>tomcat-embedded-6</module>
-    <module>weld-embedded</module>    
+    <module>weld-se-embedded-1</module>    
     <module>weld-ee-embedded</module>
-    <module>openejb</module>
+    <module>openejb-embedded-3.1</module>
     <module>reloaded</module>
-    <module>openwebbeans-embedded</module>
+    <module>openwebbeans-embedded-1</module>
   </modules>
 
 </project>

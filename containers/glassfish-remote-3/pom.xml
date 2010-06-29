@@ -13,7 +13,7 @@
 
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-glassfish-remote-3</artifactId>
-   <name>Arquillian GlassFish 3.x Remote Container (JSR 88)</name>
+   <name>Arquillian Container GlassFish Remote 3.x (JSR 88)</name>
    <description>GlassFish 3.x Remote Container integration (JSR 88) for the Arquillian Project</description>
 
    <properties>

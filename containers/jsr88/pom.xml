@@ -13,7 +13,7 @@
 
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-jsr88</artifactId>
-   <name>Arquillian JSR 88-compliant Remote Container</name>
+   <name>Arquillian Container JSR 88-compliant Remote</name>
    <description>JSR 88-compliant Remote Container integration for the Arquillian Project</description>
 
    <properties>
