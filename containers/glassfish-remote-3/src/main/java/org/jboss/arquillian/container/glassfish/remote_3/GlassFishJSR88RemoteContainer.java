@@ -45,7 +45,7 @@ public class GlassFishJSR88RemoteContainer extends JSR88RemoteContainer
 
     @Override
     public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException {
-       if (archive instanceof WebArchive)
+       if (WebArchive.class.isInstance(archive))
        {
           //ArchivePath webXmlPath = ArchivePaths.create("/WEB-INF/web.xml");
           //if (!archive.contains(webXmlPath))
