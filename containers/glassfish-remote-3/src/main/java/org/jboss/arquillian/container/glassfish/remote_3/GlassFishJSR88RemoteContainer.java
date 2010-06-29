@@ -57,7 +57,7 @@ public class GlassFishJSR88RemoteContainer extends JSR88RemoteContainer
           if (!archive.contains(sunWebXmlPath))
           {
              // sets the module name to "test"
-             ((WebArchive) archive).addWebResource("org/jboss/arquillian/container/glassfish/remote_3/sun-web.xml", "sun-web.xml");
+             WebArchive.class.cast(archive).addWebResource("org/jboss/arquillian/container/glassfish/remote_3/sun-web.xml", "sun-web.xml");
           }
        }
        return super.deploy(context, archive);
