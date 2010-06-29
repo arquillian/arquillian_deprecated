@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <arquillian xmlns="http://jboss.com/arquillian"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:gfembed="urn:arq:org.jboss.arquillian.glassfish.embedded30">
+   xmlns:gfembed="urn:arq:org.jboss.arquillian.container.glassfish.embedded_3">
 
    <gfembed:container>
       <gfembed:bindHttpPort>7070</gfembed:bindHttpPort>

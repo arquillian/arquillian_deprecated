@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.glassfish.embedded30;
+package org.jboss.arquillian.container.glassfish.embedded_3;
 
 import java.io.IOException;
 import javax.annotation.Resource;
