@@ -3,7 +3,7 @@
          xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
   <servlet>
     <servlet-name>hello</servlet-name>
-    <servlet-class>org.jboss.arquillian.container.tomcat.embedded.test.war.HelloWorldServlet</servlet-class>
+    <servlet-class>org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>

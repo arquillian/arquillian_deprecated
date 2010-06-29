@@ -2,7 +2,7 @@
 
 <arquillian xmlns="http://jboss.com/arquillian"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:tomcat="urn:arq:org.jboss.arquillian.container.tomcat.embedded">
+		xmlns:tomcat="urn:arq:org.jboss.arquillian.container.tomcat.embedded_6">
 
 	<tomcat:container>
 		<!--tomcat:tomcatHome>/home/deruelle/servers/apache-tomcat-6.0.20</tomcat:tomcatHome-->
