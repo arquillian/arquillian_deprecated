@@ -14,9 +14,9 @@
 
   <!-- Artifact Configuration -->
   <groupId>org.jboss.arquillian.container</groupId>
-  <artifactId>arquillian-osgi-embedded</artifactId>
-  <name>Arquillian Container OSGi Embedded</name>
-  <description>OSGi Embedded Container integration for the Arquillian Project</description>
+  <artifactId>arquillian-osgi-embedded-4.2</artifactId>
+  <name>Arquillian Container OSGi Embedded 4.2.x</name>
+  <description>OSGi 4.2.x Embedded Container integration for the Arquillian Project</description>
 
 
   <!-- Properties -->

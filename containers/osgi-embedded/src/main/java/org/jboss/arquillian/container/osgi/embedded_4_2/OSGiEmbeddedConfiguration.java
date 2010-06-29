@@ -14,43 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.osgi;
+package org.jboss.arquillian.container.osgi.embedded_4_2;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import org.jboss.arquillian.spi.ContainerConfiguration;
+import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * A BundleActivator that registers a {@ SimpleService}
+ * OSGiEmbeddedConfiguration
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class SimpleActivator implements BundleActivator
+public class OSGiEmbeddedConfiguration implements ContainerConfiguration
 {
-   @Override
-   public void start(BundleContext context) throws Exception
+   public ContainerProfile getContainerProfile()
    {
-      SimpleService service = new SimpleService()
-      {
-         @Override
-         public Integer sum(Integer... values)
-         {
-            Integer result = 0;
-            if (values != null)
-            {
-               for (Integer i : values)
-               {
-                  result += i;
-               }
-            }
-            return result;
-         }
-      };
-      context.registerService(SimpleService.class.getName(), service, null);
+      return ContainerProfile.STANDALONE;
    }
 
-   @Override
-   public void stop(BundleContext context) throws Exception
-   {
-   }
 }
