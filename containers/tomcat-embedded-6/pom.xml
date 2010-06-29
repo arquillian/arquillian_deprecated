@@ -13,7 +13,7 @@
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-tomcat-embedded-6</artifactId>
    <name>Arquillian Container Tomcat Embedded 6.x</name>
-   <description>Tomcat Embedded Container Integration for the Arquillian Project</description>
+   <description>Tomcat 6.x Embedded Container Integration for the Arquillian Project</description>
 
    <properties>
       <version.org.apache.tomcat>6.0.26</version.org.apache.tomcat>
