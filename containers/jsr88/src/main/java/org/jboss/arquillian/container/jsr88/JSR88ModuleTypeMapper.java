@@ -35,15 +35,15 @@ public class JSR88ModuleTypeMapper
 
    public ModuleType getModuleType(Archive<?> archive)
    {
-      if (archive instanceof WebArchive)
+      if (WebArchive.class.isInstance(archive))
       {
          return ModuleType.WAR;
       }
-      if (archive instanceof EnterpriseArchive)
+      if (EnterpriseArchive.class.isInstance(archive))
       {
          return ModuleType.EAR;
       }
-      if (archive instanceof ResourceAdapterArchive)
+      if (ResourceAdapterArchive.class.isInstance(archive))
       {
          return ModuleType.RAR;
       }
