@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.weld;
+package org.jboss.arquillian.container.weld.se.embedded_1;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkWrapClassLoader;
+import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -30,8 +32,6 @@ import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
 import org.jboss.arquillian.spi.event.suite.After;
 import org.jboss.arquillian.spi.event.suite.Before;
 import org.jboss.arquillian.spi.event.suite.BeforeClass;
-import org.jboss.arquillian.weld.shrinkwrap.ShrinkWrapClassLoader;
-import org.jboss.arquillian.weld.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.bootstrap.api.Environments;

@@ -1,1 +1,1 @@
-org.jboss.arquillian.weld.WeldSEConfiguration
+org.jboss.arquillian.container.weld.se.embedded_1.WeldSEConfiguration

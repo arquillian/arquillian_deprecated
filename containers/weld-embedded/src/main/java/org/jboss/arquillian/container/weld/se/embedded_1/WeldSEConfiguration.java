@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.weld;
+package org.jboss.arquillian.container.weld.se.embedded_1;
 
-import javax.enterprise.inject.spi.BeanManager;
-
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
-import org.jboss.weld.manager.api.WeldManager;
+import org.jboss.arquillian.spi.ContainerConfiguration;
+import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * WeldSETestEnricher
+ * WeldSEConfiguration
  *
- * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldSETestEnricher extends CDIInjectionEnricher
+public class WeldSEConfiguration implements ContainerConfiguration
 {
-   @Override
-   protected BeanManager lookupBeanManager(Context context)
+
+   public ContainerProfile getContainerProfile()
    {
-      return context.get(WeldManager.class);
+      return ContainerProfile.STANDALONE;
    }
+
 }

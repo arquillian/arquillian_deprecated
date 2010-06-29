@@ -14,21 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.weld.beans;
+package org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap;
 
-import javax.enterprise.context.ApplicationScoped;
+import org.jboss.shrinkwrap.api.Assignable;
+import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 
 /**
- * MyBean
+ * ShrinkwrapBeanDeploymentArchive
  *
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-@ApplicationScoped
-public class MyBean
+public interface ShrinkwrapBeanDeploymentArchive extends BeanDeploymentArchive, Assignable
 {
-   public String getName() 
-   {
-      return "aslak";
-   }
+
 }

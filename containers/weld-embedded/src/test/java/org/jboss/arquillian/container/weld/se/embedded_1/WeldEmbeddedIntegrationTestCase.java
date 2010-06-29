@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.weld;
+package org.jboss.arquillian.container.weld.se.embedded_1;
 
 import javax.inject.Inject;
 
 import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.container.weld.se.embedded_1.beans.MyBean;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.weld.beans.MyBean;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;

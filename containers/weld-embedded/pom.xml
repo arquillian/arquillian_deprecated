@@ -15,9 +15,9 @@
 
    <!-- Artifact Configuration -->
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-weld-embedded</artifactId>
-   <name>Arquillian Container Weld Embedded</name>
-   <description>Weld Embedded Container integration for the Arquillian Project</description>
+   <artifactId>arquillian-weld-se-embedded-1</artifactId>
+   <name>Arquillian Container Weld SE Embedded 1.x</name>
+   <description>Weld SE 1.x Embedded Container integration for the Arquillian Project</description>
 
 
    <!-- Properties -->
