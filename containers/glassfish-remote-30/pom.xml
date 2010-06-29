@@ -12,9 +12,9 @@
    <modelVersion>4.0.0</modelVersion>
 
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-glassfish-remote-30</artifactId>
-   <name>Arquillian GlassFish 3.0 Remote Container (JSR 88)</name>
-   <description>GlassFish 3.0 Remote Container integration (JSR 88) for the Arquillian Project</description>
+   <artifactId>arquillian-glassfish-remote-3</artifactId>
+   <name>Arquillian GlassFish 3.x Remote Container (JSR 88)</name>
+   <description>GlassFish 3.x Remote Container integration (JSR 88) for the Arquillian Project</description>
 
    <properties>
       <version.glassfish>3.0.1-b19</version.glassfish>

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.glassfish.remote30;
+package org.jboss.arquillian.container.glassfish.remote_3;
 
 import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.container.jsr88.JSR88RemoteContainer;
@@ -51,13 +51,13 @@ public class GlassFishJSR88RemoteContainer extends JSR88RemoteContainer
           //if (!archive.contains(webXmlPath))
           //{
           //   // sets the module name to "test"
-          //   ((WebArchive) archive).setWebXML("org/jboss/arquillian/container/glassfish/remote30/web.xml");
+          //   ((WebArchive) archive).setWebXML("org/jboss/arquillian/container/glassfish/remote_3/web.xml");
           //}
           ArchivePath sunWebXmlPath = ArchivePaths.create("/WEB-INF/sun-web.xml");
           if (!archive.contains(sunWebXmlPath))
           {
              // sets the module name to "test"
-             ((WebArchive) archive).addWebResource("org/jboss/arquillian/container/glassfish/remote30/sun-web.xml", "sun-web.xml");
+             ((WebArchive) archive).addWebResource("org/jboss/arquillian/container/glassfish/remote_3/sun-web.xml", "sun-web.xml");
           }
        }
        return super.deploy(context, archive);

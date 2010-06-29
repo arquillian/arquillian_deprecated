@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.glassfish.remote30;
+package org.jboss.arquillian.container.glassfish.remote_3;
 
 import org.jboss.arquillian.container.jsr88.JSR88Configuration;
 
