@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.tomcat.embedded.test.war;
+package org.jboss.arquillian.container.tomcat.embedded_6.test.war;
 
 import java.io.IOException;
 import java.io.PrintWriter;
