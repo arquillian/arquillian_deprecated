@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.jboss.arquillian.openejb.ejb;
+package org.jboss.arquillian.container.openejb.embedded_3_1.ejb;
 
 /**
  * Local business interface of an EJB which echos a sent message

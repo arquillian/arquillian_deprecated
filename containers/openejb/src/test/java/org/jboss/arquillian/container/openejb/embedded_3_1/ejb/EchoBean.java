@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.jboss.arquillian.openejb.ejb;
+package org.jboss.arquillian.container.openejb.embedded_3_1.ejb;
 
 import javax.annotation.Resource;
 import javax.annotation.security.DeclareRoles;
@@ -56,7 +56,7 @@ public class EchoBean implements EchoLocalBusiness
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.openejb.ejb.EchoLocalBusiness#securedEcho(java.lang.String)
+    * @see org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoLocalBusiness#securedEcho(java.lang.String)
     */
    @RolesAllowed(
    {ROLE_ADMIN})
@@ -69,7 +69,7 @@ public class EchoBean implements EchoLocalBusiness
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.openejb.ejb.EchoLocalBusiness#echo(java.lang.String)
+    * @see org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoLocalBusiness#echo(java.lang.String)
     */
    @Override
    @PermitAll

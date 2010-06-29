@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.openejb;
+package org.jboss.arquillian.container.openejb.embedded_3_1;
 
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoBean;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoLocalBusiness;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.openejb.ejb.EchoBean;
-import org.jboss.arquillian.openejb.ejb.EchoLocalBusiness;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;

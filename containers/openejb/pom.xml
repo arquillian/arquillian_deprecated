@@ -15,9 +15,9 @@
 
   <!-- Artifact Configuration -->
   <groupId>org.jboss.arquillian.container</groupId>
-  <artifactId>arquillian-openejb</artifactId>
-  <name>Arquillian Container OpenEJB</name>
-  <description>OpenEJB Integration for the Arquillian Project</description>
+  <artifactId>arquillian-openejb-embedded-3.1</artifactId>
+  <name>Arquillian Container OpenEJB Embedded 3.1.x</name>
+  <description>OpenEJB 3.1.x Embedded integration for the Arquillian Project</description>
 
 
   <!-- Properties -->

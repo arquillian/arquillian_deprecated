@@ -24,9 +24,9 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoBean;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoLocalBusiness;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.openejb.ejb.EchoBean;
-import org.jboss.arquillian.openejb.ejb.EchoLocalBusiness;
 import org.jboss.arquillian.prototyping.context.api.Properties;
 import org.jboss.arquillian.prototyping.context.api.Property;
 import org.jboss.arquillian.prototyping.context.api.openejb.OpenEJBArquillianContext;

@@ -1,1 +1,1 @@
-org.jboss.arquillian.openejb.OpenEJBConfiguration
+org.jboss.arquillian.container.openejb.embedded_3_1.OpenEJBConfiguration
