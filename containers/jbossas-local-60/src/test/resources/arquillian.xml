@@ -2,7 +2,7 @@
 
 <arquillian xmlns="http://jboss.com/arquillian"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:jboss="urn:arq:org.jboss.arquillian.jbossas.local60">
+		xmlns:jboss="urn:arq:org.jboss.arquillian.container.jbossas.managed_6">
 
 	<jboss:container>
 		<jbossHome>target/jboss-6.0.0.20100429-M3</jbossHome>

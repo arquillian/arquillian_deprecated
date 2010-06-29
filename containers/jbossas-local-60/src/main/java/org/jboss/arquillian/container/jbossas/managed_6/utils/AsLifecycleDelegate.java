@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jbossas.local60.utils;
+package org.jboss.arquillian.container.jbossas.managed_6.utils;
 
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jbossas.local60;
+package org.jboss.arquillian.container.jbossas.managed_6;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jboss.arquillian.jbossas.local60.utils.AsLifecycleDelegate;
+import org.jboss.arquillian.container.jbossas.managed_6.utils.AsLifecycleDelegate;
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
