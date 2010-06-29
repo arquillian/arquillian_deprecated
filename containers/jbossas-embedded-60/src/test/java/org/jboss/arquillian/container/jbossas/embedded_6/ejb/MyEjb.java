@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.jbossas.embedded60.ejb;
+package org.jboss.arquillian.container.jbossas.embedded_6.ejb;
 
 import javax.ejb.Stateless;
 
