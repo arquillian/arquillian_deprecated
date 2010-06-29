@@ -28,7 +28,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class JettyEmbeddedConfiguration implements ContainerConfiguration
 {
-   private String bindHost = "localhost";
+   private String bindAddress = "localhost";
 
    private int bindHttpPort = 9090;
 
@@ -49,14 +49,14 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
       this.bindHttpPort = bindHttpPort;
    }
 
-   public String getBindHost()
+   public String getBindAddress()
    {
-      return bindHost;
+      return bindAddress;
    }
 
-   public void setBindHost(String bindHost)
+   public void setBindAddress(String bindAddress)
    {
-      this.bindHost = bindHost;
+      this.bindAddress = bindAddress;
    }
 
    public boolean isJettyPlus()

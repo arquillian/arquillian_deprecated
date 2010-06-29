@@ -41,9 +41,9 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)
-public class JettyEmbeddedContainerClientTestCase
+public class JettyEmbeddedClientTestCase
 {
-   private static final Logger log = Logger.getLogger(JettyEmbeddedContainerClientTestCase.class.getName());
+   private static final Logger log = Logger.getLogger(JettyEmbeddedClientTestCase.class.getName());
    
    /**
     * Deployment for the test

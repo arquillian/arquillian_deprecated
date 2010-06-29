@@ -91,7 +91,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
       {
          server = new Server();
          Connector connector = new SelectChannelConnector();
-         connector.setHost(containerConfig.getBindHost());
+         connector.setHost(containerConfig.getBindAddress());
          connector.setPort(containerConfig.getBindHttpPort());
          server.setConnectors(new Connector[] { connector });
          server.start();
@@ -150,7 +150,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
          return new ServletMethodExecutor(
                new URL(
                      HTTP_PROTOCOL,
-                     containerConfig.getBindHost(),
+                     containerConfig.getBindAddress(),
                      containerConfig.getBindHttpPort(),
                      "/")
                );
