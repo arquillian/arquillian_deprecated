@@ -12,9 +12,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.jboss.arquillian.container</groupId>
-	<artifactId>arquillian-openwebbeans-embedded</artifactId>
-	<name>Arquillian Container OpenWebBeans Embedded</name>
-	<description>OpenWebBeans Embedded Container integration for the Arquillian Project</description>
+	<artifactId>arquillian-openwebbeans-embedded-1</artifactId>
+	<name>Arquillian Container OpenWebBeans Embedded 1.x</name>
+	<description>OpenWebBeans 1.x Embedded Container integration for the Arquillian Project</description>
 
 	<properties>
 		<version.openwebbeans>1.0.0-M4</version.openwebbeans>

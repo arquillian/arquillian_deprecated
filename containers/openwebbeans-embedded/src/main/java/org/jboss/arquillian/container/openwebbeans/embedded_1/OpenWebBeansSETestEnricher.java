@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.openwebbeans;
+package org.jboss.arquillian.container.openwebbeans.embedded_1;
 
 import javax.enterprise.inject.spi.BeanManager;
-import org.jboss.arquillian.openwebbeans.OpenWebBeansSEContainer.ContainerInstanceHolder;
+
+import org.jboss.arquillian.container.openwebbeans.embedded_1.OpenWebBeansSEContainer.ContainerInstanceHolder;
 
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.openwebbeans.beans;
+package org.jboss.arquillian.container.openwebbeans.embedded_1.beans;
 
 
 /**

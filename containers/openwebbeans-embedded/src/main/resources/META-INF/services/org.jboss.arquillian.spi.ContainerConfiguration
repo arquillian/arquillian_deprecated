@@ -1,1 +1,1 @@
-org.jboss.arquillian.openwebbeans.OpenWebBeansConfiguration
+org.jboss.arquillian.container.openwebbeans.embedded_1.OpenWebBeansConfiguration
