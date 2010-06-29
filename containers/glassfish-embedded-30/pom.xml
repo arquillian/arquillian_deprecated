@@ -15,9 +15,9 @@
 
    <!-- Artifact Configuration -->
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-glassfish-embedded-30</artifactId>
-   <name>Arquillian Container Glassfish Embedded 3.0</name>
-   <description>Glassfish Embedded Container integration for the Arquillian Project</description>
+   <artifactId>arquillian-glassfish-embedded-3</artifactId>
+   <name>Arquillian Container Glassfish Embedded 3.x</name>
+   <description>Glassfish Embedded 3.x Container integration for the Arquillian Project</description>
 
 
    <!-- Properties -->
