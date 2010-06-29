@@ -15,9 +15,9 @@
 
     <!-- Artifact Configuration -->
     <groupId>org.jboss.arquillian.container</groupId>
-    <artifactId>arquillian-jbossas-local-60</artifactId>
-    <name>Arquillian Container JBoss AS Local 6.0</name>
-    <description>JBoss AS 6.0 Local Container integration for the Arquillian Project</description>
+    <artifactId>arquillian-jbossas-managed-6</artifactId>
+    <name>Arquillian Container JBoss AS Managed 6.x</name>
+    <description>JBoss AS 6.x Managed Container integration for the Arquillian Project</description>
 
 
     <!-- Properties -->
