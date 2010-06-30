@@ -15,9 +15,9 @@
 
   <!-- Artifact Configuration -->
   <groupId>org.jboss.arquillian.container</groupId>
-  <artifactId>arquillian-reloaded</artifactId>
-  <name>Arquillian Container JBoss Reloaded</name>
-  <description>JBoss Reloaded Integration for the Arquillian Project</description>
+  <artifactId>arquillian-reloaded-embedded-1</artifactId>
+  <name>Arquillian Container JBoss Reloaded Embedded 1.x</name>
+  <description>JBoss Reloaded 1.x Embedded integration for the Arquillian Project</description>
 
 
   <!-- Properties -->

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.reloaded;
+package org.jboss.arquillian.container.reloaded.embedded_1;
 
 import org.jboss.beans.metadata.api.annotations.Start;
 import org.jboss.beans.metadata.api.annotations.Stop;
