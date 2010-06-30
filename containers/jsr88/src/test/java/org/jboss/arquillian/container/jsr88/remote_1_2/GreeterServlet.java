@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.jsr88;
+package org.jboss.arquillian.container.jsr88.remote_1_2;
 
 import java.io.IOException;
 import javax.ejb.EJB;

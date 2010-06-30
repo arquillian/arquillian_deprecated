@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.container.jsr88.JSR88RemoteContainer;
+import org.jboss.arquillian.container.jsr88.remote_1_2.JSR88Configuration;
+import org.jboss.arquillian.container.jsr88.remote_1_2.JSR88RemoteContainer;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -38,7 +38,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class GlassFishJSR88RemoteContainer extends JSR88RemoteContainer
 {
    @Override
-   public Class<? extends ContainerConfiguration> getContainerConfigurationClass()
+   public Class<? extends JSR88Configuration> getContainerConfigurationClass()
    {
       return GlassFishJSR88Configuration.class;
    }

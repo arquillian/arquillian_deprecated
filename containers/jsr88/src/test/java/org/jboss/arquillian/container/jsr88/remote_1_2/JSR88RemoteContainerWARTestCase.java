@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.jsr88;
+package org.jboss.arquillian.container.jsr88.remote_1_2;
 
 import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
 
@@ -28,11 +28,7 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,12 +44,12 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)
-public class JSR88RemoteContainerEARTestCase
+public class JSR88RemoteContainerWARTestCase
 {
    /**
     * Logger
     */
-   private static final Logger log = Logger.getLogger(JSR88RemoteContainerEARTestCase.class.getName());
+   private static final Logger log = Logger.getLogger(JSR88RemoteContainerWARTestCase.class.getName());
    
    /**
     * Deployment for the test
@@ -62,17 +58,11 @@ public class JSR88RemoteContainerEARTestCase
    @Deployment
    public static Archive<?> getTestArchive()
    {
-      ArchivePath root = ArchivePaths.create("/");
       final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class)
-            .addClasses(GreeterServlet.class);
-      final JavaArchive ejb = ShrinkWrap.create("test.jar", JavaArchive.class)
-            .addClass(Greeter.class);
-      final EnterpriseArchive ear = ShrinkWrap.create("test.ear", EnterpriseArchive.class)
-            .setApplicationXML("application.xml")
-            .add(war, root)
-            .add(ejb, root);
-      log.info(ear.toString(true));
-      return ear;
+            .addClasses(GreeterServlet.class, Greeter.class)
+            .setWebXML("web.xml");
+      log.info(war.toString(true));
+      return war;
    }
 
    @Test

@@ -12,9 +12,9 @@
    <modelVersion>4.0.0</modelVersion>
 
    <groupId>org.jboss.arquillian.container</groupId>
-   <artifactId>arquillian-jsr88</artifactId>
-   <name>Arquillian Container JSR 88-compliant Remote</name>
-   <description>JSR 88-compliant Remote Container integration for the Arquillian Project</description>
+   <artifactId>arquillian-jsr88-1.2</artifactId>
+   <name>Arquillian Container JSR 88-compliant Remote 1.2</name>
+   <description>JSR 88 1.2 compliant Remote Container integration for the Arquillian Project</description>
 
    <properties>
       <version.glassfish>3.0.1-b19</version.glassfish>

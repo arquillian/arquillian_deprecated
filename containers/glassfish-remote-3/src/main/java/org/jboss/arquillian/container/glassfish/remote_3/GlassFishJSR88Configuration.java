@@ -16,7 +16,7 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3;
 
-import org.jboss.arquillian.container.jsr88.JSR88Configuration;
+import org.jboss.arquillian.container.jsr88.remote_1_2.JSR88Configuration;
 
 /**
  * This class extends the {@link JSR88Configuration} to provide the
