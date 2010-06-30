@@ -17,6 +17,7 @@
 package org.jboss.arquillian.container.jsr88;
 
 import java.util.logging.Logger;
+
 import javax.enterprise.deploy.shared.CommandType;
 import javax.enterprise.deploy.spi.TargetModuleID;
 import javax.enterprise.deploy.spi.status.DeploymentStatus;
@@ -53,7 +54,6 @@ class JSR88DeploymentListener implements ProgressListener
       this.type = type;
    }
 
-   @Override
    public void handleProgressEvent(ProgressEvent event)
    {
       DeploymentStatus status = event.getDeploymentStatus();
@@ -65,7 +65,6 @@ class JSR88DeploymentListener implements ProgressListener
             ProgressObject startProgress = container.getDeploymentManager().start(ids);
             startProgress.addProgressListener(new ProgressListener()
             {
-               @Override
                public void handleProgressEvent(ProgressEvent startEvent)
                {
                   log.info(startEvent.getDeploymentStatus().getMessage());

@@ -31,7 +31,6 @@ import javax.enterprise.deploy.spi.status.ProgressObject;
 
 import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
@@ -92,8 +91,7 @@ public class JSR88RemoteContainer implements DeployableContainer
    
    public void setup(Context context, Configuration arquillianConfig)
    {
-      // I'm doing something wrong w/ the generics to require a cast
-      containerConfig = (JSR88Configuration) arquillianConfig.getContainerConfig(getContainerConfigurationClass());
+      containerConfig = arquillianConfig.getContainerConfig(getContainerConfigurationClass());
    }
    
    public void start(Context context) throws LifecycleException
@@ -224,7 +222,7 @@ public class JSR88RemoteContainer implements DeployableContainer
       }
    }
 
-   public Class<? extends ContainerConfiguration> getContainerConfigurationClass()
+   public Class<? extends JSR88Configuration> getContainerConfigurationClass()
    {
       return JSR88Configuration.class;
    }
