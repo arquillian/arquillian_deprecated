@@ -23,7 +23,7 @@
 
   <!-- Aggregate Modules -->
   <modules>
-    <module>jsr88</module>
+    <module>jsr88-remote-1.2</module>
     <module>osgi-embedded-4.2</module> 
 <!--    <module>jbossas-remote-4_2</module> -->
     <module>jbossas-remote-5</module>
@@ -37,9 +37,9 @@
     <module>jetty-embedded-6.1</module>
     <module>tomcat-embedded-6</module>
     <module>weld-se-embedded-1</module>    
-    <module>weld-ee-embedded</module>
+    <module>weld-ee-embedded-1.1</module>
     <module>openejb-embedded-3.1</module>
-    <module>reloaded</module>
+    <module>reloaded-embedded-1</module>
     <module>openwebbeans-embedded-1</module>
   </modules>
 

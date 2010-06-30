@@ -24,7 +24,7 @@
 
       <dependency>
          <groupId>org.jboss.arquillian.container</groupId>
-         <artifactId>arquillian-jsr88</artifactId>
+         <artifactId>arquillian-jsr88-remote-1.2</artifactId>
          <version>${project.version}</version>
          <exclusions>
             <exclusion>
