@@ -32,19 +32,8 @@ import org.jboss.weld.manager.api.WeldManager;
  * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class SessionLifeCycleController implements EventHandler<Event>
+public class RequestLifeCycleCreator implements EventHandler<Event>
 {
-   private Class<? extends Event> endSessionEvent;
-   
-   public SessionLifeCycleController(Class<? extends Event> endSessionEvent) 
-   {
-      if(endSessionEvent == null) 
-      {
-         throw new IllegalArgumentException("EndSessionEvent must be specified");
-      }
-      this.endSessionEvent = endSessionEvent;
-   }
-
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
@@ -57,37 +46,12 @@ public class SessionLifeCycleController implements EventHandler<Event>
       }
       ContextLifecycle lifeCycle = manager.getServices().get(ContextLifecycle.class);
 
-      String sessionId = UUID.randomUUID().toString();
+      String requestId = UUID.randomUUID().toString();
       BeanStore beanStore = new ConcurrentHashMapBeanStore();
       
-      lifeCycle.restoreSession(sessionId, beanStore);
-      context.register(endSessionEvent, new DestorySession(sessionId, beanStore));
+      lifeCycle.beginRequest(requestId, beanStore);
+      
+      context.add(CDIRequestID.class, new CDIRequestID(requestId, beanStore));
    }
    
-   /**
-    * DestorySession
-    *
-    * @author <a href="mailto:aknutsen@redhat.org">Aslak Knutsen</a>
-    * @version $Revision: $
-    */
-   private static class DestorySession implements EventHandler<Event> {
-      
-      private String sessionId;
-      private BeanStore beanStore;
-      
-      public DestorySession(String sessionId, BeanStore beanStore)
-      {
-         this.sessionId = sessionId;
-         this.beanStore = beanStore;
-      }
-      
-      /* (non-Javadoc)
-       * @see org.jboss.arquillian.spi.event.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
-       */
-      public void callback(Context context, Event event) throws Exception
-      {
-         WeldManager manager = context.get(WeldManager.class);
-         manager.getServices().get(ContextLifecycle.class).endSession(sessionId, beanStore);
-      }
-   }
 }

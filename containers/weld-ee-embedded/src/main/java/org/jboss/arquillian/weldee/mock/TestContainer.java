@@ -117,27 +117,6 @@ public class TestContainer
    }
    
    /**
-    * Utility method which ensures a request is active and available for use
-    * 
-    */
-   public TestContainer ensureRequestActive()
-   {
-      if (!getLifecycle().isSessionActive())
-      {
-         getLifecycle().beginSession();
-      }
-      if (!getLifecycle().isConversationActive())
-      {
-         ((ConversationContext) getLifecycle().getConversationContext()).setActive(true);
-      }
-      if (!getLifecycle().isRequestActive())
-      {
-         getLifecycle().beginRequest();
-      }
-      return this;
-   }
-
-   /**
     * Clean up the container, ending any active contexts
     * 
     */

@@ -16,34 +16,27 @@
  */
 package org.jboss.arquillian.weldee;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 
 /**
- * WeldSEConfiguration
+ * BeanUtils
  *
- * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldEEMockConfiguration implements ContainerConfiguration
+final class BeanUtils
 {
-   /**
-    * Flag to enable the Conversation Scope outside a JSF Request 
-    */
-   private boolean enableConversationScope = false;
+   private BeanUtils() {}
    
-   public ContainerProfile getContainerProfile()
+   @SuppressWarnings("unchecked")
+   static <T> T getBeanReference(BeanManager manager, Class<T> type) 
    {
-      return ContainerProfile.STANDALONE;
+      Bean bean = manager.resolve(manager.getBeans(type));
+      return (T)manager.getReference(
+            bean, 
+            type,
+            manager.createCreationalContext(null));
    }
 
-   public void setEnableConversationScope(boolean enableConversationScope)
-   {
-      this.enableConversationScope = enableConversationScope;
-   }
-   
-   public boolean isEnableConversationScope()
-   {
-      return enableConversationScope;
-   }
 }

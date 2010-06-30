@@ -16,34 +16,29 @@
  */
 package org.jboss.arquillian.weldee;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.event.Event;
+import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.weld.context.ContextLifecycle;
+import org.jboss.weld.manager.api.WeldManager;
 
 /**
- * WeldSEConfiguration
  *
- * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aknutsen@redhat.org">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldEEMockConfiguration implements ContainerConfiguration
-{
-   /**
-    * Flag to enable the Conversation Scope outside a JSF Request 
+public class RequestLifeCycleDestroyer implements EventHandler<Event> {
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.event.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
-   private boolean enableConversationScope = false;
-   
-   public ContainerProfile getContainerProfile()
+   public void callback(Context context, Event event) throws Exception
    {
-      return ContainerProfile.STANDALONE;
-   }
-
-   public void setEnableConversationScope(boolean enableConversationScope)
-   {
-      this.enableConversationScope = enableConversationScope;
-   }
-   
-   public boolean isEnableConversationScope()
-   {
-      return enableConversationScope;
+      WeldManager manager = context.get(WeldManager.class);
+      CDIRequestID id = context.get(CDIRequestID.class);
+      if(id != null)
+      {
+         manager.getServices().get(ContextLifecycle.class).endRequest(id.getId(), id.getBeanStore());
+      }
    }
 }

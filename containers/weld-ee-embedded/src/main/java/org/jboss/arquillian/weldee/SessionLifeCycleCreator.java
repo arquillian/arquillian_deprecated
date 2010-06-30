@@ -32,19 +32,8 @@ import org.jboss.weld.manager.api.WeldManager;
  * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class RequestLifeCycleController implements EventHandler<Event>
+public class SessionLifeCycleCreator implements EventHandler<Event>
 {
-   private Class<? extends Event> endRequestEvent;
-   
-   public RequestLifeCycleController(Class<? extends Event> endRequestEvent) 
-   {
-      if(endRequestEvent == null) 
-      {
-         throw new IllegalArgumentException("EndSessionEvent must be specified");
-      }
-      this.endRequestEvent = endRequestEvent;
-   }
-
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
@@ -57,38 +46,10 @@ public class RequestLifeCycleController implements EventHandler<Event>
       }
       ContextLifecycle lifeCycle = manager.getServices().get(ContextLifecycle.class);
 
-      String requestId = UUID.randomUUID().toString();
+      String sessionId = UUID.randomUUID().toString();
       BeanStore beanStore = new ConcurrentHashMapBeanStore();
       
-      lifeCycle.beginRequest(requestId, beanStore);
-      
-      context.register(endRequestEvent, new DestoryRequest(requestId, beanStore));
-   }
-   
-   /**
-    * DestorySession
-    *
-    * @author <a href="mailto:aknutsen@redhat.org">Aslak Knutsen</a>
-    * @version $Revision: $
-    */
-   private static class DestoryRequest implements EventHandler<Event> {
-      
-      private String requestId;
-      private BeanStore beanStore;
-      
-      public DestoryRequest(String requestId, BeanStore beanStore)
-      {
-         this.requestId = requestId;
-         this.beanStore = beanStore;
-      }
-      
-      /* (non-Javadoc)
-       * @see org.jboss.arquillian.spi.event.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
-       */
-      public void callback(Context context, Event event) throws Exception
-      {
-         WeldManager manager = context.get(WeldManager.class);
-         manager.getServices().get(ContextLifecycle.class).endRequest(requestId, beanStore);
-      }
+      lifeCycle.restoreSession(sessionId, beanStore);
+      context.add(CDISessionID.class, new CDISessionID(sessionId, beanStore));
    }
 }

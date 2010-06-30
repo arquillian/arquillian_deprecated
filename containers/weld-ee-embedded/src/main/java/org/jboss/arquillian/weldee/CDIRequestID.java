@@ -16,34 +16,33 @@
  */
 package org.jboss.arquillian.weldee;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.weld.context.api.BeanStore;
 
 /**
- * WeldSEConfiguration
+ * Simple CDI COnversation ID holder object. Bound to the Class context
  *
- * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldEEMockConfiguration implements ContainerConfiguration
+public class CDIRequestID 
 {
-   /**
-    * Flag to enable the Conversation Scope outside a JSF Request 
-    */
-   private boolean enableConversationScope = false;
+   private String id;
+   private BeanStore beanStore;
    
-   public ContainerProfile getContainerProfile()
+   public CDIRequestID(final String id, BeanStore beanStore)
    {
-      return ContainerProfile.STANDALONE;
-   }
-
-   public void setEnableConversationScope(boolean enableConversationScope)
-   {
-      this.enableConversationScope = enableConversationScope;
+      this.id = id;
+      this.beanStore = beanStore;
    }
    
-   public boolean isEnableConversationScope()
+   public String getId()
    {
-      return enableConversationScope;
+      return id;
+   }
+   
+   public BeanStore getBeanStore()
+   {
+      return beanStore;
    }
 }
+

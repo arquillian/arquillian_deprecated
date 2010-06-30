@@ -23,16 +23,21 @@ import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.arquillian.spi.event.container.AfterDeploy;
 import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
 import org.jboss.arquillian.spi.event.suite.After;
 import org.jboss.arquillian.spi.event.suite.Before;
-import org.jboss.arquillian.spi.event.suite.BeforeClass;
+import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.arquillian.spi.event.suite.TestEvent;
 import org.jboss.arquillian.weldee.mock.MockEELifecycle;
+import org.jboss.arquillian.weldee.mock.MockHttpSession;
+import org.jboss.arquillian.weldee.mock.MockServletContext;
 import org.jboss.arquillian.weldee.mock.TestContainer;
 import org.jboss.arquillian.weldee.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.manager.api.WeldManager;
+import org.jboss.weld.servlet.HttpSessionManager;
 
 /**
  * WeldEEMockConainer
@@ -52,6 +57,10 @@ public class WeldEEMockContainer implements DeployableContainer
 
    public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
+      boolean enableConversation = context.get(Configuration.class)
+                                          .getContainerConfig(WeldEEMockConfiguration.class)
+                                          .isEnableConversationScope();
+      
       MockEELifecycle lifecycle = new MockEELifecycle(
             archive.as(ShrinkwrapBeanDeploymentArchive.class));
 
@@ -62,8 +71,33 @@ public class WeldEEMockContainer implements DeployableContainer
       context.add(WeldBootstrap.class, lifecycle.getBootstrap());
       context.add(WeldManager.class, container.getBeanManager());
 
-      context.register(BeforeClass.class, new SessionLifeCycleController(BeforeUnDeploy.class));
-      context.register(Before.class, new RequestLifeCycleController(After.class));
+      context.register(AfterDeploy.class, new SessionLifeCycleCreator());
+      context.register(BeforeUnDeploy.class, new SessionLifeCycleDestoryer());
+      
+      context.register(Before.class, new RequestLifeCycleCreator());
+
+      // handler to 'Produce' a fake HTTPSession
+      // TODO: Weld ConversationManager should communicate with a Service so it's possible to override the HttpSessionManager as part of Bootstrap.
+      context.register(Before.class, new EventHandler<TestEvent>()
+      {
+         public void callback(Context context, TestEvent event) throws Exception
+         {
+            WeldManager manager = context.get(WeldManager.class);
+            CDISessionID id = context.get(CDISessionID.class);
+            if(id != null)
+            {
+               BeanUtils.getBeanReference(manager, HttpSessionManager.class)
+                     .setSession(
+                           new MockHttpSession(id.getId(), new MockServletContext("/")));
+            }
+         }
+      });
+      if(enableConversation)
+      {
+         context.register(Before.class, new ConversationLifeCycleCreator());         
+         context.register(After.class, new ConversationLifeCycleDestoryer());
+      }
+      context.register(After.class, new RequestLifeCycleDestroyer());
       
       return new LocalMethodExecutor();
    }

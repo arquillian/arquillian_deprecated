@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.weldee.beans;
 
+import java.io.Serializable;
+
 import javax.enterprise.context.ApplicationScoped;
 
 /**
@@ -25,8 +27,10 @@ import javax.enterprise.context.ApplicationScoped;
  * @version $Revision: $
  */
 @ApplicationScoped
-public class MyBean
+public class MyBean implements Serializable
 {
+   private static final long serialVersionUID = 1L;
+
    public String getName() 
    {
       return "aslak";
