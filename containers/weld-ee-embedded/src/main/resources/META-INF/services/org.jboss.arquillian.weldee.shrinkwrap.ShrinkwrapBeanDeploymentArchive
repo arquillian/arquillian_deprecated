@@ -1,1 +1,1 @@
-org.jboss.arquillian.weldee.shrinkwrap.ShrinkwrapBeanDeploymentArchiveImpl
+org.jboss.arquillian.container.weld.ee.embedded_1_1.shrinkwrap.ShrinkwrapBeanDeploymentArchiveImpl
