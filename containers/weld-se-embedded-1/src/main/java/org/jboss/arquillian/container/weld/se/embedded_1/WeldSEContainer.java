@@ -28,10 +28,6 @@ import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
-import org.jboss.arquillian.spi.event.suite.After;
-import org.jboss.arquillian.spi.event.suite.Before;
-import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.bootstrap.api.Environments;
@@ -54,14 +50,6 @@ public class WeldSEContainer implements DeployableContainer
     */
    public void setup(Context context, Configuration configuration)
    {
-      //configuration.getContainerConfig(WeldSEConfiguration.class);
-
-        /*
-         *  TODO: make this work ? these handlers will be fired. 
-         *  Not with the needed ClassContext but with the SuiteContext the event was fired from..  
-         */
-//      context.register(AfterDeploy.class, new SessionLifeCycleController(BeforeUnDeploy.class));
-//      context.register(Before.class, new RequestLifeCycleController(After.class));
    }
    
    /* (non-Javadoc)
@@ -120,8 +108,6 @@ public class WeldSEContainer implements DeployableContainer
       
       context.add(WeldBootstrap.class, bootstrap);
       context.add(WeldManager.class, manager);
-      context.register(BeforeClass.class, new SessionLifeCycleController(BeforeUnDeploy.class));
-      context.register(Before.class, new RequestLifeCycleController(After.class));
       
       return new LocalMethodExecutor();
    }
