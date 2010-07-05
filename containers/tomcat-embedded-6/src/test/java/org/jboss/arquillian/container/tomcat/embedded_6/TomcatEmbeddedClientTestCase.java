@@ -40,7 +40,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
-public class TomcatIntegrationTestCase {
+public class TomcatEmbeddedClientTestCase {
 
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/hello";
 
@@ -53,7 +53,7 @@ public class TomcatIntegrationTestCase {
 	 * Logger
 	 */
 	private static final Logger log = Logger
-			.getLogger(TomcatIntegrationTestCase.class.getName());
+			.getLogger(TomcatEmbeddedClientTestCase.class.getName());
 
 	// -------------------------------------------------------------------------------------||
 	// Instance Members

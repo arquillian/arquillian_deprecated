@@ -12,8 +12,8 @@
 
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-tomcat-embedded-6</artifactId>
-   <name>Arquillian Container Tomcat Embedded 6.x</name>
-   <description>Tomcat 6.x Embedded Container Integration for the Arquillian Project</description>
+   <name>Arquillian Container: Tomcat Embedded 6.x</name>
+   <description>Tomcat 6.x Embedded container integration for the Arquillian Project</description>
 
    <properties>
       <version.org.apache.tomcat>6.0.26</version.org.apache.tomcat>
@@ -39,7 +39,7 @@
          <artifactId>shrinkwrap-impl-base</artifactId>
       </dependency>
 
-      <!-- Not yet working -->
+      <!-- Not yet working w/o a hack -->
       <dependency>
         <groupId>org.jboss.arquillian.protocol</groupId>
         <artifactId>arquillian-protocol-servlet-ee6</artifactId>
