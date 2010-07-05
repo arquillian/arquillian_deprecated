@@ -29,7 +29,7 @@ public class TomcatConfiguration implements ContainerConfiguration {
 
 	private String bindAddress = "localhost";
 
-	private int httpPort = 8080;
+	private int bindHttpPort = 8080;
 
 	private String tomcatHome = null;
 	
@@ -37,7 +37,7 @@ public class TomcatConfiguration implements ContainerConfiguration {
 
 	private String workDir = null;
 	
-	private String serverName = null;
+	private String serverName = "tomcat";
 
 	public ContainerProfile getContainerProfile() {
 		return ContainerProfile.CLIENT;
@@ -51,21 +51,18 @@ public class TomcatConfiguration implements ContainerConfiguration {
 		this.bindAddress = bindAddress;
 	}
 
-	public int getHttpPort() {
-		return httpPort;
+	public int getBindHttpPort() {
+		return bindHttpPort;
 	}
 
 	/**
-	 * Set the HTTP Connect port. <br/>
-	 * This is not the JBoss AS HTTP Bind port, bind port must be set in the
-	 * JBoss XML configuration.<br/>
-	 * <b>Only set this if default http port is changed in JBoss AS!</b>
+	 * Set the HTTP bind port.
 	 * 
-	 * @param httpPort
-	 *            HTTP Connect port
+	 * @param httpBindPort
+	 *            HTTP bind port
 	 */
-	public void setHttpPort(int httpPort) {
-		this.httpPort = httpPort;
+	public void setBindHttpPort(int bindHttpPort) {
+		this.bindHttpPort = bindHttpPort;
 	}
 
 	public void setTomcatHome(String jbossHome) {

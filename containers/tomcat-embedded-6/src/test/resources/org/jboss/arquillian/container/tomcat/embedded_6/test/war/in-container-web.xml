@@ -6,6 +6,12 @@
       http://java.sun.com/xml/ns/javaee
       http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+   <env-entry>
+      <env-entry-name>name</env-entry-name>
+      <env-entry-type>java.lang.String</env-entry-type>
+      <env-entry-value>Tomcat</env-entry-value>
+   </env-entry>
+
    <servlet>
       <servlet-name>hello</servlet-name>
       <servlet-class>org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet</servlet-class>
@@ -14,6 +20,16 @@
    <servlet-mapping>
       <servlet-name>hello</servlet-name>
       <url-pattern>/hello</url-pattern>
+   </servlet-mapping>
+
+   <servlet>
+      <servlet-name>ServletTestRunner</servlet-name>
+      <servlet-class>org.jboss.arquillian.protocol.servlet.ServletTestRunner</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>ServletTestRunner</servlet-name>
+      <url-pattern>/ArquillianServletRunner</url-pattern>
    </servlet-mapping>
 
 </web-app>

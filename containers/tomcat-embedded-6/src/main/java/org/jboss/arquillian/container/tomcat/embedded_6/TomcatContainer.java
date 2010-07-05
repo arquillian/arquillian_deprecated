@@ -19,6 +19,7 @@ package org.jboss.arquillian.container.tomcat.embedded_6;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,52 +30,40 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.Embedded;
+import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.TestMethodExecutor;
-import org.jboss.arquillian.spi.TestResult;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.tomcat.api.ShrinkWrapStandardContext;
 
 /**
  * Arquillian {@link DeployableContainer} adaptor for a target Tomcat
- * environment; responible for lifecycle and deployment operations
+ * environment; responsible for lifecycle and deployment operations
  * 
  * @author <a href="mailto:jean.deruelle@gmail.com">Jean Deruelle</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 public class TomcatContainer implements DeployableContainer {
 
 	private static final String ENV_VAR = "${env.";
 
-	// -------------------------------------------------------------------------------------||
-	// Class Members
-	// ----------------------------------------------------------------------||
-	// -------------------------------------------------------------------------------------||	
+   private static final String HTTP_PROTOCOL = "http";
 
-	private static final String SEPARATOR = "/";
+   private static final String SEPARATOR = "/";
 
-	/**
-	 * Logger
-	 */
-	private static final Logger log = Logger.getLogger(TomcatContainer.class
-			.getName());
-
-	// -------------------------------------------------------------------------------------||
-	// Instance Members
-	// -------------------------------------------------------------------||
-	// -------------------------------------------------------------------------------------||
+	private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
 
 	/**
 	 * Tomcat embedded
 	 */
-	private Embedded tomcatEmbedded;
+	private Embedded embedded;
+   
 	/**
 	 * Engine contained within Tomcat embedded
 	 */
@@ -86,49 +75,28 @@ public class TomcatContainer implements DeployableContainer {
 	private Host standardHost;	
 
 	/**
-	 * Tomcat configuration
+	 * Tomcat container configuration
 	 */
 	private TomcatConfiguration configuration;
 
-	private String serverName = "tomcat";
+	private String serverName;
 	
-	private String host = "localhost";
+	private String bindAddress;
 
-	private int port = 8080;
+	private int bindPort;
 
 	private boolean wasStarted;
 
 	private final List<String> failedUndeployments = new ArrayList<String>();
 
-	// -------------------------------------------------------------------------------------||
-	// Required Implementations
-	// -----------------------------------------------------------||
-	// -------------------------------------------------------------------------------------||
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian
-	 * .spi.Context, org.jboss.arquillian.spi.Configuration)
-	 */
 	public void setup(Context context, Configuration configuration) {
 		this.configuration = configuration
 				.getContainerConfig(TomcatConfiguration.class);
-		host = this.configuration.getBindAddress();
-		port = this.configuration.getHttpPort();
-		if (this.configuration.getServerName() != null) {
-			serverName = this.configuration.getServerName();
-		}
+		bindAddress = this.configuration.getBindAddress();
+		bindPort = this.configuration.getBindHttpPort();
+      serverName = this.configuration.getServerName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian
-	 * .spi.Context)
-	 */
 	public void start(Context context) throws LifecycleException {
 		try {
 			startTomcatEmbedded();
@@ -137,13 +105,6 @@ public class TomcatContainer implements DeployableContainer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian
-	 * .spi.Context)
-	 */
 	public void stop(Context context) throws LifecycleException {
 		try {
 			removeFailedUnDeployments();
@@ -159,63 +120,53 @@ public class TomcatContainer implements DeployableContainer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian
-	 * .spi.Context, org.jboss.shrinkwrap.api.Archive)
-	 */
 	public ContainerMethodExecutor deploy(Context context,
 			final Archive<?> archive) throws DeploymentException {
 		if (archive == null) {
 			throw new IllegalArgumentException("Archive must be specified");
 		}
-		if (tomcatEmbedded == null) {
+		if (embedded == null) {
 			throw new IllegalStateException("start has not been called!");
 		}
-		final String deploymentName = archive.getName();
 
-		File file = new File(deploymentName);
-		archive.as(ZipExporter.class).exportZip(file, true);
-
-		try {
-			StandardContext standardContext = (StandardContext) tomcatEmbedded
-					.createContext(deploymentName, file.getAbsolutePath());
-			StandardManager manager = new StandardManager();		
-			standardContext.setManager(manager);
+      try {
+         StandardContext standardContext = archive.as(ShrinkWrapStandardContext.class);
 			standardContext.setParent(standardHost);
          if (configuration.getTomcatWorkDir() != null)
          {
             standardContext.setWorkDir(configuration.getTomcatWorkDir());
          }
+         // possible option
+         standardContext.setUnpackWAR(false);
 			standardHost.addChild(standardContext);
+         context.add(StandardContext.class, standardContext);
 		} catch (Exception e) {
-			throw new DeploymentException("Failed to deploy " + deploymentName,
-					e);
+			throw new DeploymentException("Failed to deploy " + archive.getName(), e);
 		}
-		return new ContainerMethodExecutor() {
-			
-			public TestResult invoke(TestMethodExecutor testMethodExecutor) {
-				// nothing to do here, done by the test
-				return null;
-			}
-		};		
+
+      try
+      {
+         return new ServletMethodExecutor(
+               new URL(
+                     HTTP_PROTOCOL,
+                     bindAddress,
+                     bindPort,
+                     "/")
+               );
+      }
+      catch (Exception e)
+      {
+         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
+      }
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian
-	 * .spi.Context, org.jboss.shrinkwrap.api.Archive)
-	 */
 	public void undeploy(Context context, Archive<?> archive)
 			throws DeploymentException {
-		if (archive == null) {
-			throw new IllegalArgumentException("Archive must be specified");
-		}		
-		undeploy(archive.getName());
+      StandardContext standardContext = context.get(StandardContext.class);
+      if (standardContext != null)
+      {
+         standardHost.removeChild(standardContext);
+      }
 	}
 
 	private void undeploy(String name) throws DeploymentException {
@@ -223,8 +174,6 @@ public class TomcatContainer implements DeployableContainer {
 		if(child != null) {
 			standardHost.removeChild(child);
 		}
-		File file = new File(name);
-		file.delete();
 	}
 
 	private void removeFailedUnDeployments() throws IOException {
@@ -241,16 +190,15 @@ public class TomcatContainer implements DeployableContainer {
 			}
 		}
 		if (remainingDeployments.size() > 0) {
-			log.severe("Failed to undeploy these artifacts: "
-					+ remainingDeployments);
+			log.severe("Failed to undeploy these artifacts: " + remainingDeployments);
 		}
 		failedUndeployments.clear();
 	}
 
 	protected void startTomcatEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException {
 		// creating the tomcat embedded == service tag in server.xml
-		tomcatEmbedded = new Embedded();
-		tomcatEmbedded.setName(serverName);
+		embedded = new Embedded();
+		embedded.setName(serverName);
 		String tomcatHome = configuration.getTomcatHome();
 		if(tomcatHome != null) {
 			if(tomcatHome.startsWith(ENV_VAR)) {
@@ -260,39 +208,37 @@ public class TomcatContainer implements DeployableContainer {
 			} 
 			if(tomcatHome != null) {
 				tomcatHome = new File(tomcatHome).getAbsolutePath();
-				tomcatEmbedded.setCatalinaBase(tomcatHome);
-				tomcatEmbedded.setCatalinaHome(tomcatHome);
+				embedded.setCatalinaBase(tomcatHome);
+				embedded.setCatalinaHome(tomcatHome);
 			}						
 		}
 		// creates the engine == engine tag in server.xml
-		engine = tomcatEmbedded.createEngine();
+		engine = embedded.createEngine();
 		engine.setName(serverName);
-		engine.setDefaultHost(host + SEPARATOR);
-		engine.setService(tomcatEmbedded);
-		tomcatEmbedded.setContainer(engine);
-		tomcatEmbedded.addEngine(engine);
+		engine.setDefaultHost(bindAddress + SEPARATOR);
+		engine.setService(embedded);
+		embedded.setContainer(engine);
+		embedded.addEngine(engine);
 		// creates the host == host tag in server.xml
 		if(tomcatHome != null) {
-			standardHost = tomcatEmbedded.createHost(host + SEPARATOR, tomcatEmbedded.getCatalinaHome() + configuration
-				.getAppBase());
+			standardHost = embedded.createHost(bindAddress + SEPARATOR, embedded.getCatalinaHome() + configuration.getAppBase());
 		} else {
-			standardHost = tomcatEmbedded.createHost(host + SEPARATOR, System.getProperty("java.io.tmpdir"));
+			standardHost = embedded.createHost(bindAddress + SEPARATOR, System.getProperty("java.io.tmpdir"));
 		}
 		standardHost.setParent(engine);
 		engine.addChild(standardHost);
 		// creates an http connector == connector in server.xml
 		// TODO externalize this stuff in the configuration
-		Connector connector = tomcatEmbedded.createConnector(InetAddress
-				.getByName(host), port, false);
-		tomcatEmbedded.addConnector(connector);
+		Connector connector = embedded.createConnector(InetAddress.getByName(bindAddress), bindPort, false);
+		embedded.addConnector(connector);
 		connector.setContainer(engine);
 		//starts tomcat embedded
-		tomcatEmbedded.init();
-		tomcatEmbedded.start();
+		embedded.init();
+		embedded.start();
 		wasStarted = true;
 	}
 
 	protected void stopTomcatEmbedded() throws LifecycleException, org.apache.catalina.LifecycleException {
-		tomcatEmbedded.stop();
+		embedded.stop();
 	}
 }

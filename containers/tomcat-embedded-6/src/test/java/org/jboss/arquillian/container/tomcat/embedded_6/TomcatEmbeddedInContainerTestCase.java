@@ -19,10 +19,9 @@ package org.jboss.arquillian.container.tomcat.embedded_6;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Run;
-import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -39,8 +38,7 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-@Run(RunModeType.AS_CLIENT)
-public class TomcatIntegrationTestCase {
+public class TomcatEmbeddedInContainerTestCase {
 
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/hello";
 
@@ -53,7 +51,7 @@ public class TomcatIntegrationTestCase {
 	 * Logger
 	 */
 	private static final Logger log = Logger
-			.getLogger(TomcatIntegrationTestCase.class.getName());
+			.getLogger(TomcatEmbeddedInContainerTestCase.class.getName());
 
 	// -------------------------------------------------------------------------------------||
 	// Instance Members
@@ -64,16 +62,18 @@ public class TomcatIntegrationTestCase {
 	 * Define the deployment
 	 */
 	@Deployment
-	public static WebArchive createDeployment() {
-		return ShrinkWrap.create("test.war", WebArchive.class).addClasses(
-				HelloWorldServlet.class).addWebResource(
-				HelloWorldServlet.class.getPackage(), "web.xml", "web.xml");
+	public static WebArchive createTestArchive() {
+		return ShrinkWrap.create("test.war", WebArchive.class)
+         .addClasses(HelloWorldServlet.class)
+         .addWebResource(HelloWorldServlet.class.getPackage(), "in-container-web.xml", "web.xml");
 	}
 
 	// -------------------------------------------------------------------------------------||
 	// Tests
 	// ------------------------------------------------------------------------------||
 	// -------------------------------------------------------------------------------------||
+
+   @Resource(name = "name") String name;
 
 	/**
 	 * Ensures the {@link HelloWorldServlet} returns the expected response
@@ -96,5 +96,6 @@ public class TomcatIntegrationTestCase {
 		Assert.assertEquals("Expected output was not equal by value", expected,
 				httpResponse);
 		log.info("Got expected result from Http Servlet: " + httpResponse);
+      log.info("Name: " + name);
 	}
 }
