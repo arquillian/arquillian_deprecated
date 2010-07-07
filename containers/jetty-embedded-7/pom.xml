@@ -50,11 +50,6 @@
       </dependency>
 
       <!-- TODO We likely need a servlet packager to restrict use of EAR -->
-      <dependency>
-         <groupId>org.jboss.arquillian.packager</groupId>
-         <artifactId>arquillian-packager-javaee</artifactId>
-         <version>${project.version}</version>
-      </dependency>
 
       <dependency>
          <groupId>org.jboss.arquillian.testenricher</groupId>

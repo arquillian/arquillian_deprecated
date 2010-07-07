@@ -12,7 +12,7 @@
 
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-tomcat-embedded-6</artifactId>
-   <name>Arquillian Container: Tomcat Embedded 6.x</name>
+   <name>Arquillian Container Tomcat Embedded 6.x</name>
    <description>Tomcat 6.x Embedded container integration for the Arquillian Project</description>
 
    <properties>
@@ -47,11 +47,6 @@
       </dependency>
 
       <!-- TODO We likely need a servlet packager to restrict use of EAR -->
-      <dependency>
-         <groupId>org.jboss.arquillian.packager</groupId>
-         <artifactId>arquillian-packager-javaee</artifactId>
-         <version>${project.version}</version>
-      </dependency>
 
       <dependency>
          <groupId>org.jboss.arquillian.testenricher</groupId>

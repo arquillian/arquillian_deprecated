@@ -43,16 +43,10 @@
          <scope>provided</scope>
       </dependency>
 
+      <!-- TODO We likely need a servlet packager to restrict use of EAR -->
       <dependency>
          <groupId>org.jboss.arquillian.protocol</groupId>
          <artifactId>arquillian-protocol-servlet-ee6</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-
-      <!-- TODO We likely need a servlet packager to restrict use of EAR -->
-      <dependency>
-         <groupId>org.jboss.arquillian.packager</groupId>
-         <artifactId>arquillian-packager-javaee</artifactId>
          <version>${project.version}</version>
       </dependency>
 
