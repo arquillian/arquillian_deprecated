@@ -35,7 +35,7 @@ import org.glassfish.api.deployment.UndeployCommandParameters;
 import org.glassfish.api.embedded.ContainerBuilder;
 import org.glassfish.api.embedded.EmbeddedFileSystem;
 import org.glassfish.api.embedded.Server;
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;

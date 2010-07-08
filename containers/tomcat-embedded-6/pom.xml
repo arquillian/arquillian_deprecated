@@ -42,7 +42,7 @@
       <!-- Not yet working w/o a hack -->
       <dependency>
         <groupId>org.jboss.arquillian.protocol</groupId>
-        <artifactId>arquillian-protocol-servlet-ee6</artifactId>
+        <artifactId>arquillian-protocol-servlet-3</artifactId>
         <version>${project.version}</version>
       </dependency>
 

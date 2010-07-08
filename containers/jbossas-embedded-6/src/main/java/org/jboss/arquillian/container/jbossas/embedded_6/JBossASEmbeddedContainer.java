@@ -18,7 +18,7 @@ package org.jboss.arquillian.container.jbossas.embedded_6;
 
 import java.net.URL;
 
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;

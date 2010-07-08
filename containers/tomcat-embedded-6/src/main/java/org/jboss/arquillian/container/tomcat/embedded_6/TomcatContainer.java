@@ -31,7 +31,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Embedded;
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;

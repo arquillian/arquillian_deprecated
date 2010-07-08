@@ -29,7 +29,7 @@ import javax.enterprise.deploy.spi.TargetModuleID;
 import javax.enterprise.deploy.spi.factories.DeploymentFactory;
 import javax.enterprise.deploy.spi.status.ProgressObject;
 
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
+import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
