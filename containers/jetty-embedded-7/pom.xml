@@ -13,7 +13,7 @@
 
    <groupId>org.jboss.arquillian.container</groupId>
    <artifactId>arquillian-jetty-embedded-7</artifactId>
-   <name>Arquillian Container: Jetty Embedded 7.x and 8.x</name>
+   <name>Arquillian Container Jetty Embedded 7.x and 8.x</name>
    <description>Jetty Embedded 7.x and 8.x container integration for the Arquillian project</description>
 
    <properties>
