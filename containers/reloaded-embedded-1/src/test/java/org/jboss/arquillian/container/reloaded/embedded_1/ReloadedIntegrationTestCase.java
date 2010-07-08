@@ -25,8 +25,8 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.beans.metadata.api.annotations.Inject;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class ReloadedIntegrationTestCase
                         + LifecyclePojo.class.getName() + "\" /></deployment>").getBytes());
          }
       };
-      final JavaArchive testJar = ShrinkWrap.create("pojo.jar", JavaArchive.class).addClass(LifecyclePojo.class).add(
+      final JavaArchive testJar = ShrinkWrap.create(JavaArchive.class, "pojo.jar").addClass(LifecyclePojo.class).add(
             deploymentXmlAsset, ArchivePaths.create("pojo-jboss-beans.xml"));
       log.info(testJar.toString(true));
       return testJar;

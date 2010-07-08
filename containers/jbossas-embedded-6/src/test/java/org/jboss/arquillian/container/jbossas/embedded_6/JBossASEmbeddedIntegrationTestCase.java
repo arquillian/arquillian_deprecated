@@ -40,7 +40,7 @@ public class JBossASEmbeddedIntegrationTestCase
    @Deployment
    public static JavaArchive createDeployment() throws Exception 
    {
-      return ShrinkWrap.create("test.jar", JavaArchive.class)
+      return ShrinkWrap.create(JavaArchive.class, "test.jar")
                .addClasses(
                      JBossASEmbeddedIntegrationTestCase.class,
                      MyEjb.class);

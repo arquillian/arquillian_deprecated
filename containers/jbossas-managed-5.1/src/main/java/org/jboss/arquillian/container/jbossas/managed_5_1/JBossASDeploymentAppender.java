@@ -38,7 +38,7 @@ public class JBossASDeploymentAppender implements AuxiliaryArchiveAppender
 
    public Archive<?> createAuxiliaryArchive()
    {
-      JavaArchive archive = ShrinkWrap.create("arquillian-jboss-testenrichers.jar", JavaArchive.class)
+      JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-jboss-testenrichers.jar")
                         .addPackages(
                               true, 
                               EJBInjectionEnricher.class.getPackage(),

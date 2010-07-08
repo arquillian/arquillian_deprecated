@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.webbeans.spi.deployer.AbstractMetaDataDiscovery;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.Asset;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
 import org.jboss.shrinkwrap.impl.base.asset.ClassAsset;

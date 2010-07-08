@@ -58,7 +58,7 @@ public class JSR88RemoteContainerWARTestCase
    @Deployment
    public static Archive<?> getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class)
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
             .addClasses(GreeterServlet.class, Greeter.class)
             .setWebXML("web.xml");
       log.info(war.toString(true));

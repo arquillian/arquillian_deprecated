@@ -65,7 +65,7 @@ public class TomcatEmbeddedClientTestCase {
 	 */
 	@Deployment
 	public static WebArchive createDeployment() {
-		return ShrinkWrap.create("test.war", WebArchive.class).addClasses(
+		return ShrinkWrap.create(WebArchive.class, "test.war").addClasses(
 				HelloWorldServlet.class).addWebResource(
 				HelloWorldServlet.class.getPackage(), "web.xml", "web.xml");
 	}

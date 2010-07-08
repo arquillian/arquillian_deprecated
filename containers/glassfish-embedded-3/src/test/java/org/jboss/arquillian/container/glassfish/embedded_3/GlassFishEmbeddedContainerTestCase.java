@@ -54,7 +54,7 @@ public class GlassFishEmbeddedContainerTestCase
    @Deployment
    public static WebArchive getDeployment()
    {
-      final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class).addClass(TestServlet.class);
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war").addClass(TestServlet.class);
       log.info(war.toString(true));
       return war;
    }

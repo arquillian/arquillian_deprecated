@@ -39,28 +39,28 @@ public class JSR88ModuleTypeMapperTestCase
    @Test
    public void testWARModuleType()
    {
-      Archive<?> archive = ShrinkWrap.create("test.war", WebArchive.class);
+      Archive<?> archive = ShrinkWrap.create(WebArchive.class, "test.war");
       assertSame(ModuleType.WAR, getMapper().getModuleType(archive));
    }
 
    @Test
    public void testEARModuleType()
    {
-      Archive<?> archive = ShrinkWrap.create("test.ear", EnterpriseArchive.class);
+      Archive<?> archive = ShrinkWrap.create(EnterpriseArchive.class, "test.ear");
       assertSame(ModuleType.EAR, getMapper().getModuleType(archive));
    }
 
    @Test
    public void testEJBModuleType()
    {
-      Archive<?> archive = ShrinkWrap.create("test.jar", JavaArchive.class);
+      Archive<?> archive = ShrinkWrap.create(JavaArchive.class ,"test.jar");
       assertSame(ModuleType.EJB, getMapper().getModuleType(archive));
    }
 
    @Test
    public void testRARModuleType()
    {
-      Archive<?> archive = ShrinkWrap.create("test.rar", ResourceAdapterArchive.class);
+      Archive<?> archive = ShrinkWrap.create(ResourceAdapterArchive.class, "test.rar");
       assertSame(ModuleType.RAR, getMapper().getModuleType(archive));
    }
 
@@ -68,9 +68,9 @@ public class JSR88ModuleTypeMapperTestCase
    public void testSequentialUsage()
    {
       JSR88ModuleTypeMapper mapper = getMapper();
-      Archive<?> rar = ShrinkWrap.create("test.rar", ResourceAdapterArchive.class);
+      Archive<?> rar = ShrinkWrap.create(ResourceAdapterArchive.class ,"test.rar");
       assertSame(ModuleType.RAR, mapper.getModuleType(rar));
-      Archive<?> war = ShrinkWrap.create("test.war", WebArchive.class);
+      Archive<?> war = ShrinkWrap.create(WebArchive.class ,"test.war");
       assertSame(ModuleType.WAR, mapper.getModuleType(war));
    }
 

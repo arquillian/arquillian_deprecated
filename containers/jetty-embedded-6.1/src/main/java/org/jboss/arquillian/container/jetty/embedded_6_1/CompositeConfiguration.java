@@ -17,6 +17,8 @@ import org.mortbay.resource.Resource;
  */
 public class CompositeConfiguration extends Configuration
 {
+   private static final long serialVersionUID = 1L;
+
    @Override
    public void configureWebApp() throws Exception
    {

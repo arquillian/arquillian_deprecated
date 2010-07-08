@@ -57,7 +57,7 @@ public class GlassFishJSR88RemoteContainerWARTestCase
    @Deployment
    public static Archive<?> getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create("test.war", WebArchive.class)
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
             .addClasses(GreeterServlet.class, Greeter.class);
       log.info(war.toString(true));
       return war;

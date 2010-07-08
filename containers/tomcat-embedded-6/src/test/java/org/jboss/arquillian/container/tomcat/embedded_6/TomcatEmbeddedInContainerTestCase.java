@@ -63,7 +63,7 @@ public class TomcatEmbeddedInContainerTestCase {
 	 */
 	@Deployment
 	public static WebArchive createTestArchive() {
-		return ShrinkWrap.create("test.war", WebArchive.class)
+		return ShrinkWrap.create(WebArchive.class, "test.war")
          .addClasses(HelloWorldServlet.class)
          .addWebResource(HelloWorldServlet.class.getPackage(), "in-container-web.xml", "web.xml");
 	}

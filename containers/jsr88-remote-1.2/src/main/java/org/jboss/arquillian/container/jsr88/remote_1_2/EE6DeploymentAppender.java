@@ -36,7 +36,7 @@ public class EE6DeploymentAppender implements AuxiliaryArchiveAppender
 {
    public Archive<?> createAuxiliaryArchive()
    {
-      JavaArchive archive = ShrinkWrap.create("arquillian-ee6-container-testenrichers.jar", JavaArchive.class)
+      JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-ee6-container-testenrichers.jar")
             .addPackages(
                   true, 
                   EJBInjectionEnricher.class.getPackage(),

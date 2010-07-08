@@ -83,7 +83,7 @@ public class OpenEJBArquillianContextTestCase
    @Deployment
    public static JavaArchive createDeployment()
    {
-      return ShrinkWrap.create("slsb.jar", JavaArchive.class).addClasses(EchoLocalBusiness.class, EchoBean.class);
+      return ShrinkWrap.create(JavaArchive.class, "slsb.jar").addClasses(EchoLocalBusiness.class, EchoBean.class);
    }
 
    /**

@@ -51,7 +51,7 @@ public class JettyEmbeddedClientTestCase
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create("client-test.war", WebArchive.class)
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "client-test.war")
          .addClass(TestServlet.class)
          .setWebXML("client-web.xml");
       log.info(war.toString(true));
