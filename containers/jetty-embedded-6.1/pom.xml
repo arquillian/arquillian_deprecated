@@ -46,7 +46,7 @@
       <!-- TODO We likely need a servlet packager to restrict use of EAR -->
       <dependency>
          <groupId>org.jboss.arquillian.protocol</groupId>
-         <artifactId>arquillian-protocol-servlet-333</artifactId>
+         <artifactId>arquillian-protocol-servlet-3</artifactId>
          <version>${project.version}</version>
       </dependency>
 
