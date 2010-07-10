@@ -39,8 +39,8 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-public class TomcatEmbeddedInContainerTestCase {
-
+public class TomcatEmbeddedInContainerTestCase
+{
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
 	// -------------------------------------------------------------------------------------||
@@ -62,7 +62,8 @@ public class TomcatEmbeddedInContainerTestCase {
 	 * Define the deployment
 	 */
 	@Deployment
-	public static WebArchive createTestArchive() {
+	public static WebArchive createTestArchive()
+   {
 		return ShrinkWrap.create(WebArchive.class, "test.war")
          .addClasses(TestServlet.class, TestBean.class)
          .addLibrary(MavenArtifactResolver.resolve("org.jboss.weld.servlet:weld-servlet:1.0.1-Final"))
@@ -92,7 +93,8 @@ public class TomcatEmbeddedInContainerTestCase {
 	}
 
    @Test
-   public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception {
+   public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception
+   {
 		// Define the input and expected outcome
 		final String expected = "hello";
 

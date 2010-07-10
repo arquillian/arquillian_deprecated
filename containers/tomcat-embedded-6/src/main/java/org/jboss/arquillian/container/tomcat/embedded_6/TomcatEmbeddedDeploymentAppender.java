@@ -33,19 +33,17 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public class TomcatEmbeddedDeploymentAppender implements AuxiliaryArchiveAppender
 {
-
    public Archive<?> createAuxiliaryArchive()
    {
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-tomcat-testenrichers.jar")
-                        .addPackages(
-                              false,
-                              CDIInjectionEnricher.class.getPackage(),
-                              ResourceInjectionEnricher.class.getPackage())
-                        .addServiceProvider(
-                              TestEnricher.class,
-                              CDIInjectionEnricher.class,
-                              ResourceInjectionEnricher.class);
+            .addPackages(
+                  false,
+                  CDIInjectionEnricher.class.getPackage(),
+                  ResourceInjectionEnricher.class.getPackage())
+            .addServiceProvider(
+                  TestEnricher.class,
+                  CDIInjectionEnricher.class,
+                  ResourceInjectionEnricher.class);
       return archive;
    }
-
 }

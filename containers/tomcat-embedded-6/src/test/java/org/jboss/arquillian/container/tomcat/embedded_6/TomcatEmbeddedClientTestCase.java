@@ -40,8 +40,8 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
-public class TomcatEmbeddedClientTestCase {
-
+public class TomcatEmbeddedClientTestCase
+{
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
 	// -------------------------------------------------------------------------------------||
@@ -52,8 +52,7 @@ public class TomcatEmbeddedClientTestCase {
 	/**
 	 * Logger
 	 */
-	private static final Logger log = Logger
-			.getLogger(TomcatEmbeddedClientTestCase.class.getName());
+	private static final Logger log = Logger.getLogger(TomcatEmbeddedClientTestCase.class.getName());
 
 	// -------------------------------------------------------------------------------------||
 	// Instance Members
@@ -64,7 +63,8 @@ public class TomcatEmbeddedClientTestCase {
 	 * Define the deployment
 	 */
 	@Deployment
-	public static WebArchive createDeployment() {
+	public static WebArchive createDeployment()
+   {
 		return ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestServlet.class)
          .addWebResource("client-web.xml", "web.xml");
@@ -79,7 +79,8 @@ public class TomcatEmbeddedClientTestCase {
 	 * Ensures the {@link HelloWorldServlet} returns the expected response
 	 */
 	@Test
-	public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception {
+	public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception
+   {
 		// Define the input and expected outcome
 		final String expected = "hello";
 
@@ -93,8 +94,7 @@ public class TomcatEmbeddedClientTestCase {
 			httpResponse += (char) buffer[q];
 
 		// Test
-		Assert.assertEquals("Expected output was not equal by value", expected,
-				httpResponse);
+		Assert.assertEquals("Expected output was not equal by value", expected, httpResponse);
 		log.info("Got expected result from Http Servlet: " + httpResponse);
 	}
 }
