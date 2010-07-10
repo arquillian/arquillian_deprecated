@@ -7,13 +7,13 @@
       http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
    <servlet>
-      <servlet-name>hello</servlet-name>
-      <servlet-class>org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet</servlet-class>
+      <servlet-name>TestServlet</servlet-name>
+      <servlet-class>org.jboss.arquillian.container.tomcat.embedded_6.TestServlet</servlet-class>
    </servlet>
 
    <servlet-mapping>
-      <servlet-name>hello</servlet-name>
-      <url-pattern>/hello</url-pattern>
+      <servlet-name>TestServlet</servlet-name>
+      <url-pattern>/Test</url-pattern>
    </servlet-mapping>
 
 </web-app>

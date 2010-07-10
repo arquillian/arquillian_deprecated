@@ -39,11 +39,11 @@ public class TomcatEmbeddedDeploymentAppender implements AuxiliaryArchiveAppende
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-tomcat-testenrichers.jar")
                         .addPackages(
                               false,
-//                              CDIInjectionEnricher.class.getPackage(),
+                              CDIInjectionEnricher.class.getPackage(),
                               ResourceInjectionEnricher.class.getPackage())
                         .addServiceProvider(
                               TestEnricher.class,
-//                              CDIInjectionEnricher.class,
+                              CDIInjectionEnricher.class,
                               ResourceInjectionEnricher.class);
       return archive;
    }

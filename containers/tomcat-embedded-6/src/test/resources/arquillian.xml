@@ -3,11 +3,19 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:tomcat6="urn:arq:org.jboss.arquillian.container.tomcat.embedded_6">
 
+   <!-- Uncomment to have test archives exported to the file system for inspection -->
+   <!--
+   <engine>
+      <deploymentExportPath>target/test-archives</deploymentExportPath>
+   </engine>
+   -->
+
 	<tomcat6:container>
 		<!--tomcat6:tomcatHome>/path/to/apache-tomcat-6.0.20</tomcat6:tomcatHome-->
 		<!--tomcat6:tomcatHome>${env.CATALINA_HOME}</tomcat6:tomcatHome-->
-		<tomcat6:workDir>target/tomcat/work</tomcat6:workDir> 
-		<tomcat6:appBase>target/tomcat/webapps</tomcat6:appBase> 
+		<tomcat6:tomcatHome>target/tomcat</tomcat6:tomcatHome>
+		<tomcat6:workDir>work</tomcat6:workDir> 
+		<tomcat6:appBase>webapps</tomcat6:appBase> 
 		<tomcat6:bindHttpPort>8888</tomcat6:bindHttpPort>
 	</tomcat6:container>
 

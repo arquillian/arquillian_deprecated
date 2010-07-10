@@ -94,6 +94,28 @@
          <scope>test</scope>
       </dependency>
 
+      <!-- Weld servlet required for testing CDI injections -->
+      <dependency>
+         <groupId>org.jboss.weld.servlet</groupId>
+         <artifactId>weld-servlet</artifactId>
+         <version>1.0.1-Final</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.glassfish.web</groupId>
+         <artifactId>el-impl</artifactId>
+         <version>2.2</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.servlet.jsp</groupId>
+         <artifactId>jsp-api</artifactId>
+         <version>2.2</version>
+         <scope>test</scope>
+      </dependency>
+
    </dependencies>
 
 </project>

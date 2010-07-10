@@ -23,6 +23,7 @@ import org.jboss.arquillian.spi.ContainerProfile;
  * Arquillian Tomcat Container Configuration
  * 
  * @author <a href="mailto:jean.deruelle@gmail.com">Jean Deruelle</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 public class TomcatConfiguration implements ContainerConfiguration {
@@ -33,11 +34,13 @@ public class TomcatConfiguration implements ContainerConfiguration {
 
 	private String tomcatHome = null;
 	
-	private String appBase = null;
+	private String appBase = "webapps";
 
 	private String workDir = null;
 	
 	private String serverName = "tomcat";
+
+   private boolean unpackWar = true;
 
 	public ContainerProfile getContainerProfile() {
 		return ContainerProfile.CLIENT;
@@ -108,4 +111,24 @@ public class TomcatConfiguration implements ContainerConfiguration {
 	public String getServerName() {
 		return serverName;
 	}
+
+   /**
+    * @return a switch indicating whether the WAR should be unpacked
+    */
+   public boolean isUnpackWar()
+   {
+      return unpackWar;
+   }
+
+   /**
+    * Sets the WAR to be unpacked into the java.io.tmpdir when deployed.
+    * Unpacking is required if you are using Weld to provide CDI support
+    * in a servlet environment.
+    *
+    * @param a switch indicating whether the WAR should be unpacked
+    */
+   public void setUnpackWar(boolean unpackWar)
+   {
+      this.unpackWar = unpackWar;
+   }
 }

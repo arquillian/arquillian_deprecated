@@ -136,8 +136,7 @@ public class TomcatContainer implements DeployableContainer {
          {
             standardContext.setWorkDir(configuration.getTomcatWorkDir());
          }
-         // possible option
-         standardContext.setUnpackWAR(false);
+         standardContext.setUnpackWAR(configuration.isUnpackWar());
 			standardHost.addChild(standardContext);
          context.add(StandardContext.class, standardContext);
 		} catch (Exception e) {
@@ -199,29 +198,39 @@ public class TomcatContainer implements DeployableContainer {
 		// creating the tomcat embedded == service tag in server.xml
 		embedded = new Embedded();
 		embedded.setName(serverName);
+      // TODO this needs to be a lot more robust
 		String tomcatHome = configuration.getTomcatHome();
+      File tomcatHomeFile = null;
 		if(tomcatHome != null) {
 			if(tomcatHome.startsWith(ENV_VAR)) {
 				String sysVar = tomcatHome.substring(ENV_VAR.length(), tomcatHome.length() -1);
 				tomcatHome = System.getProperty(sysVar);
-				System.out.println("Sys var for tomcat : " + tomcatHome);
+            tomcatHomeFile = new File(tomcatHome);
+				log.info("Using tomcat home from environment variable: " + tomcatHome);
 			} 
 			if(tomcatHome != null) {
-				tomcatHome = new File(tomcatHome).getAbsolutePath();
+            tomcatHomeFile = new File(tomcatHome);
+				tomcatHome = tomcatHomeFile.getAbsolutePath();
 				embedded.setCatalinaBase(tomcatHome);
 				embedded.setCatalinaHome(tomcatHome);
-			}						
+         }
+         if (tomcatHomeFile != null)
+         {
+            tomcatHomeFile.mkdirs();
+         }
 		}
 		// creates the engine == engine tag in server.xml
 		engine = embedded.createEngine();
 		engine.setName(serverName);
-		engine.setDefaultHost(bindAddress + SEPARATOR);
+		engine.setDefaultHost(bindAddress);
 		engine.setService(embedded);
 		embedded.setContainer(engine);
 		embedded.addEngine(engine);
 		// creates the host == host tag in server.xml
-		if(tomcatHome != null) {
-			standardHost = embedded.createHost(bindAddress + SEPARATOR, embedded.getCatalinaHome() + configuration.getAppBase());
+		if(tomcatHomeFile != null) {
+         File appBaseFile = new File(tomcatHomeFile, configuration.getAppBase());
+         appBaseFile.mkdirs();
+			standardHost = embedded.createHost(bindAddress + SEPARATOR, appBaseFile.getAbsolutePath());
 		} else {
 			standardHost = embedded.createHost(bindAddress + SEPARATOR, System.getProperty("java.io.tmpdir"));
 		}

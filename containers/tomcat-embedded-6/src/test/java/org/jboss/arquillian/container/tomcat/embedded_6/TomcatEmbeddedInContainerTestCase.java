@@ -20,11 +20,12 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
+import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,13 +35,13 @@ import org.junit.runner.RunWith;
  * Tests that Tomcat deployments into the Tomcat server work through the
  * Arquillian lifecycle
  * 
- * @author <a href="mailto:jean.deruelle@gmail.com">Jean Deruelle</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
 public class TomcatEmbeddedInContainerTestCase {
 
-	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/hello";
+	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
 	// -------------------------------------------------------------------------------------||
 	// Class Members
@@ -50,8 +51,7 @@ public class TomcatEmbeddedInContainerTestCase {
 	/**
 	 * Logger
 	 */
-	private static final Logger log = Logger
-			.getLogger(TomcatEmbeddedInContainerTestCase.class.getName());
+	private static final Logger log = Logger.getLogger(TomcatEmbeddedInContainerTestCase.class.getName());
 
 	// -------------------------------------------------------------------------------------||
 	// Instance Members
@@ -64,8 +64,11 @@ public class TomcatEmbeddedInContainerTestCase {
 	@Deployment
 	public static WebArchive createTestArchive() {
 		return ShrinkWrap.create(WebArchive.class, "test.war")
-         .addClasses(HelloWorldServlet.class)
-         .addWebResource(HelloWorldServlet.class.getPackage(), "in-container-web.xml", "web.xml");
+         .addClasses(TestServlet.class, TestBean.class)
+         .addLibrary(MavenArtifactResolver.resolve("org.jboss.weld.servlet:weld-servlet:1.0.1-Final"))
+         .addWebResource(new ByteArrayAsset(new byte[0]), "beans.xml")
+         .addManifestResource("in-container-context.xml", "context.xml")
+         .setWebXML("in-container-web.xml");
 	}
 
 	// -------------------------------------------------------------------------------------||
@@ -75,13 +78,23 @@ public class TomcatEmbeddedInContainerTestCase {
 
    @Resource(name = "name") String name;
 
+   @Inject TestBean testBean;
+
 	/**
 	 * Ensures the {@link HelloWorldServlet} returns the expected response
 	 */
 	@Test
-	public void testHelloWorldServlet() throws Exception {
+	public void shouldBeAbleToInjectMembersIntoTestClass()
+   {
+      log.info("Name: " + name);
+      Assert.assertEquals("Tomcat", name);
+      Assert.assertEquals("Tomcat", testBean.getName());
+	}
+
+   @Test
+   public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception {
 		// Define the input and expected outcome
-		final String expected = "Hello, world!";
+		final String expected = "hello";
 
 		URL url = new URL(HELLO_WORLD_URL);
 		InputStream in = url.openConnection().getInputStream();
@@ -90,12 +103,12 @@ public class TomcatEmbeddedInContainerTestCase {
 		int len = in.read(buffer);
 		String httpResponse = "";
 		for (int q = 0; q < len; q++)
+      {
 			httpResponse += (char) buffer[q];
+      }
 
 		// Test
-		Assert.assertEquals("Expected output was not equal by value", expected,
-				httpResponse);
+		Assert.assertEquals("Expected output was not equal by value", expected, httpResponse);
 		log.info("Got expected result from Http Servlet: " + httpResponse);
-      log.info("Name: " + name);
-	}
+   }
 }

@@ -14,29 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.tomcat.embedded_6.test.war;
+package org.jboss.arquillian.container.tomcat.embedded_6;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.annotation.Resource;
 
 /**
- * Sample Servlet to test Tomcat based Arquillian deployment
- * 
- * @author jean.deruelle@gmail.com
- * 
+ * @author Dan Allen
  */
-public class HelloWorldServlet extends HttpServlet {
+public class TestBean
+{
+   @Resource(name = "name")
+   private String name;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
-		PrintWriter out = res.getWriter();
-
-		out.print("Hello, world!");
-		out.close();
-	}
+   public String getName()
+   {
+      return name;
+   }
 }

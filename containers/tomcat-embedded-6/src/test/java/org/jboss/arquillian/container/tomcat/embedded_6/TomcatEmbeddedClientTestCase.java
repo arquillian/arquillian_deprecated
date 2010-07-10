@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.api.RunModeType;
-import org.jboss.arquillian.container.tomcat.embedded_6.test.war.HelloWorldServlet;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -36,13 +35,14 @@ import org.junit.runner.RunWith;
  * Arquillian lifecycle
  * 
  * @author <a href="mailto:jean.deruelle@gmail.com">Jean Deruelle</a>
+ * @author Dan Allen
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
 public class TomcatEmbeddedClientTestCase {
 
-	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/hello";
+	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
 	// -------------------------------------------------------------------------------------||
 	// Class Members
@@ -65,9 +65,9 @@ public class TomcatEmbeddedClientTestCase {
 	 */
 	@Deployment
 	public static WebArchive createDeployment() {
-		return ShrinkWrap.create(WebArchive.class, "test.war").addClasses(
-				HelloWorldServlet.class).addWebResource(
-				HelloWorldServlet.class.getPackage(), "web.xml", "web.xml");
+		return ShrinkWrap.create(WebArchive.class, "test.war")
+         .addClass(TestServlet.class)
+         .addWebResource("client-web.xml", "web.xml");
 	}
 
 	// -------------------------------------------------------------------------------------||
@@ -79,9 +79,9 @@ public class TomcatEmbeddedClientTestCase {
 	 * Ensures the {@link HelloWorldServlet} returns the expected response
 	 */
 	@Test
-	public void testHelloWorldServlet() throws Exception {
+	public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception {
 		// Define the input and expected outcome
-		final String expected = "Hello, world!";
+		final String expected = "hello";
 
 		URL url = new URL(HELLO_WORLD_URL);
 		InputStream in = url.openConnection().getInputStream();
