@@ -38,9 +38,9 @@ public class TomcatConfiguration implements ContainerConfiguration
 
    private String workDir = null;
 
-   private String serverName = "tomcat";
+   private String serverName = "arquillian-tomcat-embedded-6";
    
-   private boolean unpackArchive = true;
+   private boolean unpackArchive = false;
 
    public ContainerProfile getContainerProfile()
    {

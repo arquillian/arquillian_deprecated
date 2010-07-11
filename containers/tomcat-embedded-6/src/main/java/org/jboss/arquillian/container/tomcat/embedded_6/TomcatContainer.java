@@ -28,9 +28,13 @@ import java.util.logging.Logger;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Embedded;
+import org.apache.catalina.startup.ExpandWar;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -42,8 +46,15 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.tomcat.api.ShrinkWrapStandardContext;
 
 /**
- * Arquillian {@link DeployableContainer} adaptor for a target Tomcat
- * environment; responsible for lifecycle and deployment operations
+ * <p>Arquillian {@link DeployableContainer} implementation for an
+ * Embedded Tomcat server; responsible for both lifecycle and deployment
+ * operations.</p>
+ *
+ * <p>Please note that the context path set for the webapp must begin with
+ * a forward slash. Otherwise, certain path operations within Tomcat
+ * will behave inconsistently. Though it goes without saying, the host
+ * name (bindAddress) cannot have a trailing slash for the same
+ * reason.</p>
  * 
  * @author <a href="mailto:jean.deruelle@gmail.com">Jean Deruelle</a>
  * @author Dan Allen
@@ -51,13 +62,13 @@ import org.jboss.shrinkwrap.tomcat.api.ShrinkWrapStandardContext;
  */
 public class TomcatContainer implements DeployableContainer
 {
+   private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
+
    private static final String ENV_VAR = "${env.";
 
    private static final String HTTP_PROTOCOL = "http";
 
-   private static final String SEPARATOR = "/";
-
-   private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
+   private static final String TMPDIR_SYS_PROP = "java.io.tmpdir";
 
    /**
     * Tomcat embedded
@@ -140,18 +151,19 @@ public class TomcatContainer implements DeployableContainer
       }
       if (embedded == null)
       {
-         throw new IllegalStateException("start has not been called!");
+         throw new IllegalStateException("Embedded container is not running");
       }
 
       try
       {
          StandardContext standardContext = archive.as(ShrinkWrapStandardContext.class);
-         standardContext.setParent(standardHost);
-         if (configuration.getTomcatWorkDir() != null)
-         {
-            standardContext.setWorkDir(configuration.getTomcatWorkDir());
-         }
+         standardContext.addLifecycleListener(new EmbeddedContextConfig());
          standardContext.setUnpackWAR(configuration.isUnpackArchive());
+         if (standardContext.getUnpackWAR())
+         {
+            deleteUnpackedWAR(standardContext);
+         }
+
          standardHost.addChild(standardContext);
          context.add(StandardContext.class, standardContext);
       }
@@ -181,6 +193,10 @@ public class TomcatContainer implements DeployableContainer
       if (standardContext != null)
       {
          standardHost.removeChild(standardContext);
+         if (standardContext.getUnpackWAR())
+         {
+            deleteUnpackedWAR(standardContext);
+         }
       }
    }
 
@@ -198,11 +214,9 @@ public class TomcatContainer implements DeployableContainer
       List<String> remainingDeployments = new ArrayList<String>();
       for (String name : failedUndeployments)
       {
-
          try
          {
             undeploy(name);
-
          }
          catch (Exception e)
          {
@@ -232,47 +246,52 @@ public class TomcatContainer implements DeployableContainer
          {
             String sysVar = tomcatHome.substring(ENV_VAR.length(), tomcatHome.length() - 1);
             tomcatHome = System.getProperty(sysVar);
-            tomcatHomeFile = new File(tomcatHome);
-            log.info("Using tomcat home from environment variable: " + tomcatHome);
+            if (tomcatHome != null && tomcatHome.length() > 0 && new File(tomcatHome).isAbsolute())
+            {
+               tomcatHomeFile = new File(tomcatHome);
+               log.info("Using tomcat home from environment variable: " + tomcatHome);
+            }
          }
-         if (tomcatHome != null)
+         else
          {
             tomcatHomeFile = new File(tomcatHome);
-            tomcatHome = tomcatHomeFile.getAbsolutePath();
-            embedded.setCatalinaBase(tomcatHome);
-            embedded.setCatalinaHome(tomcatHome);
-         }
-         if (tomcatHomeFile != null)
-         {
-            tomcatHomeFile.mkdirs();
          }
       }
-      // creates the engine == engine tag in server.xml
+
+      if (tomcatHomeFile == null)
+      {
+         tomcatHomeFile = new File(System.getProperty(TMPDIR_SYS_PROP), "tomcat-embedded-6");
+      }
+
+      tomcatHomeFile.mkdirs();
+      embedded.setCatalinaBase(tomcatHomeFile.getAbsolutePath());
+      embedded.setCatalinaHome(tomcatHomeFile.getAbsolutePath());
+     
+      // creates the engine, i.e., <engine> element in server.xml
       engine = embedded.createEngine();
       engine.setName(serverName);
       engine.setDefaultHost(bindAddress);
       engine.setService(embedded);
       embedded.setContainer(engine);
       embedded.addEngine(engine);
-      // creates the host == host tag in server.xml
-      if (tomcatHomeFile != null)
+      
+      // creates the host, i.e., <host> element in server.xml
+      File appBaseFile = new File(tomcatHomeFile, configuration.getAppBase());
+      appBaseFile.mkdirs();
+      standardHost = embedded.createHost(bindAddress, appBaseFile.getAbsolutePath());
+      if (configuration.getTomcatWorkDir() != null)
       {
-         File appBaseFile = new File(tomcatHomeFile, configuration.getAppBase());
-         appBaseFile.mkdirs();
-         standardHost = embedded.createHost(bindAddress + SEPARATOR, appBaseFile.getAbsolutePath());
+         ((StandardHost) standardHost).setWorkDir(configuration.getTomcatWorkDir());
       }
-      else
-      {
-         standardHost = embedded.createHost(bindAddress + SEPARATOR, System.getProperty("java.io.tmpdir"));
-      }
-      standardHost.setParent(engine);
+      ((StandardHost) standardHost).setUnpackWARs(configuration.isUnpackArchive());
       engine.addChild(standardHost);
-      // creates an http connector == connector in server.xml
-      // TODO externalize this stuff in the configuration
+      
+      // creates an http connector, i.e., <connector> element in server.xml
       Connector connector = embedded.createConnector(InetAddress.getByName(bindAddress), bindPort, false);
       embedded.addConnector(connector);
       connector.setContainer(engine);
-      //starts tomcat embedded
+      
+      // starts embedded tomcat
       embedded.init();
       embedded.start();
       wasStarted = true;
@@ -281,5 +300,18 @@ public class TomcatContainer implements DeployableContainer
    protected void stopTomcatEmbedded() throws LifecycleException, org.apache.catalina.LifecycleException
    {
       embedded.stop();
+   }
+
+   /**
+    * Make sure an the unpacked WAR is not left behind
+    * you would think Tomcat would cleanup an unpacked WAR, but it doesn't
+    */
+   protected void deleteUnpackedWAR(StandardContext standardContext)
+   {
+      File unpackDir = new File(standardHost.getAppBase(), standardContext.getPath().substring(1));
+      if (unpackDir.exists())
+      {
+         ExpandWar.deleteDir(unpackDir);
+      }
    }
 }
