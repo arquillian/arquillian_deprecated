@@ -54,7 +54,7 @@ public class OSGiEmbeddedFrameworkTestCase
    @Deployment
    public static JavaArchive createdeployment()
    {
-      final JavaArchive archive = ShrinkWrap.create("test.jar", JavaArchive.class);
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar");
       archive.setManifest(new Asset()
       {
          public InputStream openStream()

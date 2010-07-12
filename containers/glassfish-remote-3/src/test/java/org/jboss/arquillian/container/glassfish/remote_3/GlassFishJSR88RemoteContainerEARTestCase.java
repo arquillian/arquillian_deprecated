@@ -22,14 +22,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Logger;
+
 import javax.servlet.annotation.WebServlet;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ArchivePath;
-import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -61,15 +60,14 @@ public class GlassFishJSR88RemoteContainerEARTestCase
    @Deployment
    public static Archive<?> getTestArchive()
    {
-      ArchivePath root = ArchivePaths.create("/");
       final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
             .addClasses(GreeterServlet.class);
       final JavaArchive ejb = ShrinkWrap.create(JavaArchive.class, "test.jar")
             .addClass(Greeter.class);
       final EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "test.ear")
             .setApplicationXML("application.xml")
-            .add(war, root)
-            .add(ejb, root);
+            .addModule(war)
+            .addModule(ejb);
       log.info(ear.toString(true));
       return ear;
    }
