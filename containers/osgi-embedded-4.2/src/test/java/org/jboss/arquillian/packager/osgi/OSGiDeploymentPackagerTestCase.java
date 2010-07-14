@@ -20,7 +20,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
+import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -51,7 +54,8 @@ public class OSGiDeploymentPackagerTestCase
          }
       });
       
-      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(archive, null);
+      Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
+      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives));
       assertNotNull("Result archive not null", result);
    }
    
@@ -69,7 +73,8 @@ public class OSGiDeploymentPackagerTestCase
       });
       try
       {
-         new OSGiDeploymentPackager().generateDeployment(archive, null);
+         Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
+         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives));
          fail("RuntimeException expected");
       }
       catch (RuntimeException ex)

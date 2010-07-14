@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.Collection;
 
 import org.jboss.arquillian.spi.DeploymentPackager;
+import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.vfs.AbstractVFS;
 import org.jboss.osgi.vfs.VirtualFile;
@@ -35,16 +36,17 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public class OSGiDeploymentPackager implements DeploymentPackager
 {
-   @Override
-   public Archive<?> generateDeployment(Archive<?> bundleArchive, Collection<Archive<?>> auxiliaryArchives)
+   public Archive<?> generateDeployment(TestDeployment testDeployment)
    {
-      if(JavaArchive.class.isInstance(bundleArchive))
+      Archive<?> appArchive = testDeployment.getApplicationArchive();
+      Collection<Archive<?>> auxArchives = testDeployment.getAuxiliaryArchives();
+      if(JavaArchive.class.isInstance(appArchive))
       {
-         return handleArchive(JavaArchive.class.cast(bundleArchive), auxiliaryArchives);
+         return handleArchive(JavaArchive.class.cast(appArchive), auxArchives);
       }
       
       throw new IllegalArgumentException(OSGiDeploymentPackager.class.getName()  + 
-            " can not handle archive of type " +  bundleArchive.getClass().getName());
+            " can not handle archive of type " +  appArchive.getClass().getName());
    }
 
    private Archive<?> handleArchive(JavaArchive archive, Collection<Archive<?>> auxiliaryArchives) 

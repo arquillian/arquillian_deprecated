@@ -19,15 +19,17 @@
             org.jboss.beans.metadata.spi.builder;version=2.2,
             org.jboss.dependency.spi;version=2.2,
             org.jboss.kernel.spi.dependency;version=2.2,
+            -->
             
-            <!- - jboss-osgi - ->
+            <!-- jboss-osgi -->
+            org.jboss.osgi.deployment.deployer;version=1.0,
+            org.jboss.osgi.deployment.interceptor;version=1.0,
             org.jboss.osgi.spi;version=1.0,
             org.jboss.osgi.spi.capability;version=1.0,
             org.jboss.osgi.spi.framework;version=1.0,
             org.jboss.osgi.spi.service;version=1.0,
             org.jboss.osgi.spi.util;version=1.0,
             org.jboss.osgi.testing;version=1.0
-            -->
           </value></entry>
         </map>
       </parameter>

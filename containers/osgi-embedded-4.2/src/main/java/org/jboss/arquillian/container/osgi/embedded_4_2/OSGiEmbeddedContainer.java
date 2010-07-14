@@ -18,6 +18,7 @@ package org.jboss.arquillian.container.osgi.embedded_4_2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
@@ -37,19 +38,18 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 
 /**
- * OSGiEmbeddedFrameworkContainer
+ * OSGiEmbeddedContainer
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
+public class OSGiEmbeddedContainer implements DeployableContainer
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiEmbeddedFrameworkContainer.class);
+   private static final Logger log = Logger.getLogger(OSGiEmbeddedContainer.class);
 
    private Framework framework;
 
-   @Override
    public void setup(Context context, Configuration configuration)
    {
       OSGiBootstrapProvider provider = OSGiBootstrap.getBootstrapProvider();
@@ -57,13 +57,19 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       context.add(Framework.class, framework);
    }
 
-   @Override
    public void start(Context context) throws LifecycleException
    {
       try
       {
          framework.start();
          context.add(BundleContext.class, framework.getBundleContext());
+         
+         Bundle[] bundles = framework.getBundleContext().getBundles();
+         if (getInstalledBundle(bundles, "osgi.cmpn") == null)
+            installBundle("org.osgi.compendium", false);
+         
+         if (getInstalledBundle(bundles, "arquillian-bundle") == null)
+            installBundle("arquillian-bundle", true);
       }
       catch (BundleException ex)
       {
@@ -71,7 +77,6 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       }
    }
 
-   @Override
    public void stop(Context context) throws LifecycleException
    {
       try
@@ -89,7 +94,6 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       }
    }
 
-   @Override
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       try
@@ -118,7 +122,6 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       return new JMXMethodExecutor();
    }
 
-   @Override
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
       try
@@ -131,5 +134,47 @@ public class OSGiEmbeddedFrameworkContainer implements DeployableContainer
       {
          log.error("Cannot undeploy: " + archive, ex);
       }
+   }
+
+   private Bundle getInstalledBundle(Bundle[] bundles, String symbolicName)
+   {
+      for (Bundle aux : bundles)
+      {
+         if (symbolicName.equals(aux.getSymbolicName()))
+            return aux;
+      }
+      return null;
+   }
+
+   private Bundle installBundle(String artifactId, boolean startBundle)
+   {
+      String classPath = System.getProperty("java.class.path");
+      if (classPath.contains(artifactId) == false)
+      {
+         log.debug("Class path does not contain '" + artifactId + "'");
+         return null;
+      }
+
+      String[] paths = classPath.split("" + File.pathSeparatorChar);
+      for (String path : paths)
+      {
+         if (path.contains(artifactId))
+         {
+            BundleContext sysContext = framework.getBundleContext();
+            try
+            {
+               Bundle bundle = sysContext.installBundle(new File(path).toURI().toString());
+               if (startBundle == true)
+                  bundle.start();
+               
+               return bundle;
+            }
+            catch (BundleException ex)
+            {
+               log.error("Cannot install bundle: " + path);
+            }
+         }
+      }
+      return null;
    }
 }

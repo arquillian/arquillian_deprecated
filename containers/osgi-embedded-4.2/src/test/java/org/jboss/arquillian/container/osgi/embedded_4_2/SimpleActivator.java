@@ -27,12 +27,10 @@ import org.osgi.framework.BundleContext;
  */
 public class SimpleActivator implements BundleActivator
 {
-   @Override
    public void start(BundleContext context) throws Exception
    {
       SimpleService service = new SimpleService()
       {
-         @Override
          public Integer sum(Integer... values)
          {
             Integer result = 0;
@@ -49,7 +47,6 @@ public class SimpleActivator implements BundleActivator
       context.registerService(SimpleService.class.getName(), service, null);
    }
 
-   @Override
    public void stop(BundleContext context) throws Exception
    {
    }

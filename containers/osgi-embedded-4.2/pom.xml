@@ -21,7 +21,8 @@
 
   <!-- Properties -->
   <properties>
-    <version.jboss_osgi_framework>1.0.0.Alpha5</version.jboss_osgi_framework>
+    <version.jboss_osgi_framework>1.0.0.Alpha6-SNAPSHOT</version.jboss_osgi_framework>
+    <version.jboss_osgi_resolver_felix>2.1.0-SNAPSHOT</version.jboss_osgi_resolver_felix>
   </properties>
 
   <!-- Build -->
@@ -62,12 +63,6 @@
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-jmx</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-local</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -117,6 +112,12 @@
       <groupId>org.jboss.osgi.framework</groupId>
       <artifactId>jboss-osgi-framework-core</artifactId>
       <version>${version.jboss_osgi_framework}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.osgi.resolver</groupId>
+      <artifactId>jbosgi-resolver-felix</artifactId>
+      <version>${version.jboss_osgi_resolver_felix}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

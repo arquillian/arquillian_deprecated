@@ -17,7 +17,6 @@
 package org.jboss.arquillian.container.osgi.embedded_4_2;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
@@ -45,12 +44,6 @@ import org.osgi.framework.ServiceReference;
 @RunWith(Arquillian.class)
 public class OSGiEmbeddedFrameworkTestCase
 {
-   
-   public OSGiEmbeddedFrameworkTestCase()
-   {
-      super();
-   }
-
    @Deployment
    public static JavaArchive createdeployment()
    {
@@ -65,7 +58,8 @@ public class OSGiEmbeddedFrameworkTestCase
             builder.addBundleActivator(SimpleActivator.class.getName());
             // [TODO] generate a separate bundle the contains the test case
             builder.addExportPackages(OSGiEmbeddedFrameworkTestCase.class);
-            builder.addImportPackages("org.jboss.arquillian.junit", "org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.spec");
+            builder.addImportPackages("org.jboss.arquillian.junit");
+            builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
             builder.addImportPackages("javax.inject", "org.junit", "org.junit.runner");
             return builder.openStream();
          }
