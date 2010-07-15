@@ -17,6 +17,8 @@
 
    <properties>
       <version.org.apache.tomcat>6.0.26</version.org.apache.tomcat>
+      <!-- override shrinkwrap version until Arquillian switches to 1.0.0-alpha-11 -->
+      <version.shrinkwrap_shrinkwrap>1.0.0-SNAPSHOT</version.shrinkwrap_shrinkwrap>
    </properties>
 
    <dependencies>
@@ -30,27 +32,8 @@
       <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
          <artifactId>shrinkwrap-extension-tomcat-6</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
+         <version>${version.shrinkwrap_shrinkwrap}</version>
          <scope>provided</scope>
-      </dependency>
-
-      <!-- shrinkwrap dependencies temporary until we move to 1.0.0-alpha-11 -->
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-api</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-spi</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
       <!-- Not yet working w/o a hack -->
