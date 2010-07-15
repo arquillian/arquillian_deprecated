@@ -67,12 +67,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.arquillian.packager</groupId>
-      <artifactId>arquillian-packager-osgi</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.arquillian</groupId>
       <artifactId>arquillian-bundle</artifactId>
       <version>${project.version}</version>
