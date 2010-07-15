@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <parent>
       <groupId>org.jboss.arquillian</groupId>
@@ -19,6 +18,8 @@
    <properties>
       <!-- known to work with all Jetty 7.x and 8.x versions (7.0.0.v20091005 through 8.0.0.M0) -->
       <version.jetty>7.0.0.v20091005</version.jetty>
+      <!-- override shrinkwrap version until Arquillian switches to 1.0.0-alpha-11 -->
+      <version.shrinkwrap_shrinkwrap>1.0.0-SNAPSHOT</version.shrinkwrap_shrinkwrap>
    </properties>
 
    <dependencies>
@@ -39,7 +40,7 @@
       <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
          <artifactId>shrinkwrap-extension-jetty-7</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
+         <version>${version.shrinkwrap_shrinkwrap}</version>
          <scope>provided</scope>
       </dependency>
 
@@ -61,11 +62,6 @@
          <groupId>org.jboss.arquillian.testenricher</groupId>
          <artifactId>arquillian-testenricher-resource</artifactId>
          <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
       </dependency>
 
       <dependency>
@@ -134,4 +130,3 @@
 
    </dependencies>
 </project>
-
