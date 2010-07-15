@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <parent>
       <groupId>org.jboss.arquillian</groupId>
@@ -19,6 +18,8 @@
    <properties>
       <!-- minimum version known to work with tests (minimum recommended version) -->
       <version.jetty>6.1.12</version.jetty>
+      <!-- override shrinkwrap version until Arquillian switches to 1.0.0-alpha-11 -->
+      <version.shrinkwrap_shrinkwrap>1.0.0-SNAPSHOT</version.shrinkwrap_shrinkwrap>
    </properties>
 
    <dependencies>
@@ -38,7 +39,7 @@
 
       <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-extension-jetty</artifactId>
+         <artifactId>shrinkwrap-extension-jetty-6</artifactId>
          <version>${version.shrinkwrap_shrinkwrap}</version>
          <scope>provided</scope>
       </dependency>
@@ -62,18 +63,6 @@
          <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-impl-base</artifactId>
-         <version>${project.version}</version>
-         <scope>test</scope>
-      </dependency>
-      
       <dependency>
         <groupId>org.jboss.arquillian</groupId>
         <artifactId>arquillian-junit</artifactId>
@@ -140,4 +129,3 @@
 
    </dependencies>
 </project>
-

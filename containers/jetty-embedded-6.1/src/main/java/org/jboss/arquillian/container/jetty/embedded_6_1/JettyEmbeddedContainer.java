@@ -27,7 +27,7 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.jetty.api.ShrinkWrapWebAppContext;
+import org.jboss.shrinkwrap.jetty_6.api.ShrinkWrapWebAppContext;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
