@@ -41,7 +41,7 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.tomcat.api.ShrinkWrapStandardContext;
+import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
 
 /**
  * <p>Arquillian {@link DeployableContainer} implementation for an

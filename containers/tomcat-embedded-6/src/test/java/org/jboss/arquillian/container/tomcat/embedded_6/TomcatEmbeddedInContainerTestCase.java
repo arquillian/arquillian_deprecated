@@ -68,7 +68,7 @@ public class TomcatEmbeddedInContainerTestCase
          .addClasses(TestServlet.class, TestBean.class)
          .addLibrary(MavenArtifactResolver.resolve("org.jboss.weld.servlet:weld-servlet:1.0.1-Final"))
          .addWebResource(new ByteArrayAsset(new byte[0]), "beans.xml")
-         .addManifestResource("in-container-context.xml", "context.xml")
+         .addResource("in-container-context.xml", "META-INF/context.xml")
          .setWebXML("in-container-web.xml");
 	}
 
@@ -89,6 +89,7 @@ public class TomcatEmbeddedInContainerTestCase
    {
       log.info("Name: " + name);
       Assert.assertEquals("Tomcat", name);
+      Assert.assertNotNull(testBean);
       Assert.assertEquals("Tomcat", testBean.getName());
 	}
 
