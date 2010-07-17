@@ -67,8 +67,13 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.arquillian</groupId>
-      <artifactId>arquillian-bundle</artifactId>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-jmx-osgi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-jmx-osgi-bundle</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

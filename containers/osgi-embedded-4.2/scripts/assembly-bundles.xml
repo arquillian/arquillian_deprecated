@@ -15,7 +15,7 @@
       <outputDirectory>bundles</outputDirectory>
       <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
       <includes>
-        <include>*:arquillian-bundle:jar</include>
+        <include>*:arquillian-protocol-jmx-osgi-bundle:jar</include>
         <include>*:org.osgi.compendium:jar</include>
       </includes>
       <useStrictFiltering>true</useStrictFiltering>
