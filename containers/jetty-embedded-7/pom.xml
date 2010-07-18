@@ -18,8 +18,7 @@
    <properties>
       <!-- known to work with all Jetty 7.x and 8.x versions (7.0.0.v20091005 through 8.0.0.M0) -->
       <version.jetty>7.0.0.v20091005</version.jetty>
-      <!-- override shrinkwrap version until Arquillian switches to 1.0.0-alpha-11 -->
-      <version.shrinkwrap_shrinkwrap>1.0.0-SNAPSHOT</version.shrinkwrap_shrinkwrap>
+
    </properties>
 
    <dependencies>
@@ -28,20 +27,6 @@
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-spi</artifactId>
          <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.eclipse.jetty</groupId>
-         <artifactId>jetty-webapp</artifactId>
-         <version>${version.jetty}</version>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-extension-jetty-7</artifactId>
-         <version>${version.shrinkwrap_shrinkwrap}</version>
-         <scope>provided</scope>
       </dependency>
 
       <dependency>
@@ -62,6 +47,18 @@
          <groupId>org.jboss.arquillian.testenricher</groupId>
          <artifactId>arquillian-testenricher-resource</artifactId>
          <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-extension-jetty-7</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.eclipse.jetty</groupId>
+         <artifactId>jetty-webapp</artifactId>
+         <version>${version.jetty}</version>
+         <scope>provided</scope>
       </dependency>
 
       <dependency>

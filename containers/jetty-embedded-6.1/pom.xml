@@ -18,8 +18,6 @@
    <properties>
       <!-- minimum version known to work with tests (minimum recommended version) -->
       <version.jetty>6.1.12</version.jetty>
-      <!-- override shrinkwrap version until Arquillian switches to 1.0.0-alpha-11 -->
-      <version.shrinkwrap_shrinkwrap>1.0.0-SNAPSHOT</version.shrinkwrap_shrinkwrap>
    </properties>
 
    <dependencies>
@@ -31,17 +29,8 @@
       </dependency>
 
       <dependency>
-         <groupId>org.mortbay.jetty</groupId>
-         <artifactId>jetty</artifactId>
-         <version>${version.jetty}</version>
-         <scope>provided</scope>
-      </dependency>
-
-      <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
          <artifactId>shrinkwrap-extension-jetty-6</artifactId>
-         <version>${version.shrinkwrap_shrinkwrap}</version>
-         <scope>provided</scope>
       </dependency>
 
       <!-- TODO We likely need a servlet packager to restrict use of EAR -->
@@ -81,6 +70,13 @@
          <artifactId>cdi-api</artifactId>
          <version>1.0</version>
          <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.mortbay.jetty</groupId>
+         <artifactId>jetty</artifactId>
+         <version>${version.jetty}</version>
+         <scope>provided</scope>
       </dependency>
 
       <!-- Jetty plus and naming required for testing resource injections -->
