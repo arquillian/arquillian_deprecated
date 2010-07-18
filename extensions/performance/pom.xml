@@ -67,7 +67,7 @@
          <dependencies>
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-weld-embedded</artifactId>
+               <artifactId>arquillian-weld-se-embedded</artifactId>
                <version>${project.version}</version>
             </dependency>
             <dependency> 
@@ -125,7 +125,7 @@
          <dependencies>
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-jbossas-remote-60</artifactId>
+               <artifactId>arquillian-jbossas-remote-6</artifactId>
                <version>${project.version}</version>
             </dependency>
             <dependency> <!-- Need on all profiles except Glassfish to compile, api is not 100% up to date with final spec -->

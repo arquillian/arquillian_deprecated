@@ -23,7 +23,6 @@
 
   <!-- Aggregate Modules -->
   <modules>
-    
     <module>performance</module>
   </modules>
 
