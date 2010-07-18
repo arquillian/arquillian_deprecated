@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+  vi:ts=2:sw=2:expandtab:
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<!-- Parent -->
+	<parent>
+		<groupId>org.jboss.arquillian</groupId>
+		<artifactId>arquillian-build</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../build/pom.xml</relativePath>
+	</parent>
+
+	<!-- Model Version -->
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Artifact Configuration -->
+	<groupId>org.jboss.arquillian.framework</groupId>
+	<artifactId>arquillian-framework-cobertura</artifactId>
+	<name>Arquillian Framework Cobertura</name>
+	<description>Cobertura code coverage integration for the Arquillian project</description>
+
+
+	<!-- Properties -->
+	<properties>
+
+		<version.cobertura>1.9.4.1</version.cobertura>
+		<version.jboss_6>6.0.0.20100429-M3</version.jboss_6>
+		
+	</properties>
+
+	<!-- Dependencies -->
+	<dependencies>
+
+		<!-- 
+    org.jboss.arquillian
+     -->
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-spi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-impl-base</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-spi</artifactId>
+		</dependency>
+
+		<!-- 
+    org.jboss.jsfunit
+     -->
+
+		<dependency>
+			<groupId>net.sourceforge.cobertura</groupId>
+			<artifactId>cobertura</artifactId>
+			<version>${version.cobertura}</version>
+			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- 
+    External Projects
+     -->
+
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-junit</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-jbossas-remote-6</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.jbossas</groupId>
+			<artifactId>jboss-as-client</artifactId>
+			<version>${version.jboss_6}</version>
+			<type>pom</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>1.0-SP1</version>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Surefire -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Skip Tests in main build due to bug in JSFUnit -->
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+
