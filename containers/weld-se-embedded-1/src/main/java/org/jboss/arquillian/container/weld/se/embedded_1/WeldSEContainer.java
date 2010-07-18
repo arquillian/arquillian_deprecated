@@ -19,7 +19,6 @@ package org.jboss.arquillian.container.weld.se.embedded_1;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkWrapClassLoader;
 import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
 import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
@@ -72,17 +71,13 @@ public class WeldSEContainer implements DeployableContainer
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
          throws DeploymentException
    {
-      final BeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
+      final ShrinkwrapBeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
 
-      ClassLoader cl = new ShrinkWrapClassLoader(archive);
-
-      Thread.currentThread().setContextClassLoader(cl);
-
-      Deployment deployment = new Deployment() 
+      final Deployment deployment = new Deployment() 
       {
          public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()
          {
-            return Arrays.asList(beanArchive);
+            return Arrays.asList((BeanDeploymentArchive)beanArchive);
          }
          
          public ServiceRegistry getServices()
@@ -96,6 +91,11 @@ public class WeldSEContainer implements DeployableContainer
             return beanArchive;
          }
       };
+      
+      ContextClassLoaderManager classLoaderManager = new ContextClassLoaderManager(beanArchive.getClassLoader());
+      classLoaderManager.enable();
+
+      context.add(ContextClassLoaderManager.class, classLoaderManager);
       
       WeldBootstrap bootstrap = new WeldBootstrap();
       bootstrap.startContainer(Environments.SE, deployment, new ConcurrentHashMapBeanStore())
@@ -122,7 +122,7 @@ public class WeldSEContainer implements DeployableContainer
       {
          bootstrap.shutdown();
       }
-      Thread.currentThread().setContextClassLoader(
-            Thread.currentThread().getContextClassLoader().getParent());
+      ContextClassLoaderManager classLoaderManager = context.get(ContextClassLoaderManager.class);
+      classLoaderManager.disable();
    }
 }
