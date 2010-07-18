@@ -70,6 +70,12 @@
       <version>${version.org.jboss.threads}</version>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.shrinkwrap</groupId>
+      <artifactId>shrinkwrap-extension-vdf</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
 	<!-- Test Dependencies -->
     <dependency>
@@ -84,11 +90,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.jboss.shrinkwrap</groupId>
       <artifactId>shrinkwrap-extension-vfs3</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

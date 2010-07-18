@@ -16,8 +16,6 @@
  */
 package org.jboss.arquillian.container.reloaded.embedded_1;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
@@ -27,6 +25,7 @@ import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,16 +59,9 @@ public class ReloadedIntegrationTestCase
    public static JavaArchive createDeployment()
    {
       // Construct a test JAR to install the Lifecycle POJO
-      final Asset deploymentXmlAsset = new Asset()
-      {
-
-         public InputStream openStream()
-         {
-            return new ByteArrayInputStream(new String(
+      final Asset deploymentXmlAsset = new StringAsset(
                   "<deployment xmlns=\"urn:jboss:bean-deployer:2.0\"><bean name=\"LifecyclePojo\" class=\""
-                        + LifecyclePojo.class.getName() + "\" /></deployment>").getBytes());
-         }
-      };
+                        + LifecyclePojo.class.getName() + "\" /></deployment>");
       final JavaArchive testJar = ShrinkWrap.create(JavaArchive.class, "pojo.jar").addClass(LifecyclePojo.class).add(
             deploymentXmlAsset, ArchivePaths.create("pojo-jboss-beans.xml"));
       log.info(testJar.toString(true));

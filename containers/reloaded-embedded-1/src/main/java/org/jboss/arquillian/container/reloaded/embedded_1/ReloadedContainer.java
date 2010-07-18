@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.container.reloaded.embedded_1;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.List;
@@ -31,11 +33,15 @@ import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
 import org.jboss.bootstrap.api.lifecycle.LifecycleState;
 import org.jboss.bootstrap.api.mc.server.MCServer;
 import org.jboss.bootstrap.api.mc.server.MCServerFactory;
+import org.jboss.deployers.client.spi.main.MainDeployer;
+import org.jboss.deployers.vfs.spi.client.VFSDeployment;
+import org.jboss.deployers.vfs.spi.client.VFSDeploymentFactory;
 import org.jboss.logging.Logger;
 import org.jboss.reloaded.api.ReloadedDescriptors;
-import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapDeployer;
-import org.jboss.reloaded.shrinkwrap.api.ShrinkWrapReloadedDescriptors;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.vdf.api.ShrinkWrapDeployer;
+import org.jboss.vfs.VFS;
+import org.jboss.vfs.VirtualFile;
 
 /**
  * {@link DeployableContainer} implementation to integrate the
@@ -55,6 +61,7 @@ public class ReloadedContainer implements DeployableContainer
    /**
     * Logger
     */
+   @SuppressWarnings("unused")
    private static final Logger log = Logger.getLogger(ReloadedContainer.class);
 
    /**
@@ -72,6 +79,11 @@ public class ReloadedContainer implements DeployableContainer
     */
    private static final String VALUE_SYSPROP_JBOSSXB_IGNORE_ORDER = "true";
 
+   /**
+    * Name of the Deployment XML to install the ShrinkWrapDeployer
+    */
+   private static final String FILENAME_SHRINKWRAP_DEPLOYER_XML = "shrinkwrap-deployer-jboss-beans.xml";
+
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -80,11 +92,21 @@ public class ReloadedContainer implements DeployableContainer
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   public void setup(final Context context,final  Configuration configuration) 
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+    */
+   @Override
+   public void setup(final Context context, final Configuration configuration)
    {
       //configuration.getContainerConfig(JBossReloadedConfiguration.class);
    }
-   
+
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
+   @Override
    public ContainerMethodExecutor deploy(final Context context, final Archive<?> archive) throws DeploymentException
    {
       // Deploy
@@ -102,6 +124,11 @@ public class ReloadedContainer implements DeployableContainer
       return new LocalMethodExecutor();
    }
 
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+    */
+   @Override
    public void start(Context context) throws LifecycleException
    {
       // Set up JBossXB
@@ -122,9 +149,6 @@ public class ReloadedContainer implements DeployableContainer
       final List<BootstrapDescriptor> descriptors = server.getConfiguration().getBootstrapDescriptors();
       descriptors.add(ReloadedDescriptors.getClassLoadingDescriptor());
       descriptors.add(ReloadedDescriptors.getVdfDescriptor());
-      descriptors.add(ReloadedDescriptors.getThreadsDescriptor());
-      descriptors.add(ShrinkWrapReloadedDescriptors.getTempFileProviderDescriptor());
-      descriptors.add(ShrinkWrapReloadedDescriptors.getShrinkWrapDeployerDescriptor());
 
       // Start the server
       try
@@ -136,14 +160,50 @@ public class ReloadedContainer implements DeployableContainer
          throw new LifecycleException("Error in starting the Microcontainer server " + server, e);
       }
 
+      // Install the ShrinkWrapDeployer
+      final URL shrinkwrapDeployerJBossBeans = Thread.currentThread().getContextClassLoader()
+            .getResource(FILENAME_SHRINKWRAP_DEPLOYER_XML);
+      assert shrinkwrapDeployerJBossBeans != null : "ShrinkWrap Deployer beans XML not found";
+      final MainDeployer mainDeployer = (MainDeployer) server.getKernel().getController()
+            .getContextByClass(MainDeployer.class).getTarget();
+      final VirtualFile file;
+      try
+      {
+         file = VFS.getChild(shrinkwrapDeployerJBossBeans);
+      }
+      catch (final URISyntaxException e)
+      {
+         throw new LifecycleException("Could not create virtual file for " + shrinkwrapDeployerJBossBeans, e);
+      }
+      if (file == null)
+      {
+         throw new IllegalStateException();
+      }
+      final VFSDeployment deployment = VFSDeploymentFactory.getInstance().createVFSDeployment(file);
+      try
+      {
+         mainDeployer.addDeployment(deployment);
+         mainDeployer.process();
+         mainDeployer.checkComplete();
+      }
+      catch (final org.jboss.deployers.spi.DeploymentException de)
+      {
+         throw new LifecycleException("Could not install ShrinkWrapDeployer", de);
+      }
+
       // Get the ShrinkWrapDeployer
-      final ShrinkWrapDeployer deployer = (ShrinkWrapDeployer) server.getKernel().getController().getInstalledContext(
-            NAME_MC_SHRINKWRAP_DEPLOYER).getTarget();
+      final ShrinkWrapDeployer deployer = (ShrinkWrapDeployer) server.getKernel().getController()
+            .getInstalledContext(NAME_MC_SHRINKWRAP_DEPLOYER).getTarget();
 
       context.add(MCServer.class, server);
       context.add(ShrinkWrapDeployer.class, deployer);
    }
 
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+    */
+   @Override
    public void stop(final Context context) throws LifecycleException
    {
       final MCServer server = context.get(MCServer.class);
@@ -162,6 +222,11 @@ public class ReloadedContainer implements DeployableContainer
       }
    }
 
+   /**
+    * {@inheritDoc}
+    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    */
+   @Override
    public void undeploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       // Undeploy
