@@ -48,6 +48,15 @@ public class PerformanceClassResult implements Serializable
    {
       return methodResults;
    }
+   
+   public PerformanceMethodResult getMethodResult(String methodName)
+   {
+      for(PerformanceMethodResult pmr : methodResults)
+         if(pmr.getTestMethod().equals(methodName))
+            return pmr;
+      
+      return null;
+   }
 
    public void addMethodResult(PerformanceMethodResult methodResult)
    {
@@ -72,6 +81,17 @@ public class PerformanceClassResult implements Serializable
    private void setTestClassName(String testClassName)
    {
       this.testClassName = testClassName;
+   }
+
+   public void compareResults(PerformanceClassResult pcr)
+   {
+      if(pcr == null)
+         throw new NullPointerException("Compared class is null!");
+      
+      for(PerformanceMethodResult pmr : getMethodResults())
+      {
+         pmr.compareResults(pcr.getMethodResult(pmr.getTestMethod()), performanceSpecs.resultsThreshold());
+      }
    }
    
    

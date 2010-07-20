@@ -65,4 +65,18 @@ public class PerformanceMethodResult implements Serializable
    {
       this.testMethod = testMethod;
    }
+   public void compareResults(PerformanceMethodResult methodResult, double resultsThreshold)
+   {
+      System.out.println("methods compared: "+testMethod+", and: "+methodResult.getTestMethod());
+      System.out.println("Comparing: "+actualTime+" to: "+methodResult.getActualTime());
+      System.out.println("Threshold is: "+resultsThreshold);
+      if((resultsThreshold +1) * actualTime < methodResult.getActualTime())
+      {
+         System.out.println("WE FAILED");
+         throw new RuntimeException("Method1 actual time: "+actualTime+
+               ", Method2: "+methodResult.getActualTime()+
+               ", threshold: "+resultsThreshold);
+      }
+      
+   }
 }

@@ -60,8 +60,11 @@ public class TestPerformanceVerifier implements EventHandler<Test>
                performance.time() < (result.getEnd()-result.getStart()))
             {
                result.setStatus(Status.FAILED);
-               result.setThrowable(new PerformanceException("The test didnt finish within the specified time: "+performance.time()+"ms"));
+               result.setThrowable(
+                     new PerformanceException("The test didnt finish within the specified time: "
+                           +performance.time()+"ms, it took "+(result.getEnd()-result.getStart())+"ms."));
             }
+            System.out.println("The test took "+(result.getEnd()-result.getStart())+"ms.");
             
             // fetch suiteResult, get the correct classResult and append the test to that
             // classResult.

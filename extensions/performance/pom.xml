@@ -24,7 +24,11 @@
 
    <!-- Properties -->
    <properties>
-      	<!-- Versioning -->
+     <maven.test.failure.ignore>true</maven.test.failure.ignore>
+    <!-- Versioning -->
+    <!--
+		<version.weld_core>1.0.2-SNAPSHOT</version.weld_core>
+    -->
 		<version.weld_core>1.0.1-SP1</version.weld_core>
 		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
 		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
@@ -37,10 +41,7 @@
 
    <profiles>
       <profile>
-         <id>default</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
+         <id>not-used</id>
          <dependencies>
             <dependency> <!-- Need on all profiles except Glassfish to compile, api is not 100% up to date with final spec -->
                <groupId>org.jboss.ejb3</groupId> 
@@ -63,11 +64,14 @@
          </build>
       </profile>
       <profile>
-         <id>weld-embedded</id>
+         <id>default</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
          <dependencies>
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-weld-se-embedded</artifactId>
+               <artifactId>arquillian-weld-se-embedded-1</artifactId>
                <version>${project.version}</version>
             </dependency>
             <dependency> 
@@ -91,7 +95,7 @@
             <dependency>
               <groupId>javax.el</groupId>
               <artifactId>el-api</artifactId>
-              <version>1.2</version>
+              <version>2.2</version>
             </dependency>
          </dependencies>
          <dependencyManagement>
@@ -120,62 +124,13 @@
             </plugins>
          </build>
       </profile>
-      <profile>
-         <id>jbossas-remote-60</id>
-         <dependencies>
-            <dependency>
-               <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-jbossas-remote-6</artifactId>
-               <version>${project.version}</version>
-            </dependency>
-            <dependency> <!-- Need on all profiles except Glassfish to compile, api is not 100% up to date with final spec -->
-               <groupId>org.jboss.ejb3</groupId> 
-               <artifactId>jboss-ejb3-api</artifactId> 
-               <version>${version.jboss_ejb3}</version>
-               <scope>test</scope>
-            </dependency>
-         </dependencies>
-         <build>
-            <testResources>
-               <testResource>
-                  <directory>src/test/jboss-resources</directory>
-               </testResource>
-            </testResources>
-         </build>
-      </profile>
-
    </profiles>
    <!-- Dependencies -->
    <dependencies>
-
-      <!-- 
-    org.jboss.arquillian
-     -->
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-api</artifactId>
-         <version>${project.version}</version>
-      </dependency>
       <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-spi</artifactId>
          <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-impl-base</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-spi</artifactId>
-      </dependency>
-
-      <dependency> 
-         <groupId>org.jboss.ejb3</groupId> 
-         <artifactId>jboss-ejb3-api</artifactId> 
-         <version>${version.jboss_ejb3}</version>
-         <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>javax.enterprise</groupId> 
@@ -195,8 +150,7 @@
          <version>1.0</version> 
          <scope>test</scope>
       </dependency>
-
-       <dependency>
+      <dependency>
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-junit</artifactId>
          <version>${project.version}</version>
@@ -204,18 +158,18 @@
       </dependency>
 
       <!-- External Projects -->
+      <!--
       <dependency>
          <groupId>org.mockito</groupId>
          <artifactId>mockito-all</artifactId>
          <scope>test</scope>
       </dependency>
-
+      -->
       <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
          <scope>test</scope>
       </dependency>
-
    </dependencies>
 
    <build>

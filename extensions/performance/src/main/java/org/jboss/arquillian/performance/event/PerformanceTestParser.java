@@ -20,6 +20,7 @@ import org.jboss.arquillian.performance.annotation.*;
 import org.jboss.arquillian.performance.meta.PerformanceClassResult;
 import org.jboss.arquillian.performance.meta.PerformanceSuiteResult;
 import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.event.suite.ClassEvent;
 import org.jboss.arquillian.spi.event.suite.EventHandler;
 
@@ -40,7 +41,7 @@ public class PerformanceTestParser implements EventHandler<ClassEvent>
       parsePerformanceRules(context, event.getTestClass());
    }
    
-   public void parsePerformanceRules(Context context, Class testClass)
+   public void parsePerformanceRules(Context context, TestClass testClass)
    {
       PerformanceTest performanceTest = (PerformanceTest) testClass.getAnnotation(PerformanceTest.class);
       if(performanceTest != null)

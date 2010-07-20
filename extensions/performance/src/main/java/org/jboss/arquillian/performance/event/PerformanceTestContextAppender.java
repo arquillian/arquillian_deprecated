@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.performance.annotation;
+package org.jboss.arquillian.performance.event;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestContextAppender;
+import org.jboss.arquillian.spi.event.suite.Test;
 
 /**
- * Specifies the maximum execution time allowed for a test method.
- * If the test method exceeds the specified time it throws an exception.
+ * 
+ * A PerformanceTestContextAppender.
  * 
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Performance {
-   /**
-    * Specify how long the method maximum should take i ms
-    * 
-    * @return
-    */
-   double time();
+public class PerformanceTestContextAppender implements TestContextAppender
+{
+
+   public void append(Context context)
+   {
+      context.register(Test.class, new TestPerformanceVerifier());
+
+   }
+
 }
