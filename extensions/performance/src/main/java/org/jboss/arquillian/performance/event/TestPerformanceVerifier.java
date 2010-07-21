@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 
 import org.jboss.arquillian.performance.annotation.Performance;
 import org.jboss.arquillian.performance.exception.PerformanceException;
-import org.jboss.arquillian.performance.meta.PerformanceClassResult;
 import org.jboss.arquillian.performance.meta.PerformanceMethodResult;
 import org.jboss.arquillian.performance.meta.PerformanceSuiteResult;
 import org.jboss.arquillian.spi.Context;
@@ -64,7 +63,6 @@ public class TestPerformanceVerifier implements EventHandler<Test>
                      new PerformanceException("The test didnt finish within the specified time: "
                            +performance.time()+"ms, it took "+(result.getEnd()-result.getStart())+"ms."));
             }
-            System.out.println("The test took "+(result.getEnd()-result.getStart())+"ms.");
             
             // fetch suiteResult, get the correct classResult and append the test to that
             // classResult.

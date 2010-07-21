@@ -30,24 +30,24 @@ public class WorkHardCdiTestCase
                        ArchivePaths.create("beans.xml"));
    }
    
-   @Inject @WorkHard double hardWorker;
+   @Inject HardWorker worker;
    
    @Test
    @Performance(time=20)
    public void doHardWork() throws Exception 
    {
-      Assert.assertEquals(21, hardWorker, 0d);
+      Assert.assertEquals(21, worker.workingHard(), 0d);
    }
    
    /**
-    * This method is supposed to fail with @Performance(time=1)
+    * This method is supposed to fail with @Performance(time=9)
     * 
     * @throws Exception
     */
    @Test
-   @Performance(time=1)
+   @Performance(time=9)
    public void doHardWorkThatFails() throws Exception
    {
-      Assert.assertEquals(21, hardWorker, 0d);
+      Assert.assertEquals(21, worker.workingHard(), 0d);
    }
 }
