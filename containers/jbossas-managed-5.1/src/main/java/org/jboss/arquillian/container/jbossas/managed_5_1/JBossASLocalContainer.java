@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
-import org.jboss.arquillian.container.jbossas.managed_5_1.utils.AsLifecycleDelegate;
 import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -30,10 +30,11 @@ import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.jbossas.servermanager.Argument;
+import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
-import org.jboss.logging.Logger;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
@@ -45,81 +46,71 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  */
 public class JBossASLocalContainer implements DeployableContainer
 {
-   private static Logger log = Logger.getLogger(JBossASLocalContainer.class);
-
-   private static AsLifecycleDelegate delegate;
-
-   protected Server server;
-
-   protected ServerManager manager;
-
-   private boolean wasStarted;
-
-   private final List<String> failedUndeployments = new ArrayList<String>();
-
-   private boolean forceRestart = false;
-
-   private int shutdownDelay = 15000;
-
-   private int bootTimeout = 240000;
-
-   private String host = "localhost";
-
-   private String profile = "default";
-
-   private int port = 8181;
+   private static Logger log = Logger.getLogger(JBossASLocalContainer.class.getName());
 
    private JBossASConfiguration configuration;
 
-   public JBossASLocalContainer()
-   {
+   protected ServerManager manager;
 
-   }
+   private final List<String> failedUndeployments = new ArrayList<String>();
 
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
-    */
+   * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+   */
    public void setup(Context context, Configuration configuration)
    {
       this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
-      host = this.configuration.getBindAddress();
-      profile = this.configuration.getProfileName();
-      port = this.configuration.getHttpPort();
+      
+      manager = createAndConfigureServerManager();
    }
-
+   
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
-    */
+   * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+   */
    public void start(Context context) throws LifecycleException
    {
-
       try
       {
-         startServerManager();
-         restartServer();
+         Server server = manager.getServer(configuration.getProfileName());
+         if(ServerController.isServerStarted(server))
+         {
+            throw new LifecycleException("Could not start server, server is already running");
+         }
+         
+         manager.startServer(server.getName());
       }
       catch (IOException e)
       {
-         throw new LifecycleException("Could not start local container", e);
+         throw new LifecycleException("Could not start remote container", e);
       }
    }
 
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
-    */
+   * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+   */
    public void stop(Context context) throws LifecycleException
    {
+      Server server = manager.getServer(configuration.getProfileName());
+      if(!server.isRunning())
+      {
+         throw new LifecycleException("Can not stop server. Server is not started");
+      }
       try
       {
          removeFailedUnDeployments();
       }
       catch (Exception e)
       {
-         throw new LifecycleException("Could not clean up", e);
+         throw new LifecycleException("Could not clean up failed undeployments", e);
       }
-      if (wasStarted)
+      
+      try
       {
-         stopServer();
+         manager.stopServer(server.getName());
+      } 
+      catch (Exception e) 
+      {
+         throw new LifecycleException("Could not stop server", e);
       }
    }
 
@@ -132,16 +123,16 @@ public class JBossASLocalContainer implements DeployableContainer
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
-      if (manager == null || server == null)
+      if (manager == null)
       {
-         throw new IllegalStateException("start has not been called!");
+         throw new IllegalStateException("Container has not been setup");
       }
       final String deploymentName = archive.getName();
 
       File file = new File(deploymentName);
       archive.as(ZipExporter.class).exportZip(file, true);
 
-      Exception failure = null;
+      Server server = manager.getServer(configuration.getProfileName());
       try
       {
          server.deploy(file);
@@ -149,10 +140,6 @@ public class JBossASLocalContainer implements DeployableContainer
       catch (Exception e)
       {
          throw new DeploymentException("Could not deploy " + deploymentName, e);
-      }
-      if (failure != null)
-      {
-         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
       try
       {
@@ -173,13 +160,14 @@ public class JBossASLocalContainer implements DeployableContainer
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
+      // we only need the File, not the content to undeploy.
       File file = new File(archive.getName());
-      archive.as(ZipExporter.class).exportZip(file, true);
       undeploy(file);
    }
 
    private void undeploy(File file) throws DeploymentException
    {
+      Server server = manager.getServer(configuration.getProfileName());
       try
       {
          server.undeploy(file);
@@ -197,14 +185,14 @@ public class JBossASLocalContainer implements DeployableContainer
 
    private void removeFailedUnDeployments() throws IOException
    {
+      Server server = manager.getServer(configuration.getProfileName());
+      
       List<String> remainingDeployments = new ArrayList<String>();
       for (String name : failedUndeployments)
       {
-
          try
          {
             server.undeploy(new File(name));
-
          }
          catch (Exception e)
          {
@@ -215,19 +203,18 @@ public class JBossASLocalContainer implements DeployableContainer
       }
       if (remainingDeployments.size() > 0)
       {
-         log.error("Failed to undeploy these artifacts: " + remainingDeployments);
+         log.severe("Failed to undeploy these artifacts: " + remainingDeployments);
       }
       failedUndeployments.clear();
    }
 
-   protected void startServerManager()
+   /*
+    * Internal Helpers for Creating and Configuring ServerManager and Server.
+    */
+   
+   private ServerManager createAndConfigureServerManager()
    {
-      manager = getDelegate().getServerManager();
-      server = new Server();
-      server.setName(profile);
-      server.setHttpPort(port);
-      server.setHost(host);
-      
+      ServerManager manager = new ServerManager();
       if(configuration.getJbossHome() != null) 
       {
          manager.setJbossHome(configuration.getJbossHome());
@@ -236,123 +223,44 @@ public class JBossASLocalContainer implements DeployableContainer
       {
          manager.setJavaHome(configuration.getJavaHome());
       }
+      manager.addServer(createAndConfigureServer());
+      return manager;
+   }
+
+   private Server createAndConfigureServer()
+   {
+      Server server = new Server();
+      server.setName(configuration.getProfileName());
+      server.setHttpPort(configuration.getHttpPort());
+      server.setHost(configuration.getBindAddress());
       
-      AsLifecycleDelegate.applyServerDefaults(server, manager);
+      server.setUsername("admin");
+      server.setPassword("admin");
+      server.setPartition(Long.toHexString(System.currentTimeMillis()));
+
+      // Set server's JVM arguments
+      setServerVMArgs(server, configuration.getJavaVmArguments());
+
+      // Set server's system properties
+      Property prop = new Property();
+      prop.setKey("jbosstest.udp.ip_ttl");
+      prop.setValue("0");
+      server.addSysProperty(prop);
+      prop = new Property();
+      prop.setKey("java.endorsed.dirs");
+      prop.setValue(new File(configuration.getJbossHome(), "lib/endorsed").getAbsolutePath());
+      server.addSysProperty(prop);
+      
+      return server;
    }
 
-   protected void restartServer() throws IOException, LifecycleException
+   private void setServerVMArgs(Server server, String arguments)
    {
-      if (getForceRestart())
+      for(String argument: arguments.split(" "))
       {
-         if (isServerUp())
-         {
-            log.info("Shutting down server as in force-restart mode");
-            stopServer();
-            try
-            {
-               Thread.sleep(getShutdownDelay());
-            }
-            catch (InterruptedException e)
-            {
-               Thread.currentThread().interrupt();
-            }
-         }
+         Argument arg = new Argument();
+         arg.setValue(argument);
+         server.addJvmArg(arg);
       }
-      if (!isServerUp())
-      {
-         wasStarted = true;
-         startServer();
-         log.info("Starting server");
-         // Wait for server to come up
-         long timeoutTime = System.currentTimeMillis() + getServerBootTimeout();
-         boolean interrupted = false;
-         while (timeoutTime > System.currentTimeMillis())
-         {
-            if (isServerUp())
-            {
-               log.info("Started server");
-               return;
-            }
-            try
-            {
-               Thread.sleep(200);
-            }
-            catch (InterruptedException e)
-            {
-               interrupted = true;
-            }
-         }
-         if (interrupted)
-         {
-            Thread.currentThread().interrupt();
-         }
-         // If we got this far something went wrong
-         log.info("Unable to connect to server after " + getServerBootTimeout() + "ms, giving up!");
-         stopServer();
-         throw new IllegalStateException("Error connecting to server");
-      }
-   }
-
-   protected void stopServer() throws LifecycleException
-   {
-      try
-      {
-         getDelegate().stopJbossAs(profile);
-      }
-      catch (Throwable t)
-      {
-         throw new LifecycleException("could not stop local container", t);
-      }
-   }
-
-   private void startServer() throws LifecycleException
-   {
-      try
-      {
-         getDelegate().startJbossAs(profile);
-      }
-      catch (Throwable t)
-      {
-         throw new LifecycleException("could not start local container", t);
-      }
-   }
-
-   protected boolean isServerUp() throws IOException
-   {
-      return ServerController.isServerStarted(server);
-   }
-
-   protected synchronized static AsLifecycleDelegate getDelegate()
-   {
-      if (delegate == null)
-      {
-         delegate = new AsLifecycleDelegate();
-      }
-      return delegate;
-   }
-
-   protected String getHost()
-   {
-      return host;
-   }
-
-   protected boolean getForceRestart()
-   {
-      return forceRestart;
-   }
-
-   protected int getShutdownDelay()
-   {
-      return shutdownDelay;
-   }
-
-   protected int getServerBootTimeout()
-   {
-      return bootTimeout;
-   }
-
-   protected int getPort()
-   {
-      return port;
    }
 }

@@ -36,9 +36,12 @@ public class JBossASConfiguration implements ContainerConfiguration
 
    private String profileName = "default";
    
-   private String jbossHome = null;
+   // 
+   private String jbossHome = System.getenv("JBOSS_HOME");
    
-   private String javaHome = null;
+   private String javaHome = System.getenv("JAVA_HOME");
+   
+   private String javaVmArguments = "-Xmx512m -XX:MaxPermSize=128m";
 
    public ContainerProfile getContainerProfile()
    {
@@ -104,5 +107,20 @@ public class JBossASConfiguration implements ContainerConfiguration
    public String getJavaHome()
    {
       return javaHome;
+   }
+   
+   /**
+    * This will override the default ("-Xmx512m -XX:MaxPermSize=128m") startup JVM arguments. 
+    * 
+    * @param javaVmArguments use as start up arguments
+    */
+   public void setJavaVmArguments(String javaVmArguments)
+   {
+      this.javaVmArguments = javaVmArguments;
+   }
+   
+   public String getJavaVmArguments()
+   {
+      return javaVmArguments;
    }
 }
