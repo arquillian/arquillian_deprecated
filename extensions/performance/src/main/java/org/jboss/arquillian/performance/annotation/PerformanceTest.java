@@ -30,6 +30,11 @@ import java.lang.annotation.Target;
  * It is possible to specify if you want to compare each test method or
  * the combined total time of all the test methods.
  * 
+ * How threshold is calculated:
+ * threshold * previous_result < latest result.
+ * Note that threshold can not be lower than 1.
+ * 
+ * Test results are stored in the folder arq-tests on project root.
  * 
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
@@ -39,7 +44,17 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface PerformanceTest {
 
-   boolean reportDegradingResults() default true;
+   /**
+    * Set the threshold of comparing new and old results. Can not be lower than 1 (which is default). 
+    * 
+    * @return
+    */
    double resultsThreshold() default 1d;
+   /**
+    * Will cause the performance check to merge previous results and only store the
+    * best result.
+    * 
+    * @return
+    */
    boolean mergeTestResults() default false;
 }

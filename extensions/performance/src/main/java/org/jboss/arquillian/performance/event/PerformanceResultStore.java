@@ -1,3 +1,19 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.jboss.arquillian.performance.event;
 
 import java.io.File;
@@ -12,68 +28,79 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.jboss.arquillian.performance.exception.PerformanceException;
 import org.jboss.arquillian.performance.meta.PerformanceClassResult;
 import org.jboss.arquillian.performance.meta.PerformanceSuiteResult;
 import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.event.suite.EventHandler;
-import org.jboss.arquillian.spi.event.suite.SuiteEvent;
+import org.jboss.arquillian.spi.event.suite.Test;
 
 /**
+ * Compares and stores test durations. 
  * 
- * 
- * 
- * fired during afterSuite
+ * fired during test
  * 
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
 
-public class PerformanceResultStore implements EventHandler<SuiteEvent>
+public class PerformanceResultStore implements EventHandler<Test>
 {
    private final String folder = "arq-perf";
    private final SimpleDateFormat fileFormat = new SimpleDateFormat("dd.MM.yy.mm.ss");
    
-   public void callback(Context context, SuiteEvent event) throws Exception
+   public void callback(Context context, Test event) throws Exception
    {
-      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.get(PerformanceSuiteResult.class);
+      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.getParentContext().getParentContext().get(PerformanceSuiteResult.class);
          
       if(suiteResult != null)
       {
-         //TODO: compare, fetch, save.
-         System.out.println("SuiteResult is ON!!!");
-         comparePerformanceSuiteResults(suiteResult);
+         try
+         {
+            comparePerformanceSuiteResults(suiteResult, event.getTestMethod().getName());
+         }
+         catch(PerformanceException pe)
+         {
+            TestResult result = context.get(TestResult.class);
+            if(result != null)
+            {
+               result.setThrowable(pe);
+            }
+         }
       }
-      else
-         System.out.println("SUITERESULT IS NULL");
    }
    
-   private void comparePerformanceSuiteResults(PerformanceSuiteResult suiteResult)
+   private void comparePerformanceSuiteResults(PerformanceSuiteResult suiteResult, String testMethod) throws PerformanceException
    {
       List<PerformanceSuiteResult> prevResults = findEarlierResults(suiteResult);
       
       for(PerformanceSuiteResult result : prevResults)
       {
-         if(!doCompareResults(result, suiteResult))
-            //throw some exception
-            System.out.println("the new result wasnt within the specified delta");
-         else
-            System.out.println("the new result is OK");
+         doCompareResults(result, suiteResult, testMethod);
       }
       
       //everything went well, now we just store the new result and we're done
       storePerformanceSuiteResult(suiteResult);
    }
    
-   private boolean doCompareResults(PerformanceSuiteResult oldResult, PerformanceSuiteResult newResult)
+   private void doCompareResults(PerformanceSuiteResult oldResult, 
+                                 PerformanceSuiteResult newResult,
+                                 String testMethod) throws PerformanceException
    {
       for(String className : oldResult.getResults().keySet())
       {
+         
          PerformanceClassResult oldClassResult = oldResult.getResult(className);
-         PerformanceClassResult newClassResult = newResult.getResult(className);
-         oldClassResult.compareResults(newClassResult);
+         if(oldClassResult.getMethodResult(testMethod) != null)
+         {
+            oldClassResult.getMethodResult(testMethod).compareResults(
+                  newResult.getResult(className).getMethodResult(testMethod), 
+                  oldClassResult.getPerformanceSpecs().resultsThreshold());
+         }
+         
       }
-        // TODO Auto-generated method stub
-      return true;
+
    }
 
    /**
@@ -98,7 +125,7 @@ public class PerformanceResultStore implements EventHandler<SuiteEvent>
        List<PerformanceSuiteResult> prevResults = new ArrayList<PerformanceSuiteResult>();
        for(File f : files)
        {
-          System.out.println("THESE ARE OUR PREV STORED TESTS: "+f.getName());
+//          System.out.println("THESE ARE OUR PREV STORED TESTS: "+f.getName());
           PerformanceSuiteResult result = getResultFromFile(f);
           if(result != null)
              prevResults.add(result);
@@ -152,6 +179,7 @@ public class PerformanceResultStore implements EventHandler<SuiteEvent>
          }
          catch(IOException ex)
          {
+            System.err.println("Storing test results failed.");
             ex.printStackTrace();
          }
       }

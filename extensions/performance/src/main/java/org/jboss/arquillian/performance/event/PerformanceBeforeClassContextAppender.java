@@ -16,28 +16,20 @@
  */
 package org.jboss.arquillian.performance.event;
 
+import org.jboss.arquillian.spi.ClassContextAppender;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.TestContextAppender;
-import org.jboss.arquillian.spi.event.suite.Test;
+import org.jboss.arquillian.spi.event.suite.BeforeClass;
 
 /**
- * 
- * A PerformanceTestContextAppender.
+ * A PerformanceBeforeClassContextAppender.
  * 
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
-public class PerformanceTestContextAppender implements TestContextAppender
+public class PerformanceBeforeClassContextAppender implements ClassContextAppender
 {
-
    public void append(Context context)
    {
-      context.register(Test.class, new TestPerformanceVerifier());
-      context.register(Test.class, new PerformanceResultStore());
-      
-
-      
-      
+      context.register(BeforeClass.class, new PerformanceTestParser());
    }
-
 }

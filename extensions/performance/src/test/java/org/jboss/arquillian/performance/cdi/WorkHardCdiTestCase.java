@@ -14,7 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-@PerformanceTest(reportDegradingResults=true)
+@PerformanceTest(resultsThreshold=2)
 @RunWith(Arquillian.class)
 public class WorkHardCdiTestCase
 {

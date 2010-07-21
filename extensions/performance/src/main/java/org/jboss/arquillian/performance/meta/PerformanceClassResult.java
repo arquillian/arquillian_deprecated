@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.performance.annotation.PerformanceTest;
-
 /**
  * A PerformanceClassResult.
  * 
@@ -82,17 +81,5 @@ public class PerformanceClassResult implements Serializable
    {
       this.testClassName = testClassName;
    }
-
-   public void compareResults(PerformanceClassResult pcr)
-   {
-      if(pcr == null)
-         throw new NullPointerException("Compared class is null!");
-      
-      for(PerformanceMethodResult pmr : getMethodResults())
-      {
-         pmr.compareResults(pcr.getMethodResult(pmr.getTestMethod()), performanceSpecs.resultsThreshold());
-      }
-   }
-   
    
 }

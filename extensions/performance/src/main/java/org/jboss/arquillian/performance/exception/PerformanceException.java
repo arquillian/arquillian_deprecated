@@ -17,7 +17,7 @@
 package org.jboss.arquillian.performance.exception;
 
 /**
- * A PerformanceException.
+ * A PerformanceException, will be thrown when a performance rule have been breached.
  * 
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $

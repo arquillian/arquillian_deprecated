@@ -54,16 +54,13 @@ public class PerformanceTestParser implements EventHandler<ClassEvent>
          if(suitePerformance == null)
          {
             suitePerformance = new PerformanceSuiteResult(classPerformance.getTestClassName());
-            System.out.println("adding performancesuiteresult to context");
+//            System.out.println("adding performancesuiteresult to context");
             context.getParentContext().add(PerformanceSuiteResult.class, suitePerformance);
          }
          
          suitePerformance.addClassResult(testClass.getName(), classPerformance);
 //         setThreshold(performanceTest.resultsThreshold());
-       System.out.println("PerformanceTest is: "+performanceTest.resultsThreshold());
-      }
-      else
-         System.out.println("PerformanceTest is NULL!");
-         
+//       System.out.println("PerformanceTest is: "+performanceTest.resultsThreshold());
+      }  
    }
 }

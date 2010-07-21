@@ -19,6 +19,8 @@ package org.jboss.arquillian.performance.meta;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
+import org.jboss.arquillian.performance.exception.PerformanceException;
+
 /**
  * A PerformanceMethodResult.
  * 
@@ -65,16 +67,16 @@ public class PerformanceMethodResult implements Serializable
    {
       this.testMethod = testMethod;
    }
-   public void compareResults(PerformanceMethodResult methodResult, double resultsThreshold)
-   {
-      System.out.println("methods compared: "+testMethod+", and: "+methodResult.getTestMethod());
-      System.out.println("Comparing: "+actualTime+" to: "+methodResult.getActualTime());
-      System.out.println("Threshold is: "+resultsThreshold);
-      if((resultsThreshold +1) * actualTime < methodResult.getActualTime())
+   public void compareResults(PerformanceMethodResult methodResult, double resultsThreshold) throws PerformanceException
+   {     
+      if(resultsThreshold < 1)
+         resultsThreshold = 1;
+//      System.out.println("Comparing "+testMethod+", was: "+actualTime+", latest result: "
+//            +methodResult.getActualTime()+", threshold: "+resultsThreshold);
+      if(resultsThreshold * actualTime < methodResult.getActualTime())
       {
-         System.out.println("WE FAILED");
-         throw new RuntimeException("Method1 actual time: "+actualTime+
-               ", Method2: "+methodResult.getActualTime()+
+         throw new PerformanceException("Degrading results; earlier result for method: "+
+               testMethod+", was: "+actualTime+", latest result: "+methodResult.getActualTime()+
                ", threshold: "+resultsThreshold);
       }
       
