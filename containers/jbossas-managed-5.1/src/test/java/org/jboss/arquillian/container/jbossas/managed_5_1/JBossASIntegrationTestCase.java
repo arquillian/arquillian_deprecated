@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-//@Ignore // TODO: Add auto extract of 5.1 container. No Maven based dist for 5.1, download from sourceforge? 
+@Ignore // TODO: Add auto extract of 5.1 container. No Maven based dist for 5.1, download from sourceforge? 
 @RunWith(Arquillian.class)
 public class JBossASIntegrationTestCase
 {
