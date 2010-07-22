@@ -27,6 +27,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
 import javax.naming.InitialContext;
 
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
@@ -81,6 +83,7 @@ public class JBossASRemoteContainer implements DeployableContainer
                -1);
          httpFileServer.start();
          initDeploymentManager();
+         stopDeploymentScanner();
       } 
       catch (Exception e) 
       {
@@ -94,6 +97,7 @@ public class JBossASRemoteContainer implements DeployableContainer
       {
          httpFileServer.stop(0);
          removeFailedUnDeployments();
+         startDeploymentScanner();
       } 
       catch (Exception e) 
       {
@@ -281,5 +285,25 @@ public class JBossASRemoteContainer implements DeployableContainer
       { 
          destination.write(readBuffer, 0, bytesIn); 
       }
+   }
+
+   /*
+    * JBoss AS 6.0 M4 has problems when using the ProfileService for deployment. Both the DeploymentManager and the HDScanner
+    * tried to deploy the same file. Since the HDScanner is lagging behind, it will undeploy what the DeploymentManager deployed and redeploy.
+    * 
+    *  Stop the HDScanner before we start to deploy, then start it again when we're done. 
+    */
+   private void startDeploymentScanner() throws Exception
+   {
+      ObjectName DEPLOYMNET_SCANNER = new ObjectName("jboss.deployment:flavor=URL,type=DeploymentScanner");
+      MBeanServerConnection adaptor = (MBeanServerConnection)new InitialContext().lookup("jmx/invoker/RMIAdaptor");
+      adaptor.invoke(DEPLOYMNET_SCANNER, "start", new Object[] {}, new String[]{});
+   }
+
+   private void stopDeploymentScanner() throws Exception
+   {
+      ObjectName DEPLOYMNET_SCANNER = new ObjectName("jboss.deployment:flavor=URL,type=DeploymentScanner");
+      MBeanServerConnection adaptor = (MBeanServerConnection)new InitialContext().lookup("jmx/invoker/RMIAdaptor");
+      adaptor.invoke(DEPLOYMNET_SCANNER, "stop", new Object[] {}, new String[]{});
    }
 }
