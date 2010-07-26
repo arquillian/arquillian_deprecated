@@ -74,7 +74,11 @@ public class JBossASLocalContainer implements DeployableContainer
          Server server = manager.getServer(configuration.getProfileName());
          if(ServerController.isServerStarted(server))
          {
-            throw new LifecycleException("Could not start server, server is already running");
+            throw new LifecycleException(
+                  "The server is already running! " +
+                  "Managed containers does not support connecting to running server instances due to the " +
+                  "possible harmfull effect of connecting to the wrong server. Please stop server before running or " +
+                  "change to another type of container.");
          }
          
          manager.startServer(server.getName());
