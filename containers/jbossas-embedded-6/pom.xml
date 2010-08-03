@@ -25,7 +25,7 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.org.jboss.jbossas>6.0.0.20100429-M3</version.org.jboss.jbossas>
+		<version.org.jboss.jbossas>6.0.0.20100721-M4</version.org.jboss.jbossas>
 
 	</properties>
 
@@ -119,12 +119,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<additionalClasspathElements>
-						<additionalClasspathElement>${project.build.directory}/jboss-6.0.0.20100429-M3/client/jbossws-native-client.jar</additionalClasspathElement>
+						<additionalClasspathElement>${project.build.directory}/jboss-${version.org.jboss.jbossas}/client/jbossws-native-client.jar</additionalClasspathElement>
 						<!--
 							Because jbossweb.sar contains shared web.xml, which must be
 							visible from same CL as TomcatDeployer.class.getClassLoader
 						-->
-						<additionalClasspathElement>${project.build.directory}/jboss-6.0.0.20100429-M3/server/default/deploy/jbossweb.sar</additionalClasspathElement>
+						<additionalClasspathElement>${project.build.directory}/jboss-${version.org.jboss.jbossas}/server/default/deploy/jbossweb.sar</additionalClasspathElement>
 					</additionalClasspathElements>
 
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -137,7 +137,7 @@
 						classes, methods, etc. EMB-41. Endorsed required for things like
 						WS support (EMB-61)
 					-->
-					<argLine>-Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Djava.endorsed.dirs=${project.build.directory}/jboss-6.0.0.20100429-M3/lib/endorsed -Djboss.home=${project.build.directory}/jboss-6.0.0.20100429-M3 -Djboss.boot.server.log.dir=${project.build.directory}/jboss-6.0.0.20100429-M3</argLine>
+					<argLine>-Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Djava.endorsed.dirs=${project.build.directory}/jboss-${version.org.jboss.jbossas}/lib/endorsed -Djboss.home=${project.build.directory}/jboss-${version.org.jboss.jbossas} -Djboss.boot.server.log.dir=${project.build.directory}/jboss-${version.org.jboss.jbossas}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -155,7 +155,7 @@
 								<artifactItem>
 									<groupId>org.jboss.jbossas</groupId>
 									<artifactId>jboss-as-distribution</artifactId>
-									<version>6.0.0.20100429-M3</version>
+									<version>${version.org.jboss.jbossas}</version>
 									<type>zip</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}</outputDirectory>

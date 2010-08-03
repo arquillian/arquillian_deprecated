@@ -24,6 +24,9 @@
     <properties>
 
         <!-- Versioning -->
+        <version.org.jboss.jbossas>6.0.0.20100721-M4</version.org.jboss.jbossas>
+        <version.org.jboss.jbossas_server-manager>1.0.3.GA</version.org.jboss.jbossas_server-manager>
+        
 
     </properties>
 
@@ -67,14 +70,14 @@
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-server-manager</artifactId>
-            <version>1.0.3.GA</version>
+            <version>${version.org.jboss.jbossas_server-manager}</version>
             <scope>provided</scope>
         </dependency>
         
         <dependency>
             <groupId>org.jboss.jbossas</groupId>
             <artifactId>jboss-as-client</artifactId>
-            <version>6.0.0.20100429-M3</version>
+            <version>${version.org.jboss.jbossas}</version>
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
@@ -128,7 +131,7 @@
 								<artifactItem>
 									<groupId>org.jboss.jbossas</groupId>
 									<artifactId>jboss-as-distribution</artifactId>
-									<version>6.0.0.20100429-M3</version>
+									<version>${version.org.jboss.jbossas}</version>
 									<type>zip</type>
 									<overWrite>false</overWrite>
 									<outputDirectory>${project.build.directory}</outputDirectory>
