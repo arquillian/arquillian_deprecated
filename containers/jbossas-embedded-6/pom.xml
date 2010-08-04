@@ -137,7 +137,7 @@
 						classes, methods, etc. EMB-41. Endorsed required for things like
 						WS support (EMB-61)
 					-->
-					<argLine>-Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Djava.endorsed.dirs=${project.build.directory}/jboss-${version.org.jboss.jbossas}/lib/endorsed -Djboss.home=${project.build.directory}/jboss-${version.org.jboss.jbossas} -Djboss.boot.server.log.dir=${project.build.directory}/jboss-${version.org.jboss.jbossas}</argLine>
+					<argLine>-Xmx512m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Djava.util.logging.manager=org.jboss.logmanager.LogManager -Djava.endorsed.dirs=${project.build.directory}/jboss-${version.org.jboss.jbossas}/lib/endorsed -Djboss.home=${project.build.directory}/jboss-${version.org.jboss.jbossas} -Djboss.boot.server.log.dir=${project.build.directory}/jboss-${version.org.jboss.jbossas} -Dorg.jboss.reflect.spi.TypeInfoFactory=org.jboss.reflect.plugins.introspection.IntrospectionTypeInfoFactory</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
