@@ -47,7 +47,6 @@ public class JSFUnitTestCase
                         ScopeAwareBean.class)
                   .setWebXML("jsf/jsf-web.xml")
                   .addResource("jsf/index.xhtml", "index.xhtml")
-                  .addWebResource("jsf/faces-config.xml", "faces-config.xml")
                   .addWebResource(new ByteArrayAsset("<beans/>".getBytes()), ArchivePaths.create("beans.xml"));
    }
 
