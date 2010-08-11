@@ -71,7 +71,7 @@ public class TomcatContainer implements DeployableContainer
    /**
     * Tomcat embedded
     */
-   private Embedded embedded;
+   private TomcatEmbedded embedded;
 
    /**
     * Engine contained within Tomcat embedded
@@ -233,8 +233,8 @@ public class TomcatContainer implements DeployableContainer
    protected void startTomcatEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException
    {
       // creating the tomcat embedded == service tag in server.xml
-      embedded = new Embedded();
-      embedded.setName(serverName);
+      embedded = new TomcatEmbedded();
+      embedded.getService().setName(serverName);
       // TODO this needs to be a lot more robust
       String tomcatHome = configuration.getTomcatHome();
       File tomcatHomeFile = null;
@@ -269,8 +269,8 @@ public class TomcatContainer implements DeployableContainer
       engine = embedded.createEngine();
       engine.setName(serverName);
       engine.setDefaultHost(bindAddress);
-      engine.setService(embedded);
-      embedded.setContainer(engine);
+      engine.setService(embedded.getService());
+      embedded.getService().setContainer(engine);
       embedded.addEngine(engine);
       
       // creates the host, i.e., <host> element in server.xml
@@ -290,7 +290,7 @@ public class TomcatContainer implements DeployableContainer
       connector.setContainer(engine);
       
       // starts embedded tomcat
-      embedded.init();
+      embedded.getService().init();
       embedded.start();
       wasStarted = true;
    }
