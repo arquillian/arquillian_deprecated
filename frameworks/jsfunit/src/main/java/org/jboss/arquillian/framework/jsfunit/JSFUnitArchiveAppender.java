@@ -62,7 +62,7 @@ public class JSFUnitArchiveAppender implements AuxiliaryArchiveAppender
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/IE8.properties")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/JavaScriptConfiguration.xml")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/JavaScriptConfiguration.xsd")
-                  //.addManifestResource("faces-config.xml")
+                  .addManifestResource("faces-config.xml")
                   .addManifestResource("web-fragment.xml");
    }
 }
