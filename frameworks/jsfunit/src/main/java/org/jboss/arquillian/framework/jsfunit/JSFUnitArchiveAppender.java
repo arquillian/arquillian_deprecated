@@ -43,17 +43,20 @@ public class JSFUnitArchiveAppender implements AuxiliaryArchiveAppender
                         org.jboss.jsfunit.framework.WebClientSpec.class.getPackage(),
                         org.jboss.jsfunit.context.JSFUnitFacesContext.class.getPackage(),
                         org.jboss.jsfunit.seam.SeamUtil.class.getPackage(),
+                        org.apache.http.HttpEntity.class.getPackage(), // HTTPClient
                         com.gargoylesoftware.htmlunit.BrowserVersion.class.getPackage(),
                         org.apache.commons.codec.Decoder.class.getPackage(),
                         org.apache.commons.httpclient.HttpClient.class.getPackage(),
                         org.apache.commons.io.IOUtils.class.getPackage(),
                         org.apache.commons.lang.StringUtils.class.getPackage(),
+                        
                         net.sourceforge.htmlunit.corejs.javascript.EvaluatorException.class.getPackage(),
                         org.w3c.css.sac.CSSException.class.getPackage(),
                         com.steadystate.css.dom.CSSOMObject.class.getPackage(),
                         org.cyberneko.html.HTMLComponent.class.getPackage())
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/FF2.properties")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/FF3.properties")
+                  .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/FF3.6.properties")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/IE6.properties")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/IE7.properties")
                   .addResource("com/gargoylesoftware/htmlunit/javascript/configuration/IE8.properties")
