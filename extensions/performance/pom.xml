@@ -17,8 +17,9 @@
    <modelVersion>4.0.0</modelVersion>
 
    <!-- Artifact Configuration -->
+   <groupId>org.jboss.arquillian.extension</groupId>
    <artifactId>arquillian-performance</artifactId>
-   <name>Arquillian Performance</name>
+   <name>Arquillian Extension Performance</name>
    <description>Extension to add performance measurement to Arquillian</description>
 
 
