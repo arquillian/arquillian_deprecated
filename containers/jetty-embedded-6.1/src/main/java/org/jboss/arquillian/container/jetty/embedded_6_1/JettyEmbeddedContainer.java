@@ -136,6 +136,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);
+         wctx.setParentLoaderPriority(true);
          server.addHandler(wctx);
          wctx.start();
          context.add(WebAppContext.class, wctx);
