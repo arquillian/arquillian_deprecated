@@ -59,8 +59,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
 {
    public static final String HTTP_PROTOCOL = "http";
 
-   public static final String WEB_APP_CONTEXT_PATH = "/test";
-
    public static final String[] JETTY_PLUS_CONFIGURATION_CLASSES =
    {
        "org.mortbay.jetty.webapp.WebInfConfiguration",
@@ -124,8 +122,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
          {
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
          }
-         // FIXME shrinkwrap jetty adapter does not remove file extension from name when setting context path
-         wctx.setContextPath(WEB_APP_CONTEXT_PATH);
          // HACK this needs to be rethought, perhaps another auxiliary archive appender to guarantee uniqueness and a static check for run mode?
 //         if (archive.contains(ArchivePaths.create("/WEB-INF/lib/arquillian-protocol.jar")))
 //         {

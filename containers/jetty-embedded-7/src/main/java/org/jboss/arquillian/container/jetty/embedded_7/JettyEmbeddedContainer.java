@@ -51,8 +51,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
 {
    public static final String HTTP_PROTOCOL = "http";
 
-   public static final String WEB_APP_CONTEXT_PATH = "/test";
-
    public static final String[] JETTY_PLUS_CONFIGURATION_CLASSES =
    {
        "org.eclipse.jetty.webapp.WebInfConfiguration",
@@ -121,8 +119,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
          {
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
          }
-         // FIXME shrinkwrap jetty adapter does not remove file extension from name when setting context path
-         wctx.setContextPath(WEB_APP_CONTEXT_PATH);
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);

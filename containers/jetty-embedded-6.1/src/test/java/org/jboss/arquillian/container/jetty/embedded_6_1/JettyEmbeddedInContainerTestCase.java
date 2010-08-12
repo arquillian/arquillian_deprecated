@@ -49,7 +49,7 @@ public class JettyEmbeddedInContainerTestCase
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "in-container-test.war")
+      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestBean.class)
          // adding the configuration class silences the logged exception when building the configuration on the server-side, but shouldn't be necessary
          //.addClass(JettyEmbeddedConfiguration.class)
