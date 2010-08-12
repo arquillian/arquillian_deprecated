@@ -136,7 +136,14 @@ public class JettyEmbeddedContainer implements DeployableContainer
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);
+         
+         /*
+          * ARQ-242 Without this set we result in failure on loading Configuration in container.
+          * ServiceLoader finds service file from AppClassLoader, tried to load JettyContainerConfiguration from AppClassLoader 
+          * as a ContainerConfiguration from WebAppClassContext. ClassCastException.
+          */
          wctx.setParentLoaderPriority(true);
+         
          server.addHandler(wctx);
          wctx.start();
          context.add(WebAppContext.class, wctx);
