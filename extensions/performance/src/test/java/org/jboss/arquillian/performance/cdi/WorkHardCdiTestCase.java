@@ -6,6 +6,7 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.performance.annotation.Performance;
 import org.jboss.arquillian.performance.annotation.PerformanceTest;
+import org.jboss.arquillian.performance.exception.PerformanceException;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -42,7 +43,7 @@ public class WorkHardCdiTestCase
     * 
     * @throws Exception
     */
-   @Test
+   @Test(expected = PerformanceException.class)
    @Performance(time=9)
    public void doHardWorkThatFails() throws Exception
    {
