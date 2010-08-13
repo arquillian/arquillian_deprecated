@@ -8,7 +8,7 @@ import org.jboss.arquillian.performance.annotation.Performance;
 import org.jboss.arquillian.performance.annotation.PerformanceTest;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,9 +25,7 @@ public class WorkHardCdiTestCase
                .addPackage(
                        WorkHard.class.getPackage()
                )
-               .addManifestResource(
-                       new ByteArrayAsset("<beans/>".getBytes()),
-                       ArchivePaths.create("beans.xml"));
+               .addManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject HardWorker worker;
