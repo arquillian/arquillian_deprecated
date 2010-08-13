@@ -53,8 +53,7 @@ public class PerformanceResultStore implements EventHandler<Test>
 
    public void callback(Context context, Test event) throws Exception
    {
-      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.getParentContext().getParentContext()
-            .get(PerformanceSuiteResult.class);
+      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.get(PerformanceSuiteResult.class);
 
       if (suiteResult != null)
       {
