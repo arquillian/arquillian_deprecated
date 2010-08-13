@@ -48,57 +48,59 @@ import org.jboss.arquillian.spi.event.suite.Test;
 public class PerformanceResultStore implements EventHandler<Test>
 {
    private final String folder = "arq-perf";
+
    private final SimpleDateFormat fileFormat = new SimpleDateFormat("dd.MM.yy.mm.ss");
-   
+
    public void callback(Context context, Test event) throws Exception
    {
-      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.getParentContext().getParentContext().get(PerformanceSuiteResult.class);
-         
-      if(suiteResult != null)
+      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.getParentContext().getParentContext()
+            .get(PerformanceSuiteResult.class);
+
+      if (suiteResult != null)
       {
          try
          {
             comparePerformanceSuiteResults(suiteResult, event.getTestMethod().getName());
          }
-         catch(PerformanceException pe)
+         catch (PerformanceException pe)
          {
             TestResult result = context.get(TestResult.class);
-            if(result != null)
+            if (result != null)
             {
                result.setThrowable(pe);
             }
          }
       }
    }
-   
-   private void comparePerformanceSuiteResults(PerformanceSuiteResult suiteResult, String testMethod) throws PerformanceException
+
+   private void comparePerformanceSuiteResults(PerformanceSuiteResult suiteResult, String testMethod)
+         throws PerformanceException
    {
       List<PerformanceSuiteResult> prevResults = findEarlierResults(suiteResult);
-      
-      for(PerformanceSuiteResult result : prevResults)
+
+      for (PerformanceSuiteResult result : prevResults)
       {
          doCompareResults(result, suiteResult, testMethod);
       }
-      
+
       //everything went well, now we just store the new result and we're done
       storePerformanceSuiteResult(suiteResult);
    }
-   
-   private void doCompareResults(PerformanceSuiteResult oldResult, 
-                                 PerformanceSuiteResult newResult,
-                                 String testMethod) throws PerformanceException
+
+   private void doCompareResults(PerformanceSuiteResult oldResult, PerformanceSuiteResult newResult, String testMethod)
+         throws PerformanceException
    {
-      for(String className : oldResult.getResults().keySet())
+      for (String className : oldResult.getResults().keySet())
       {
-         
+
          PerformanceClassResult oldClassResult = oldResult.getResult(className);
-         if(oldClassResult.getMethodResult(testMethod) != null)
+         if (oldClassResult.getMethodResult(testMethod) != null)
          {
             oldClassResult.getMethodResult(testMethod).compareResults(
-                  newResult.getResult(className).getMethodResult(testMethod), 
+                  newResult.getResult(className).getMethodResult(testMethod),
                   oldClassResult.getPerformanceSpecs().resultsThreshold());
          }
-         
+
       }
 
    }
@@ -110,29 +112,32 @@ public class PerformanceResultStore implements EventHandler<Test>
     */
    private List<PerformanceSuiteResult> findEarlierResults(final PerformanceSuiteResult currentResult)
    {
-       File perfDir = new File(System.getProperty("user.dir")+File.separator+folder);
-       File[] files = perfDir.listFiles(new FileFilter() {
-
+      File perfDir = new File(System.getProperty("user.dir") + File.separator + folder);
+      File[] files = perfDir.listFiles(new FileFilter()
+      {
          public boolean accept(File pathname)
          {
-            if(pathname.getName().startsWith(currentResult.getName()))
+            if (pathname.getName().startsWith(currentResult.getName()))
                return true;
             else
                return false;
          }
-          
-       });
-       List<PerformanceSuiteResult> prevResults = new ArrayList<PerformanceSuiteResult>();
-       for(File f : files)
-       {
-//          System.out.println("THESE ARE OUR PREV STORED TESTS: "+f.getName());
-          PerformanceSuiteResult result = getResultFromFile(f);
-          if(result != null)
-             prevResults.add(result);
-       }
+
+      });
+      List<PerformanceSuiteResult> prevResults = new ArrayList<PerformanceSuiteResult>();
+      if (files != null)
+      {
+         for (File f : files)
+         {
+            //          System.out.println("THESE ARE OUR PREV STORED TESTS: "+f.getName());
+            PerformanceSuiteResult result = getResultFromFile(f);
+            if (result != null)
+               prevResults.add(result);
+         }
+      }
       return prevResults;
    }
-   
+
    private PerformanceSuiteResult getResultFromFile(File file)
    {
       try
@@ -141,7 +146,7 @@ public class PerformanceResultStore implements EventHandler<Test>
          ObjectInputStream ois = new ObjectInputStream(fis);
          return (PerformanceSuiteResult) ois.readObject();
       }
-      catch(IOException ioe)
+      catch (IOException ioe)
       {
          return null;
       }
@@ -151,7 +156,7 @@ public class PerformanceResultStore implements EventHandler<Test>
          return null;
       }
    }
-   
+
    /**
     * 1. make sure folder exists, if not create folder
     * 2. generate file name
@@ -161,23 +166,23 @@ public class PerformanceResultStore implements EventHandler<Test>
     */
    private void storePerformanceSuiteResult(PerformanceSuiteResult suiteResult)
    {
-      String filename = suiteResult.getName()+"-"+fileFormat.format(new Date())+".ser";
-      String currentPath = System.getProperty("user.dir")+File.separator+folder+File.separator;
+      String filename = suiteResult.getName() + "-" + fileFormat.format(new Date()) + ".ser";
+      String currentPath = System.getProperty("user.dir") + File.separator + folder + File.separator;
       boolean filestatus = true;
-      if(!new File(currentPath).isDirectory())
+      if (!new File(currentPath).isDirectory())
          filestatus = new File(currentPath).mkdirs();
-      if(filestatus)
+      if (filestatus)
       {
          FileOutputStream fos = null;
          ObjectOutputStream out = null;
          try
          {
-            fos = new FileOutputStream(currentPath+filename);
+            fos = new FileOutputStream(currentPath + filename);
             out = new ObjectOutputStream(fos);
             out.writeObject(suiteResult);
             out.close();
          }
-         catch(IOException ex)
+         catch (IOException ex)
          {
             System.err.println("Storing test results failed.");
             ex.printStackTrace();
