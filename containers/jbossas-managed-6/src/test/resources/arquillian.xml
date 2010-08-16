@@ -5,7 +5,7 @@
 		xmlns:jboss="urn:arq:org.jboss.arquillian.container.jbossas.managed_6">
 
 	<jboss:container>
-		<jbossHome>target/jboss-6.0.0.20100429-M3</jbossHome>
+		<jbossHome>target/jboss-6.0.0.20100721-M4</jbossHome>
 		<!-- <javaHome>/usr/lib/jvm/java-6-openjdk</javaHome> Will default o JAVA_HOME--> 
 		<bindAddress>127.0.0.1</bindAddress>
 		<httpPort>8080</httpPort> <!-- WARN: this is not the bind port, but connect port. Bind port must be set in jboss xml config -->

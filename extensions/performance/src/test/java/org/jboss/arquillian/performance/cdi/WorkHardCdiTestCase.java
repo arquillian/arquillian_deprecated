@@ -6,9 +6,10 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.performance.annotation.Performance;
 import org.jboss.arquillian.performance.annotation.PerformanceTest;
+import org.jboss.arquillian.performance.exception.PerformanceException;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,9 +26,7 @@ public class WorkHardCdiTestCase
                .addPackage(
                        WorkHard.class.getPackage()
                )
-               .addManifestResource(
-                       new ByteArrayAsset("<beans/>".getBytes()),
-                       ArchivePaths.create("beans.xml"));
+               .addManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject HardWorker worker;
@@ -44,7 +43,7 @@ public class WorkHardCdiTestCase
     * 
     * @throws Exception
     */
-   @Test
+   @Test(expected = PerformanceException.class)
    @Performance(time=9)
    public void doHardWorkThatFails() throws Exception
    {

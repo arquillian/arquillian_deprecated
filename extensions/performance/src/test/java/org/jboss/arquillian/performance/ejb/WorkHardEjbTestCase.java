@@ -12,14 +12,15 @@ import org.junit.runner.RunWith;
 @RunWith(org.jboss.arquillian.junit.Arquillian.class)
 public class WorkHardEjbTestCase
 {
-   
    @EJB
    private WorkHard hardWorker;
 
    @Deployment
    public static JavaArchive createTestArchive() {
       return ShrinkWrap.create(JavaArchive.class, "test.jar")
-         .addClasses(WorkHard.class, WorkHardBean.class);
+               .addPackage(
+                       WorkHard.class.getPackage()
+               );
    }
    
    @Test

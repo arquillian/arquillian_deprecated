@@ -51,8 +51,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
 {
    public static final String HTTP_PROTOCOL = "http";
 
-   public static final String WEB_APP_CONTEXT_PATH = "/test";
-
    public static final String[] JETTY_PLUS_CONFIGURATION_CLASSES =
    {
        "org.eclipse.jetty.webapp.WebInfConfiguration",
@@ -121,11 +119,17 @@ public class JettyEmbeddedContainer implements DeployableContainer
          {
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
          }
-         // FIXME shrinkwrap jetty adapter does not remove file extension from name when setting context path
-         wctx.setContextPath(WEB_APP_CONTEXT_PATH);
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);
+
+         /*
+          * ARQ-242 Without this set we result in failure on loading Configuration in container.
+          * ServiceLoader finds service file from AppClassLoader, tried to load JettyContainerConfiguration from AppClassLoader 
+          * as a ContainerConfiguration from WebAppClassContext. ClassCastException.
+          */
+         wctx.setParentLoaderPriority(true);
+
          ((HandlerCollection) server.getHandler()).addHandler(wctx);
          wctx.start();
          context.add(WebAppContext.class, wctx);

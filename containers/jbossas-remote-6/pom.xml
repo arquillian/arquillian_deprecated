@@ -24,6 +24,7 @@
    <properties>
 
       <!-- Versioning -->
+      <version.org.jboss.jbossas>6.0.0.20100721-M4</version.org.jboss.jbossas>
 
    </properties>
 
@@ -67,7 +68,7 @@
       <dependency>
          <groupId>org.jboss.jbossas</groupId>
          <artifactId>jboss-as-client</artifactId>
-         <version>6.0.0.20100429-M3</version>
+         <version>${version.org.jboss.jbossas}</version>
          <type>pom</type>
          <scope>provided</scope>
       </dependency>

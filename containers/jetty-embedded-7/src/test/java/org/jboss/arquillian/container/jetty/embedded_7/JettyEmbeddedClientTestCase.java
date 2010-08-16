@@ -62,7 +62,7 @@ public class JettyEmbeddedClientTestCase
    public void shouldBeAbleToInvokeServletInDeployedWebApp() throws Exception
    {
       String body = readAllAndClose(
-            new URL("http://localhost:9595/test" + TestServlet.URL_PATTERN).openStream());
+            new URL("http://localhost:9595/client-test" + TestServlet.URL_PATTERN).openStream());
       
       Assert.assertEquals(
             "Verify that the servlet was deployed and returns expected result",
