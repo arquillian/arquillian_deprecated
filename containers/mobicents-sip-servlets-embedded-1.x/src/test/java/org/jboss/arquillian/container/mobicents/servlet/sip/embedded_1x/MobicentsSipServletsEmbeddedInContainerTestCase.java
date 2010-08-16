@@ -24,13 +24,11 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
-import org.jboss.shrinkwrap.api.sip.spec.ConvergedSipWebArchive;
+import org.jboss.shrinkwrap.sip.api.spec.ConvergedSipWebArchive;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Tests that SIP Servlets deployments into the  Mobicents Sip Servlets server work through the

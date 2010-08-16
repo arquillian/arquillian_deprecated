@@ -25,7 +25,7 @@ import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.sip.spec.ConvergedSipWebArchive;
+import org.jboss.shrinkwrap.sip.api.spec.ConvergedSipWebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
