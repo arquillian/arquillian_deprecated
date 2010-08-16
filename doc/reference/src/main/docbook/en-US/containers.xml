@@ -193,6 +193,12 @@
                  <entry>EJB 3.0</entry>
                  <entry>arquillian-openejb-embedded-3.1</entry>
                </row>
+               <row>
+                 <entry><link linkend="container.tomcat-mobicents-sip-servlets-1.x">Mobicents Sip Servlets 1.x</link></entry>
+                 <entry>embedded</entry>
+                 <entry>SIP Servlets 1.1 and HTTP Servlet 2.5</entry>
+                 <entry>arquillian-mobicents-sip-servlets-embedded-1.x</entry>
+               </row>
             </tbody>
          </tgroup>
       </table>

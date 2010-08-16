@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<arquillian xmlns="http://jboss.com/arquillian"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:mss1x="urn:arq:org.jboss.arquillian.container.mobicents.servlet.sip.embedded_1x">
+
+   <!-- Uncomment to have test archives exported to the file system for inspection -->
+   <!--
+   <engine>
+      <deploymentExportPath>target/test-archives</deploymentExportPath>
+   </engine>
+   -->
+
+	<mss1x:container>
+		<mss1x:tomcatHome>target/mobicents-sip-servlets-embedded-1.x</mss1x:tomcatHome>
+      <!-- other options for setting tomcatHome -->
+		<!--mss1x:tomcatHome>/path/to/apache-tomcat-6.0.20</mss1x:tomcatHome-->
+		<!--mss1x:tomcatHome>${env.CATALINA_HOME}</mss1x:tomcatHome-->
+		<mss1x:workDir>work</mss1x:workDir> 
+		<mss1x:appBase>webapps</mss1x:appBase> 
+		<mss1x:bindHttpPort>8888</mss1x:bindHttpPort>
+		<mss1x:sipConnectors>:5080,:5080/TCP</mss1x:sipConnectors>
+      <!-- unpackArchive must be true if using the Weld Servlet module -->
+		<mss1x:unpackArchive>true</mss1x:unpackArchive>
+		<mss1x:sipApplicationRouterProviderClassName>org.jboss.arquillian.container.mobicents.servlet.sip.embedded_1x.ar.DummyRouterProvider</mss1x:sipApplicationRouterProviderClassName>
+	</mss1x:container>
+
+</arquillian>

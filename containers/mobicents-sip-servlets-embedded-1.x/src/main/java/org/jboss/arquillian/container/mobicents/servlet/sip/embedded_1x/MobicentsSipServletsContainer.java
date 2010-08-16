@@ -14,25 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.tomcat.embedded_6;
+package org.jboss.arquillian.container.mobicents.servlet.sip.embedded_1x;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import org.apache.catalina.Container;
-import org.apache.catalina.Engine;
-import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.startup.Embedded;
 import org.apache.catalina.startup.ExpandWar;
+import org.jboss.arquillian.container.tomcat.embedded_6.TomcatContainer;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
@@ -41,7 +38,12 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
+import org.jboss.shrinkwrap.mobicents.servlet.sip.api.ShrinkWrapSipStandardContext;
+import org.mobicents.servlet.sip.SipConnector;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipStandardService;
 
 /**
  * <p>Arquillian {@link DeployableContainer} implementation for an
@@ -58,89 +60,75 @@ import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
  * @author Dan Allen
  * @version $Revision: $
  */
-public class TomcatContainer implements DeployableContainer
+public class MobicentsSipServletsContainer extends TomcatContainer
 {
-   private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
+   private static final Logger log = Logger.getLogger(MobicentsSipServletsContainer.class.getName());   
 
-   private static final String ENV_VAR = "${env.";
-
-   private static final String HTTP_PROTOCOL = "http";
-
-   private static final String TMPDIR_SYS_PROP = "java.io.tmpdir";
-
-   /**
-    * Tomcat embedded
-    */
-   private TomcatEmbedded embedded;
-
-   /**
-    * Engine contained within Tomcat embedded
-    */
-   private Engine engine;
-
-   /**
-    * Host contained in the tomcat engine
-    */
-   private Host standardHost;
+   private static final String SIP_PROTOCOL = "sip";
+   
+   protected List<SipConnector> sipConnectors;   
 
    /**
     * Tomcat container configuration
     */
-   private TomcatConfiguration configuration;
-
-   private String serverName;
-
-   private String bindAddress;
-
-   private int bindPort;
-
-   private boolean wasStarted;
-
-   private final List<String> failedUndeployments = new ArrayList<String>();
+   private MobicentsSipServletsConfiguration configuration;
 
    public void setup(Context context, Configuration configuration)
    {
-      this.configuration = configuration.getContainerConfig(TomcatConfiguration.class);
+      this.configuration = configuration.getContainerConfig(MobicentsSipServletsConfiguration.class);
       bindAddress = this.configuration.getBindAddress();
       bindPort = this.configuration.getBindHttpPort();
+      sipConnectors = getSipConnectors(this.configuration.getSipConnectors());
       serverName = this.configuration.getServerName();
    }
 
-   public void start(Context context) throws LifecycleException
-   {
-      try
-      {
-         startTomcatEmbedded();
-      }
-      catch (Exception e)
-      {
-         throw new LifecycleException("Bad shit happened", e);
-      }
+   protected List<SipConnector> getSipConnectors(String sipConnectorString) {
+	   List<SipConnector> connectors = new ArrayList<SipConnector>();
+	   
+	   StringTokenizer tokenizer = new StringTokenizer(sipConnectorString, ",");
+	   while (tokenizer.hasMoreTokens()) {
+		   String connectorString = tokenizer.nextToken();
+		   String bindSipAddress;
+		   int bindSipPort;
+		   String bindSipTransport;
+		   
+		   int indexOfColumn = connectorString.indexOf(":");
+		   int indexOfSlash = connectorString.indexOf("/");
+		   if(indexOfColumn == -1) {
+			   throw new IllegalArgumentException("sipConnectors configuration should be a comma separated list of <ip_address>:<port>/<transport>");
+		   }
+		   if(indexOfColumn == 0) {
+			   bindSipAddress = bindAddress;
+		   } else {
+			   bindSipAddress = connectorString.substring(0,indexOfColumn);
+		   }
+		   if(indexOfSlash != -1) {
+			   bindSipPort = Integer.parseInt(connectorString.substring(indexOfColumn + 1, indexOfSlash));
+			   bindSipTransport = connectorString.substring(indexOfSlash + 1);
+		   } else {
+			   bindSipPort = Integer.parseInt(connectorString.substring(indexOfColumn + 1));
+			   bindSipTransport = "UDP";
+		   }
+		   SipConnector sipConnector = new SipConnector();
+		   sipConnector.setIpAddress(bindSipAddress);
+		   sipConnector.setPort(bindSipPort);
+		   try {
+			   sipConnector.setTransport(bindSipTransport);
+		   } catch (Exception e) {}
+		   connectors.add(sipConnector);
+	   } 
+	   
+	   return connectors;
    }
 
-   public void stop(Context context) throws LifecycleException
-   {
-      try
-      {
-         removeFailedUnDeployments();
-      }
-      catch (Exception e)
-      {
-         throw new LifecycleException("Could not clean up", e);
-      }
-      if (wasStarted)
-      {
-         try
-         {
-            stopTomcatEmbedded();
-         }
-         catch (org.apache.catalina.LifecycleException e)
-         {
-            throw new LifecycleException("An unexpected error occurred", e);
-         }
-      }
+   @Override
+   protected void startTomcatEmbedded() throws UnknownHostException,
+			org.apache.catalina.LifecycleException, LifecycleException {
+		startMobicentsSipServletsEmbedded();
    }
-
+   
+   
+   
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       if (archive == null)
@@ -154,16 +142,18 @@ public class TomcatContainer implements DeployableContainer
 
       try
       {
-         StandardContext standardContext = archive.as(ShrinkWrapStandardContext.class);
-         standardContext.addLifecycleListener(new EmbeddedContextConfig());
-         standardContext.setUnpackWAR(configuration.isUnpackArchive());
-         if (standardContext.getUnpackWAR())
+         SipStandardContext sipStandardContext = archive.as(ShrinkWrapSipStandardContext.class);
+         sipStandardContext.setXmlNamespaceAware(true);
+         sipStandardContext.setManager(new SipStandardManager());
+         sipStandardContext.addLifecycleListener(new EmbeddedContextConfig());
+         sipStandardContext.setUnpackWAR(configuration.isUnpackArchive());
+         if (sipStandardContext.getUnpackWAR())
          {
-            deleteUnpackedWAR(standardContext);
+            deleteUnpackedWAR(sipStandardContext);
          }
 
-         standardHost.addChild(standardContext);
-         context.add(StandardContext.class, standardContext);
+         standardHost.addChild(sipStandardContext);
+         context.add(SipStandardContext.class, sipStandardContext);
       }
       catch (Exception e)
       {
@@ -185,56 +175,18 @@ public class TomcatContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   protected void startMobicentsSipServletsEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException, LifecycleException
    {
-      StandardContext standardContext = context.get(StandardContext.class);
-      if (standardContext != null)
-      {
-         standardHost.removeChild(standardContext);
-         if (standardContext.getUnpackWAR())
-         {
-            deleteUnpackedWAR(standardContext);
-         }
-      }
-   }
-
-   private void undeploy(String name) throws DeploymentException
-   {
-      Container child = standardHost.findChild(name);
-      if (child != null)
-      {
-         standardHost.removeChild(child);
-      }
-   }
-
-   private void removeFailedUnDeployments() throws IOException
-   {
-      List<String> remainingDeployments = new ArrayList<String>();
-      for (String name : failedUndeployments)
-      {
-         try
-         {
-            undeploy(name);
-         }
-         catch (Exception e)
-         {
-            IOException ioe = new IOException();
-            ioe.initCause(e);
-            throw ioe;
-         }
-      }
-      if (remainingDeployments.size() > 0)
-      {
-         log.severe("Failed to undeploy these artifacts: " + remainingDeployments);
-      }
-      failedUndeployments.clear();
-   }
-
-   protected void startTomcatEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException
-   {
+	   System.setProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider", configuration.getSipApplicationRouterProviderClassName());
       // creating the tomcat embedded == service tag in server.xml
-      embedded = new TomcatEmbedded();
-      embedded.getService().setName(serverName);
+      embedded = new MobicentsSipServletsEmbedded();
+      SipStandardService sipStandardService = new SipStandardService();
+      sipStandardService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getCanonicalName());
+      sipStandardService.setCongestionControlCheckingInterval(-1);
+      sipStandardService.setAdditionalParameterableHeaders("additionalParameterableHeader");
+      sipStandardService.setUsePrettyEncoding(true);      
+      sipStandardService.setName(serverName);
+      embedded.setService(sipStandardService);
       // TODO this needs to be a lot more robust
       String tomcatHome = configuration.getTomcatHome();
       File tomcatHomeFile = null;
@@ -269,8 +221,8 @@ public class TomcatContainer implements DeployableContainer
       engine = embedded.createEngine();
       engine.setName(serverName);
       engine.setDefaultHost(bindAddress);
-      engine.setService(embedded.getService());
-      embedded.getService().setContainer(engine);
+      engine.setService(sipStandardService);
+      sipStandardService.setContainer(engine);
       embedded.addEngine(engine);
       
       // creates the host, i.e., <host> element in server.xml
@@ -289,9 +241,20 @@ public class TomcatContainer implements DeployableContainer
       embedded.addConnector(connector);
       connector.setContainer(engine);
       
-      // starts embedded tomcat
-      embedded.getService().init();
+      // starts embedded Mobicents Sip Serlvets
       embedded.start();
+      embedded.getService().start();
+      
+   // creates an sip connector, i.e., <connector> element in server.xml
+      for (SipConnector sipConnector : sipConnectors) {
+    	  try {
+    		  ((SipStandardService) embedded.getService()).addSipConnector(sipConnector);
+//    			Connector sipConnector = addSipConnector(serverName, bindAddress, bindSipPort, "UDP", null);
+    		} catch (Exception e) {
+    			throw new LifecycleException("Couldn't create the sip connector " + sipConnector, e);
+    		}
+      }
+      
       wasStarted = true;
    }
 
