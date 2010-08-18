@@ -27,8 +27,9 @@ import org.jboss.arquillian.container.tomcat.embedded_6.TomcatConfiguration;
  */
 public class MobicentsSipServletsConfiguration extends TomcatConfiguration
 {
+	public static final String MOBICENTS_DEFAULT_AR_CLASS_NAME = "org.mobicents.servlet.sip.router.DefaultApplicationRouterProvider";
 	private String sipConnectors = ":5080";
-	private String sipApplicationRouterProviderClassName = "org.mobicents.servlet.sip.router.DefaultApplicationRouterProvider";
+	private String sipApplicationRouterProviderClassName = MOBICENTS_DEFAULT_AR_CLASS_NAME;
 	
 
 	/**

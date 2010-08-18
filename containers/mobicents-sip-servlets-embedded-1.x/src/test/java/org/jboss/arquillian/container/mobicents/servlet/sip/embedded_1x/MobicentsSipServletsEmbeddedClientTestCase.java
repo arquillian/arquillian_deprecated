@@ -44,6 +44,9 @@ public class MobicentsSipServletsEmbeddedClientTestCase
 {
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
+	static {
+		System.setProperty("javax.servlet.sip.dar", Thread.currentThread().getContextClassLoader().getResource("test-dar.properties").toString());
+	}
 	// -------------------------------------------------------------------------------------||
 	// Class Members
 	// ----------------------------------------------------------------------||

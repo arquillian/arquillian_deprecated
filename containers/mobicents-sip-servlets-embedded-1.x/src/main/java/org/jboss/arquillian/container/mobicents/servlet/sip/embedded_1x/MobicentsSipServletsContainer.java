@@ -177,7 +177,10 @@ public class MobicentsSipServletsContainer extends TomcatContainer
 
    protected void startMobicentsSipServletsEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException, LifecycleException
    {
-	   System.setProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider", configuration.getSipApplicationRouterProviderClassName());
+	  System.setProperty("javax.servlet.sip.ar.spi.SipApplicationRouterProvider", configuration.getSipApplicationRouterProviderClassName());
+	  if(MobicentsSipServletsConfiguration.MOBICENTS_DEFAULT_AR_CLASS_NAME.equals(configuration.getSipApplicationRouterProviderClassName())) {
+		  System.setProperty("javax.servlet.sip.dar", Thread.currentThread().getContextClassLoader().getResource("empty-dar.properties").toString());
+	  }
       // creating the tomcat embedded == service tag in server.xml
       embedded = new MobicentsSipServletsEmbedded();
       SipStandardService sipStandardService = new SipStandardService();

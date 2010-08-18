@@ -109,6 +109,13 @@
          <scope>provided</scope>
       </dependency>
       
+       <dependency>
+         <groupId>org.mobicents.servlet.sip</groupId>
+         <artifactId>sip-servlets-application-router</artifactId>
+         <version>${version.org.mobicents.servlet.sip}</version>
+         <scope>provided</scope>
+      </dependency>
+      
       <dependency>
          <groupId>org.mobicents.servlet.sip</groupId>
          <artifactId>sip-servlets-tomcat-jboss4</artifactId>
