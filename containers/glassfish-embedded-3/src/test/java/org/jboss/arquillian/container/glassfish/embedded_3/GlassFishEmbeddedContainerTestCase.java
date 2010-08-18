@@ -21,7 +21,6 @@ import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
@@ -43,20 +42,13 @@ import org.junit.runner.RunWith;
 public class GlassFishEmbeddedContainerTestCase 
 {
    /**
-    * Logger
-    */
-   private static final Logger log = Logger.getLogger(GlassFishEmbeddedContainerTestCase.class.getName());
-   
-   /**
     * Deployment for the test
     * @return
     */
    @Deployment
    public static WebArchive getDeployment()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war").addClass(TestServlet.class);
-      log.info(war.toString(true));
-      return war;
+      return ShrinkWrap.create(WebArchive.class, "test.war").addClass(TestServlet.class);
    }
 
    @Test
