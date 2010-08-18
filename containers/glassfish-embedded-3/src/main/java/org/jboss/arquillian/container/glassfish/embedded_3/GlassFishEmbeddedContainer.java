@@ -17,6 +17,7 @@
 package org.jboss.arquillian.container.glassfish.embedded_3;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,16 +25,18 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.glassfish.admin.cli.resources.AddResources;
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.ActionReport.MessagePart;
 import org.glassfish.api.admin.CommandRunner;
 import org.glassfish.api.admin.ParameterMap;
-
 import org.glassfish.api.deployment.DeployCommandParameters;
 import org.glassfish.api.deployment.UndeployCommandParameters;
 import org.glassfish.api.embedded.ContainerBuilder;
+import org.glassfish.api.embedded.EmbeddedContainer;
 import org.glassfish.api.embedded.EmbeddedFileSystem;
+import org.glassfish.api.embedded.Port;
 import org.glassfish.api.embedded.Server;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
@@ -90,7 +93,6 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
       
       server = serverBuilder.embeddedFileSystem(embeddedFsBuilder.build()).build();
-
       server.addContainer(ContainerBuilder.Type.all);
 
       if (containerConfig.getSunResourcesXml() != null)
@@ -104,13 +106,9 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
          try
          {
             // GlassFish's resources XML parser is hardcoded to look for the DTD in this location
-            File resourcesDtd = new File(server.getFileSystem().instanceRoot, "lib/dtds/sun-resources_1_4.dtd");
-            if (!resourcesDtd.exists())
-            {
-               resourcesDtd.getParentFile().mkdirs();
-               copyWithClose(getClass().getClassLoader().getResourceAsStream("META-INF/sun-resources_1_4.dtd"),
-                     new FileOutputStream(resourcesDtd));
-            }
+            copyResourceDTDsToFileSystem(server.getFileSystem().instanceRoot, "META-INF/", "sun-resources_1_4.dtd");
+            copyResourceDTDsToFileSystem(server.getFileSystem().instanceRoot, "dtds/" , "glassfish-resources_1_5.dtd");
+            
             ParameterMap params = new ParameterMap();
             params.add(DEFAULT_ASADMIN_PARAM, containerConfig.getSunResourcesXml());
             {
@@ -123,14 +121,17 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
          }
       }
    }
-   
+
    public void start(Context context) throws LifecycleException
    {
       try 
       {
-         // embedded glassfish automatically binds the first port created to http
-         // the documentation, however, is very fuzzy
-         server.createPort(containerConfig.getBindHttpPort());
+         Port httpPort = server.createPort(containerConfig.getBindHttpPort());
+         for(EmbeddedContainer container : server.getContainers())
+         {
+            container.getSniffers();
+            container.bind(httpPort, Port.HTTP_PROTOCOL);
+         }
          server.start();
       } 
       catch (Exception e) 
@@ -163,7 +164,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
          server.getDeployer().deploy(
                archive.as(ShrinkwrapReadableArchive.class),
                params);
-         
+
       } 
       catch (Exception e) 
       {
@@ -191,6 +192,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       UndeployCommandParameters params = new UndeployCommandParameters();
       params.target = target;
       params.name = createDeploymentName(archive.getName());
+      
       try 
       {
          server.getDeployer().undeploy(params.name, params);
@@ -229,6 +231,27 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
          {
             log.info(command + " command result (" + i++ + "): " + part.getMessage());
 
+         }
+      }
+   }
+
+   /*
+    * GlassFish is hard-coded to look in this location for it's DTDs, but does not copy them them selves.
+    */
+   private void copyResourceDTDsToFileSystem(File instanceRoot, String dtdClassLoaderlocation, String dtdName) throws IOException, FileNotFoundException
+   {
+      ClassLoader loader = getClass().getClassLoader();
+      URL dtdResource = loader.getResource(dtdClassLoaderlocation + dtdName);
+      if(dtdResource != null)
+      {
+         File resourcesDtd = new File(instanceRoot, "lib/dtds/" + dtdName);
+         if (!resourcesDtd.exists())
+         {
+            resourcesDtd.getParentFile().mkdirs();
+            
+            copyWithClose(
+                  dtdResource.openStream(),
+                  new FileOutputStream(resourcesDtd));
          }
       }
    }

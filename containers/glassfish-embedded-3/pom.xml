@@ -24,7 +24,7 @@
    <properties>
 
       <!-- Versioning -->
-      <version.glassfish>3.0.1-b02</version.glassfish>
+      <version.glassfish>3.1-b09</version.glassfish>
 
    </properties>
 
