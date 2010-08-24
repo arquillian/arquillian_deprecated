@@ -49,7 +49,6 @@ public class JSFUnitArchiveAppender implements AuxiliaryArchiveAppender
                         org.apache.commons.httpclient.HttpClient.class.getPackage(),
                         org.apache.commons.io.IOUtils.class.getPackage(),
                         org.apache.commons.lang.StringUtils.class.getPackage(),
-                        
                         net.sourceforge.htmlunit.corejs.javascript.EvaluatorException.class.getPackage(),
                         org.w3c.css.sac.CSSException.class.getPackage(),
                         com.steadystate.css.dom.CSSOMObject.class.getPackage(),
