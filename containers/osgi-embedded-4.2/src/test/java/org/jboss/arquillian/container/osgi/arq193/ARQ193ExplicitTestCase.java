@@ -31,7 +31,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
@@ -44,7 +43,6 @@ import org.osgi.framework.BundleContext;
  * @since 31-Aug-2010
  */
 @RunWith(Arquillian.class)
-@Ignore
 public class ARQ193ExplicitTestCase
 {
    @Deployment
