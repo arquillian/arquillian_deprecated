@@ -18,13 +18,6 @@
   <name>Arquillian Container OSGi Embedded 4.2.x</name>
   <description>OSGi 4.2.x Embedded Container integration for the Arquillian Project</description>
 
-
-  <!-- Properties -->
-  <properties>
-    <version.jboss_osgi_framework>1.0.0.Alpha6</version.jboss_osgi_framework>
-    <version.jboss_osgi_resolver_felix>3.0.1</version.jboss_osgi_resolver_felix>
-  </properties>
-
   <!-- Build -->
   <build>
     <plugins>
@@ -47,6 +40,21 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>log4j.output.dir</name>
+              <value>${project.build.directory}</value>
+            </property>
+            <property>
+              <name>test.archive.directory</name>
+              <value>${project.build.directory}/test-libs</value>
+            </property>
+          </systemProperties>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -108,15 +116,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.osgi.framework</groupId>
-      <artifactId>jboss-osgi-framework-core</artifactId>
-      <version>${version.jboss_osgi_framework}</version>
+      <groupId>org.jboss.osgi.felix</groupId>
+      <artifactId>jboss-osgi-felix</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.osgi.resolver</groupId>
       <artifactId>jbosgi-resolver-felix</artifactId>
-      <version>${version.jboss_osgi_resolver_felix}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.osgi.vfs</groupId>
+      <artifactId>jboss-osgi-vfs30</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -8,7 +8,7 @@
   <!-- ================================= -->
 
   <appender name="FILE" class="org.apache.log4j.FileAppender">
-    <param name="File" value="target/test.log"/>
+    <param name="File" value="./target/test.log"/>
     <param name="Append" value="false"/>
     <layout class="org.apache.log4j.PatternLayout">
       <!-- The default pattern: Date Priority [Category] Message\n -->

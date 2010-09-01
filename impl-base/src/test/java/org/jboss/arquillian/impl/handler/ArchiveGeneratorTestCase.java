@@ -21,8 +21,10 @@ import junit.framework.Assert;
 import org.jboss.arquillian.impl.DeploymentGenerator;
 import org.jboss.arquillian.impl.context.ClassContext;
 import org.jboss.arquillian.impl.context.SuiteContext;
+import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.ServiceLoader;
 import org.jboss.arquillian.spi.TestClass;
+import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.arquillian.spi.event.suite.ClassEvent;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -32,7 +34,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 /**
  * ArchiveGeneratorHandlerTestCase
@@ -48,6 +49,9 @@ public class ArchiveGeneratorTestCase
    
    @Mock
    private DeploymentGenerator generator;
+   
+   @Mock
+   private DeploymentPackager packager;
 
    @Test(expected = IllegalStateException.class)
    public void shouldThrowIllegalStateExceptionOnMissingDeploymentGenerator() throws Exception
@@ -60,17 +64,16 @@ public class ArchiveGeneratorTestCase
    @Test
    public void shouldGenerateArchive() throws Exception
    {
-      final Archive<?> deployment = ShrinkWrap.create(JavaArchive.class, "test.jar");
+      final Archive archive = ShrinkWrap.create(JavaArchive.class, "test.jar");
+      final TestDeployment deployment = new TestDeployment(archive);
       
       TestClass testClass = new TestClass(getClass());
-      ClassContext context = new ClassContext(new SuiteContext(serviceLoader));
-      Mockito.when(generator.generate(testClass)).thenAnswer(new Answer<Archive<?>>()
-      {
-         public Archive<?> answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
-            return deployment;
-         }
-      });
+      Mockito.when(generator.generate(testClass)).thenReturn(deployment);
+      Mockito.when(serviceLoader.onlyOne(DeploymentPackager.class)).thenReturn(packager);
+      Mockito.when(packager.generateDeployment(deployment)).thenReturn(archive);
       
+      ClassContext context = new ClassContext(new SuiteContext(serviceLoader));
+      context.add(ServiceLoader.class, serviceLoader);
       context.add(DeploymentGenerator.class, generator);
 
       ArchiveGenerator handler = new ArchiveGenerator();

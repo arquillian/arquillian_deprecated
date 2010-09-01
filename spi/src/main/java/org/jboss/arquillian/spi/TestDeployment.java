@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.spi;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.jboss.shrinkwrap.api.Archive;
@@ -30,26 +31,31 @@ import org.jboss.shrinkwrap.api.Archive;
  */
 public class TestDeployment
 {
-   private Archive<?> applicationArchive;
-   private Collection<Archive<?>> auxiliaryArchives;
+   private Archive<?> appArchive;
+   private Collection<Archive<?>> auxArchives;
    
    /**
     * @param applicationArchive The user defined {@link Archive}
-    * @param auxiliaryArchives All extra library {@link Archive}s defined by extensions / core / frameworks. 
     */
-   public TestDeployment(Archive<?> applicationArchive, Collection<Archive<?>> auxiliaryArchives)
+   public TestDeployment(Archive<?> applicationArchive)
    {
-      if(applicationArchive == null)
-      {
+      this(applicationArchive, null);
+   }
+   
+   /**
+    * @param appArchive The user defined {@link Archive}
+    * @param auxArchives All extra library {@link Archive}s defined by extensions / core / frameworks. 
+    */
+   public TestDeployment(Archive<?> appArchive, Collection<Archive<?>> auxArchives)
+   {
+      if(appArchive == null)
          throw new IllegalArgumentException("ApplicationArchive must be specified");
-      }
-      if(auxiliaryArchives == null)
-      {
-         throw new IllegalArgumentException("AuxiliaryArchives must be specified");
-      }
-
-      this.applicationArchive = applicationArchive;
-      this.auxiliaryArchives = auxiliaryArchives;
+      
+      if (auxArchives == null)
+         auxArchives = new ArrayList<Archive<?>>();
+      
+      this.appArchive = appArchive;
+      this.auxArchives = auxArchives;
    }
 
    /**
@@ -59,16 +65,16 @@ public class TestDeployment
    public Archive<?> getArchiveForEnrichment() 
    {
       // TODO: lookup 'tagged' archive. return applicationArchive if none found
-      return applicationArchive;
+      return appArchive;
    }
 
    public Archive<?> getApplicationArchive()
    {
-      return applicationArchive;
+      return appArchive;
    }
    
    public Collection<Archive<?>> getAuxiliaryArchives()
    {
-      return auxiliaryArchives;
+      return auxArchives;
    }
 }

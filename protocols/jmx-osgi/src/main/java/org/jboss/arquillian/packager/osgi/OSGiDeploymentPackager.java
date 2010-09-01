@@ -16,16 +16,26 @@
  */
 package org.jboss.arquillian.packager.osgi;
 
-import java.io.File;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
+import java.util.jar.Manifest;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentPackager;
+import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestDeployment;
+import org.jboss.osgi.metadata.PackageAttribute;
+import org.jboss.osgi.metadata.internal.OSGiManifestMetaData;
 import org.jboss.osgi.spi.util.BundleInfo;
-import org.jboss.osgi.vfs.AbstractVFS;
-import org.jboss.osgi.vfs.VirtualFile;
+import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.api.Node;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
@@ -38,22 +48,115 @@ public class OSGiDeploymentPackager implements DeploymentPackager
 {
    public Archive<?> generateDeployment(TestDeployment testDeployment)
    {
-      Archive<?> bundleArchive = testDeployment.getApplicationArchive();
-      if(JavaArchive.class.isInstance(bundleArchive))
-      {
-         return handleArchive(JavaArchive.class.cast(bundleArchive), testDeployment.getAuxiliaryArchives());
-      }
-      
-      throw new IllegalArgumentException(OSGiDeploymentPackager.class.getName()  + 
-            " can not handle archive of type " +  bundleArchive.getClass().getName());
+      Archive<?> appArchive = testDeployment.getApplicationArchive();
+      assertValidateBundleArchive(appArchive);
+      return appArchive;
    }
 
-   private Archive<?> handleArchive(JavaArchive archive, Collection<Archive<?>> auxiliaryArchives) 
+   /*
+    * 
+    */
+   public void generateAuxiliaryArchives(Context context, TestDeployment testDeployment)
+   {
+      final TestClass testClass = context.get(TestClass.class);
+      final Class<?> javaClass = testClass.getJavaClass();
+      final Archive<?> appArchive = testDeployment.getApplicationArchive();
+
+      // Check if the application archive already contains the test class
+      String path = javaClass.getName().replace('.', '/') + ".class";
+      if (appArchive.contains(path) == false)
+      {
+         // Generate the auxiliary archive that contains the test case
+         final JavaArchive auxArchive = ShrinkWrap.create(JavaArchive.class, testClass.getSimpleName());
+         auxArchive.addClass(javaClass);
+
+         // Build the manifest
+         final OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
+         builder.addBundleSymbolicName(auxArchive.getName());
+         builder.addBundleManifestVersion(2);
+         builder.addExportPackages(javaClass);
+         auxArchive.setManifest(new Asset()
+         {
+            public InputStream openStream()
+            {
+               return builder.openStream();
+            }
+         });
+
+         // Generate the imported packages
+         // [TODO] use bnd or another tool to do this more inteligently
+         builder.addImportPackages("org.jboss.arquillian.junit");
+         builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
+         builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
+         builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");
+         for (Annotation anno : javaClass.getDeclaredAnnotations())
+         {
+            addImportPackage(builder, anno.annotationType());
+         }
+         for (Field field : javaClass.getDeclaredFields())
+         {
+            Class<?> type = field.getType();
+            addImportPackage(builder, type);
+         }
+         for (Method method : javaClass.getDeclaredMethods())
+         {
+            Class<?> returnType = method.getReturnType();
+            if (returnType != Void.TYPE)
+               addImportPackage(builder, returnType);
+            for (Class<?> paramType : method.getParameterTypes())
+               addImportPackage(builder, paramType);
+         }
+         
+         // Add the exported packages from the application archive
+         Manifest manifest = getBundleManifest(appArchive);
+         OSGiManifestMetaData metaData = new OSGiManifestMetaData(manifest);
+         List<PackageAttribute> exportPackages = metaData.getExportPackages();
+         if (exportPackages != null)
+         {
+            for (PackageAttribute exp : exportPackages)
+            {
+               String packageName = exp.getPackageName();
+               builder.addImportPackages(packageName);
+            }
+         }
+
+         Collection<Archive<?>> auxArchives = testDeployment.getAuxiliaryArchives();
+         auxArchives.add(auxArchive);
+      }
+   }
+
+   private void addImportPackage(final OSGiManifestBuilder builder, final Class<?> type)
+   {
+      if (type.getName().startsWith("java.") == false)
+         builder.addImportPackages(type);
+      
+      for (Annotation anno : type.getDeclaredAnnotations())
+      {
+         Class<?> anType = anno.annotationType();
+         if (anType.getName().startsWith("java.") == false)
+            builder.addImportPackages(anType);
+      }
+   }
+
+   public static boolean isValidBundleArchive(Archive<?> archive)
    {
       try
       {
-         validateBundleArchive(archive);
-         return archive;
+         assertValidateBundleArchive(archive);
+         return true;
+      }
+      catch (Exception ex)
+      {
+         return false;
+      }
+   }
+
+   public static void assertValidateBundleArchive(Archive<?> archive)
+   {
+      try
+      {
+         Manifest manifest = getBundleManifest(archive);
+         BundleInfo.validateBundleManifest(manifest);
       }
       catch (RuntimeException rte)
       {
@@ -64,26 +167,18 @@ public class OSGiDeploymentPackager implements DeploymentPackager
          throw new IllegalArgumentException("Not a valid OSGi bundle: " + archive, ex);
       }
    }
-
-   private void validateBundleArchive(Archive<?> archive) throws Exception
+   
+   private static Manifest getBundleManifest(Archive<?> archive)
    {
-      String archiveName = archive.getName();
-      int dotIndex = archiveName.lastIndexOf(".");
-      if (dotIndex > 0)
-         archiveName = archiveName.substring(0, dotIndex);
-      
-      // [TODO] Can this be done in memory?
-      File target = File.createTempFile(archiveName + "-", ".jar");
       try
       {
-         ZipExporter exporter = archive.as(ZipExporter.class);
-         exporter.exportZip(target, true);
-         VirtualFile virtualFile = AbstractVFS.getRoot(target.toURI().toURL());
-         BundleInfo.createBundleInfo(virtualFile);
+         Node node = archive.get("META-INF/MANIFEST.MF");
+         Manifest manifest = new Manifest(node.getAsset().openStream());
+         return manifest;
       }
-      finally
+      catch (Exception ex)
       {
-         target.delete();
+         return null;
       }
    }
 }

@@ -22,6 +22,7 @@ import java.util.Stack;
 import org.jboss.arquillian.impl.context.ContextLifecycleManager;
 import org.jboss.arquillian.impl.context.TestContext;
 import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
@@ -90,9 +91,11 @@ public class EventTestRunnerAdaptor implements TestRunnerAdaptor
    {
       Validate.notNull(testClass, "TestClass must be specified");
       
+      BeforeClass event = new BeforeClass(testClass);
       Context classContext = contextLifecycle.createRestoreClassContext(testClass);
       try
       {
+         classContext.add(TestClass.class, event.getTestClass());
          classContext.fire(new BeforeClass(testClass));
       }
       finally

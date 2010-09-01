@@ -16,7 +16,7 @@
   <groupId>org.jboss.arquillian.protocol</groupId>
   <artifactId>arquillian-protocol-jmx-osgi-bundle</artifactId>
   <name>Arquillian Protocol JMX OSGi Bundle</name>
-  <description>Arquillian OSGi Bundlei for JMX MBean registration</description>
+  <description>Arquillian OSGi Bundle for JMX MBean registration</description>
   <packaging>bundle</packaging>
 
   <!-- Properties -->
