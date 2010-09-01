@@ -54,7 +54,8 @@
         <module>weld-ee-embedded-1.1</module>
         <module>openejb-embedded-3.1</module>
         <module>openwebbeans-embedded-1</module>
-        <module>osgi-embedded-4.2</module>
+        <module>osgi-embedded</module>
+        <module>osgi-remote</module>
       </modules>
     </profile>
 
