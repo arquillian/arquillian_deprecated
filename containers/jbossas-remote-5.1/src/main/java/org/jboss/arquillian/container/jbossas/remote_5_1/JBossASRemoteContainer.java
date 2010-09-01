@@ -163,7 +163,7 @@ public class JBossASRemoteContainer implements DeployableContainer
       }
       if (failure != null)
       {
-         throw new DeploymentException("Failed to deply " + deploymentName, failure);
+         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
       try 
       {
