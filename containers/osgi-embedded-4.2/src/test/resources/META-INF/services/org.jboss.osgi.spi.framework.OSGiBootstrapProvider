@@ -1,1 +1,1 @@
-org.jboss.osgi.framework.launch.OSGiFrameworkBootstrapProvider
+org.jboss.osgi.felix.FelixBootstrapProvider                     # The Felix bootstrap provider

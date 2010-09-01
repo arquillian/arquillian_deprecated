@@ -159,10 +159,7 @@ public class OSGiTestEnricher implements TestEnricher
          log.warn("Multiple MBeanServer instances: " + serverArr);
 
       if (serverArr.size() > 0)
-      {
          mbeanServer = serverArr.get(0);
-         log.debug("Found MBeanServer: " + mbeanServer.getDefaultDomain());
-      }
 
       if (mbeanServer == null)
       {

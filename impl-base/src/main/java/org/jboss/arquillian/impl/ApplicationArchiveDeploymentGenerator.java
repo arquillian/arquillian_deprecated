@@ -20,6 +20,7 @@ import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.spi.ApplicationArchiveGenerator;
 import org.jboss.arquillian.spi.ServiceLoader;
 import org.jboss.arquillian.spi.TestClass;
+import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.Archive;
 
 /**
@@ -40,8 +41,10 @@ public class ApplicationArchiveDeploymentGenerator implements DeploymentGenerato
    /* (non-Javadoc)
     * @see org.jboss.arquillian.impl.DeploymentGenerator#generate(java.lang.Class)
     */
-   public Archive<?> generate(TestClass testCase)
+   public TestDeployment generate(TestClass testCase)
    {
-      return serviceLoader.onlyOne(ApplicationArchiveGenerator.class).generateApplicationArchive(testCase);
+      ApplicationArchiveGenerator generator = serviceLoader.onlyOne(ApplicationArchiveGenerator.class);
+      Archive<?> appArchive = generator.generateApplicationArchive(testCase);
+      return new TestDeployment(appArchive);
    }
 }

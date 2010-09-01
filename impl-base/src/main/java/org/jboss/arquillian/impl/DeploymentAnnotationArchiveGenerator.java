@@ -33,30 +33,46 @@ import org.jboss.shrinkwrap.api.container.ClassContainer;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveGenerator 
+public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveGenerator
 {
    public Archive<?> generateApplicationArchive(TestClass testCase)
    {
       Validate.notNull(testCase, "TestCase must be specified");
-      
+
       Method deploymentMethod = testCase.getMethod(Deployment.class);
-      if(deploymentMethod == null) 
+      if (deploymentMethod == null)
       {
          throw new IllegalArgumentException("No method annotated with " + Deployment.class.getName() + " found");
       }
-      if(!Modifier.isStatic(deploymentMethod.getModifiers()))
+      if (!Modifier.isStatic(deploymentMethod.getModifiers()))
       {
          throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " is not static");
       }
-      if(!Archive.class.isAssignableFrom(deploymentMethod.getReturnType())) 
+      if (!Archive.class.isAssignableFrom(deploymentMethod.getReturnType()))
       {
          throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " must have return type " + Archive.class.getName());
       }
+
+      Archive<?> archive;
       try 
       {
-         Archive<?> archive = (Archive<?>)deploymentMethod.invoke(null);
+         archive = (Archive<?>)deploymentMethod.invoke(null);
+      } 
+      catch (RuntimeException rte) 
+      {
+         throw rte;
+      }
+      catch (Exception e) 
+      {
+         throw new RuntimeException("Could not get Deployment", e);
+      }
+
+      /*
+       * For OSGi it is incorrect to always add the test class 
+       * 
+      try 
+      {
          // TODO: handle deployment attributes like autoAddPakcage etc..
-         
          // TODO: move the RunMode handling to one location
          RunModeType runMode = RunModeType.IN_CONTAINER;
          if(testCase.isAnnotationPresent(Run.class))
@@ -68,24 +84,29 @@ public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveG
          {
             if(ClassContainer.class.isInstance(archive) && runMode == RunModeType.IN_CONTAINER) 
             {
+               
                ClassContainer<?> classContainer = ClassContainer.class.cast(archive);
                classContainer.addClass(testCase.getJavaClass());
             }
          } 
          catch (UnsupportedOperationException e) 
          { 
-            /*
-             * Quick Fix: https://jira.jboss.org/jira/browse/ARQ-118
-             * Keep in mind when rewriting for https://jira.jboss.org/jira/browse/ARQ-94
-             * that a ShrinkWrap archive might not support a Container if even tho the 
-             * ContianerBase implements it. Check the Archive Interface..  
-             */
+             // Quick Fix: https://jira.jboss.org/jira/browse/ARQ-118
+             // Keep in mind when rewriting for https://jira.jboss.org/jira/browse/ARQ-94
+             // that a ShrinkWrap archive might not support a Container if even tho the 
+             // ContianerBase implements it. Check the Archive Interface..  
          }
-         return archive;
       } 
+      catch (RuntimeException rte) 
+      {
+         throw rte;
+      }
       catch (Exception e) 
       {
          throw new RuntimeException("Could not get Deployment", e);
       }
+      */
+      
+      return archive;
    }
 }

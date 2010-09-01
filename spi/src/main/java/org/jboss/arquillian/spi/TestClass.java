@@ -48,6 +48,11 @@ public class TestClass
       return testClass.getName();
    }
 
+   public String getSimpleName()
+   {
+      return testClass.getSimpleName();
+   }
+
    public boolean isAnnotationPresent(Class<? extends Annotation> annotation)
    {
       return testClass.isAnnotationPresent(annotation);

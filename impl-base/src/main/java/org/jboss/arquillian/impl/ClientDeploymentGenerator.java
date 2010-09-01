@@ -46,15 +46,12 @@ public class ClientDeploymentGenerator implements DeploymentGenerator
    public ClientDeploymentGenerator(ServiceLoader serviceLoader)
    {
       Validate.notNull(serviceLoader, "ServiceLoader must be specified");
-      
       this.serviceLoader = serviceLoader;
    }
    
-   public Archive<?> generate(TestClass testCase)
+   public TestDeployment generate(TestClass testCase)
    {
       Validate.notNull(testCase, "TestCase must be specified");
-
-      DeploymentPackager packager = serviceLoader.onlyOne(DeploymentPackager.class);
 
       Archive<?> applicationArchive = serviceLoader.onlyOne(ApplicationArchiveGenerator.class).generateApplicationArchive(testCase);
       applyApplicationProcessors(applicationArchive, testCase);
@@ -62,7 +59,7 @@ public class ClientDeploymentGenerator implements DeploymentGenerator
       List<Archive<?>> auxiliaryArchives = loadAuxiliaryArchives();
       applyAuxiliaryProcessors(auxiliaryArchives);
 
-      return packager.generateDeployment(new TestDeployment(applicationArchive, auxiliaryArchives));
+      return new TestDeployment(applicationArchive, auxiliaryArchives);
    }
    
    private List<Archive<?>> loadAuxiliaryArchives() 
