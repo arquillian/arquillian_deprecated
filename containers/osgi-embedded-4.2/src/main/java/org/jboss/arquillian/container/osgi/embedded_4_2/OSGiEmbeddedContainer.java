@@ -59,13 +59,31 @@ public class OSGiEmbeddedContainer implements DeployableContainer
 
    public void setup(Context context, Configuration configuration)
    {
+      // [ARQ-236] Configure the Container lifecycle based on the Test events
+      // bootstrapFramework(context);
+   }
+
+   public void start(Context context) throws LifecycleException
+   {
+      // [ARQ-236] Configure the Container lifecycle based on the Test events
+      // startFramework(context);
+   }
+
+   public void stop(Context context) throws LifecycleException
+   {
+      // [ARQ-236] Configure the Container lifecycle based on the Test events
+      // stopFramework();
+   }
+
+   private void bootstrapFramework(Context context)
+   {
       log.debug("Bootstrap framework ...");
       OSGiBootstrapProvider provider = OSGiBootstrap.getBootstrapProvider();
       framework = provider.getFramework();
       context.add(Framework.class, framework);
    }
 
-   public void start(Context context) throws LifecycleException
+   private void startFramework(Context context) 
    {
       log.debug("Start framework: " + framework);
       try
@@ -82,11 +100,11 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       }
       catch (BundleException ex)
       {
-         throw new LifecycleException("Cannot start embedded OSGi Framework", ex);
+         throw new IllegalStateException("Cannot start embedded OSGi Framework", ex);
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   private void stopFramework() 
    {
       log.debug("Stop framework: " + framework);
       try
@@ -100,12 +118,23 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       }
       catch (Exception ex)
       {
-         throw new LifecycleException("Cannot stop embedded OSGi Framework", ex);
+         throw new IllegalStateException("Cannot stop embedded OSGi Framework", ex);
+      }
+      finally
+      {
+         framework = null;
       }
    }
 
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
+      // start the framework lazily as part of @BeforeClass
+      if (framework == null)
+      {
+         bootstrapFramework(context);
+         startFramework(context);
+      }
+      
       // Generate the auxiliary archives. This is a hack and should be done previously through public API
       OSGiDeploymentPackager packager = (OSGiDeploymentPackager)context.getServiceLoader().onlyOne(DeploymentPackager.class);
       TestDeployment deployment = context.get(TestDeployment.class);
@@ -130,6 +159,7 @@ public class OSGiEmbeddedContainer implements DeployableContainer
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
+      // Uninstall all deployed bundles
       BundleList bundleList = context.get(BundleList.class);
       for (Bundle bundle : bundleList)
       {
@@ -146,6 +176,10 @@ public class OSGiEmbeddedContainer implements DeployableContainer
             log.error("Cannot undeploy: " + archive, ex);
          }
       }
+      
+      // Stop the Framework as part of @AfterClass
+      bundleList.clear();
+      stopFramework();
    }
 
    private Bundle installBundle(Context context, final Archive<?> archive) throws DeploymentException
