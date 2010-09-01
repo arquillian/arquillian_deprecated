@@ -1,0 +1,2 @@
+org.jboss.arquillian.selenium.event.SeleniumBeforeClassContextAppender
+org.jboss.arquillian.selenium.event.SeleniumBeforeContextAppender
