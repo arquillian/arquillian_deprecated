@@ -58,21 +58,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemProperties>
-            <property>
-              <name>log4j.output.dir</name>
-              <value>${project.build.directory}</value>
-            </property>
-            <property>
-              <name>test.archive.directory</name>
-              <value>${project.build.directory}/test-libs</value>
-            </property>
-          </systemProperties>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
@@ -157,7 +142,64 @@
       <artifactId>jboss-logging-log4j</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
+  <!--  Profiles -->
+  <profiles>
+  
+    <!--
+      Name: default
+      Descr: Skip remote integration testing
+    -->
+    <profile>
+      <id>default</id>
+      <activation>
+        <property>
+          <name>!remote</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!--
+      Name: remote 
+      Descr: Setup for remote integration testing
+    -->
+    <profile>
+      <id>remote-testing</id>
+      <activation>
+        <property>
+          <name>remote</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemProperties>
+                <property>
+                  <name>log4j.output.dir</name>
+                  <value>${project.build.directory}</value>
+                </property>
+                <property>
+                  <name>test.archive.directory</name>
+                  <value>${project.build.directory}/test-libs</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

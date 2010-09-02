@@ -55,7 +55,7 @@ public class OSGiTestEnricher implements TestEnricher
 {
    // Provide logging
    private static Logger log = Logger.getLogger(OSGiTestEnricher.class);
-   
+
    public void enrich(Context context, Object testCase)
    {
       Class<? extends Object> testClass = testCase.getClass();
@@ -79,8 +79,8 @@ public class OSGiTestEnricher implements TestEnricher
    {
       return null;
    }
-   
-   private void injectBundleContext(Context context, Object testCase, Field field) 
+
+   private void injectBundleContext(Context context, Object testCase, Field field)
    {
       try
       {
@@ -92,7 +92,7 @@ public class OSGiTestEnricher implements TestEnricher
       }
    }
 
-   private void injectBundle(Context context, Object testCase, Field field) 
+   private void injectBundle(Context context, Object testCase, Field field)
    {
       try
       {
@@ -109,7 +109,7 @@ public class OSGiTestEnricher implements TestEnricher
       BundleContext bundleContext = context.get(BundleContext.class);
       if (bundleContext == null)
          bundleContext = getBundleContextFromHolder();
-      
+
       // Make sure this is really the system context
       bundleContext = bundleContext.getBundle(0).getBundleContext();
       return bundleContext;
@@ -138,15 +138,18 @@ public class OSGiTestEnricher implements TestEnricher
       {
          MBeanServer mbeanServer = findOrCreateMBeanServer();
          ObjectName oname = new ObjectName(BundleContextHolder.OBJECT_NAME);
+         if (mbeanServer.isRegistered(oname) == false)
+            throw new IllegalStateException("BundleContextHolder not registered");
+
          BundleContextHolder holder = MBeanServerInvocationHandler.newProxyInstance(mbeanServer, oname, BundleContextHolder.class, false);
          return holder.getBundleContext();
       }
       catch (JMException ex)
       {
-         throw new IllegalStateException("Cannot obtain arquillian-bundle context", ex);
+         throw new IllegalStateException("Cannot obtain system context", ex);
       }
    }
-   
+
    /**
     * Find or create the MBeanServer
     */
@@ -169,5 +172,5 @@ public class OSGiTestEnricher implements TestEnricher
 
       return mbeanServer;
    }
-   
+
 }

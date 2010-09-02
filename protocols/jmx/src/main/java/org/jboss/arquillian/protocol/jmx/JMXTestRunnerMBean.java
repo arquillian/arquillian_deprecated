@@ -16,8 +16,6 @@
  */
 package org.jboss.arquillian.protocol.jmx;
 
-import java.io.InputStream;
-
 import org.jboss.arquillian.spi.TestResult;
 
 /**
@@ -36,16 +34,16 @@ public interface JMXTestRunnerMBean
     *
     * @param className the test class name
     * @param methodName the test method name
-    * @return the input stream to read the {@link TestResult} from
+    * @return the {@link TestResult} 
     */
-   InputStream runTestMethodRemote(String className, String methodName);
+   TestResult runTestMethod(String className, String methodName);
    
    /**
     * Runs a test method on the given test class
     *
     * @param className the test class name
     * @param methodName the test method name
-    * @return the {@link TestResult} 
+    * @return The bytes that represent the {@link TestResult} 
     */
-   TestResult runTestMethodLocal(String className, String methodName);
+   byte[] runTestMethodSerialized(String className, String methodName);
 }

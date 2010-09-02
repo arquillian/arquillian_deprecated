@@ -18,22 +18,19 @@ package org.jboss.arquillian.container.osgi.embedded;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
-import org.jboss.arquillian.packager.osgi.OSGiDeploymentPackager;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+
+import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.DeploymentPackager;
-import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
@@ -45,35 +42,17 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.launch.Framework;
 
 /**
- * OSGiEmbeddedContainer
+ * The embedded OSGi container.
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedContainer implements DeployableContainer
+public class OSGiEmbeddedContainer extends AbstractOSGiContainer
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiEmbeddedContainer.class);
 
    private Framework framework;
-
-   public void setup(Context context, Configuration configuration)
-   {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // bootstrapFramework(context);
-   }
-
-   public void start(Context context) throws LifecycleException
-   {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // startFramework(context);
-   }
-
-   public void stop(Context context) throws LifecycleException
-   {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // stopFramework();
-   }
 
    private void bootstrapFramework(Context context)
    {
@@ -83,20 +62,13 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       context.add(Framework.class, framework);
    }
 
-   private void startFramework(Context context) 
+   private void startFramework(Context context)
    {
       log.debug("Start framework: " + framework);
       try
       {
          framework.start();
          context.add(BundleContext.class, framework.getBundleContext());
-
-         Bundle[] bundles = framework.getBundleContext().getBundles();
-         if (getInstalledBundle(bundles, "osgi.cmpn") == null)
-            installSupportBundle("org.osgi.compendium", false);
-
-         if (getInstalledBundle(bundles, "arquillian-protocol-jmx-osgi-bundle") == null)
-            installSupportBundle("arquillian-protocol-jmx-osgi-bundle", true);
       }
       catch (BundleException ex)
       {
@@ -104,7 +76,7 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       }
    }
 
-   private void stopFramework() 
+   private void stopFramework()
    {
       log.debug("Stop framework: " + framework);
       try
@@ -133,128 +105,114 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       {
          bootstrapFramework(context);
          startFramework(context);
+         installSupportBundles();
       }
-      
-      // Generate the auxiliary archives. This is a hack and should be done previously through public API
-      OSGiDeploymentPackager packager = (OSGiDeploymentPackager)context.getServiceLoader().onlyOne(DeploymentPackager.class);
-      TestDeployment deployment = context.get(TestDeployment.class);
-      packager.generateAuxiliaryArchives(context, deployment);
 
-      // Install the application archive
-      Bundle bundle = installBundle(context, archive);
-      BundleList bundleList = new BundleList(Collections.singletonList(bundle));
-      context.add(BundleList.class, bundleList);
-
-      // Install the auxiliary archives
-      for (Archive<?> aux : deployment.getAuxiliaryArchives())
-      {
-         if (OSGiDeploymentPackager.isValidBundleArchive(aux))
-         {
-            Bundle auxBundle = installBundle(context, aux);
-            bundleList.add(auxBundle);
-         }
-      }
-      return new JMXMethodExecutor();
+      return super.deploy(context, archive);
    }
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
-      // Uninstall all deployed bundles
-      BundleList bundleList = context.get(BundleList.class);
-      for (Bundle bundle : bundleList)
-      {
-         try
-         {
-            if (bundle.getState() != Bundle.UNINSTALLED)
-            {
-               log.debug("Undeploy: " + bundle.getSymbolicName());
-               bundle.uninstall();
-            }
-         }
-         catch (BundleException ex)
-         {
-            log.error("Cannot undeploy: " + archive, ex);
-         }
-      }
-      
+      super.undeploy(context, archive);
+
       // Stop the Framework as part of @AfterClass
-      bundleList.clear();
       stopFramework();
    }
 
-   private Bundle installBundle(Context context, final Archive<?> archive) throws DeploymentException
+   @Override
+   public ContainerMethodExecutor getMethodExecutor()
    {
-      try
-      {
-         // Export the bundle bytes
-         ZipExporter exporter = archive.as(ZipExporter.class);
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         exporter.exportZip(baos);
-
-         log.debug("Deploy: " + archive.getName());
-         BundleContext sysContext = framework.getBundleContext();
-         InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
-         Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
-         return bundle;
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         throw new DeploymentException("Cannot deploy: " + archive, ex);
-      }
+      MBeanServer mbeanServer = findOrCreateMBeanServer();
+      return new JMXMethodExecutor(mbeanServer, true);
    }
 
-   private Bundle getInstalledBundle(Bundle[] bundles, String symbolicName)
+   @Override
+   public BundleHandle installBundle(Archive<?> archive) throws BundleException
    {
+      // Export the bundle bytes
+      ZipExporter exporter = archive.as(ZipExporter.class);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      exporter.exportZip(baos);
+
+      InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
+
+      BundleContext sysContext = framework.getBundleContext();
+      Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
+      return new BundleHandle(bundle.getBundleId(), bundle.getSymbolicName());
+   }
+
+   @Override
+   public BundleHandle installBundle(URL bundleURL) throws BundleException, IOException
+   {
+      BundleContext sysContext = framework.getBundleContext();
+      Bundle bundle = sysContext.installBundle(bundleURL.toExternalForm());
+      return new BundleHandle(bundle.getBundleId(), bundle.getSymbolicName());
+   }
+
+   @Override
+   public void uninstallBundle(BundleHandle handle) throws BundleException
+   {
+      Bundle bundle = getBundle(handle);
+      bundle.uninstall();
+   }
+
+   @Override
+   public int getBundleState(BundleHandle handle)
+   {
+      Bundle bundle = getBundle(handle);
+      return bundle.getState();
+   }
+   
+   @Override
+   public void startBundle(BundleHandle handle) throws BundleException
+   {
+      Bundle bundle = getBundle(handle);
+      bundle.start();
+   }
+
+   @Override
+   public void stopBundle(BundleHandle handle) throws BundleException
+   {
+      Bundle bundle = getBundle(handle);
+      bundle.stop();
+   }
+
+   @Override
+   public boolean isBundleInstalled(String symbolicName)
+   {
+      Bundle[] bundles = framework.getBundleContext().getBundles();
       for (Bundle aux : bundles)
       {
          if (symbolicName.equals(aux.getSymbolicName()))
-            return aux;
+            return true;
       }
-      return null;
+      return false;
    }
 
-   private Bundle installSupportBundle(String artifactId, boolean startBundle)
+   private Bundle getBundle(BundleHandle handle)
    {
-      String classPath = System.getProperty("java.class.path");
-      if (classPath.contains(artifactId) == false)
-      {
-         log.debug("Class path does not contain '" + artifactId + "'");
-         return null;
-      }
-
-      String[] paths = classPath.split("" + File.pathSeparatorChar);
-      for (String path : paths)
-      {
-         if (path.contains(artifactId))
-         {
-            BundleContext sysContext = framework.getBundleContext();
-            try
-            {
-               Bundle bundle = sysContext.installBundle(new File(path).toURI().toString());
-               if (startBundle == true)
-                  bundle.start();
-
-               return bundle;
-            }
-            catch (BundleException ex)
-            {
-               log.error("Cannot install bundle: " + path);
-            }
-         }
-      }
-      return null;
+      BundleContext sysContext = framework.getBundleContext();
+      Bundle bundle = sysContext.getBundle(handle.getBundleId());
+      return bundle;
    }
-   
-   @SuppressWarnings("serial")
-   private static class BundleList extends ArrayList<Bundle>
+
+   private MBeanServer findOrCreateMBeanServer()
    {
-      public BundleList(Collection<? extends Bundle> c)
+      MBeanServer mbeanServer = null;
+
+      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
+      if (serverArr.size() > 1)
+         log.warn("Multiple MBeanServer instances: " + serverArr);
+
+      if (serverArr.size() > 0)
+         mbeanServer = serverArr.get(0);
+
+      if (mbeanServer == null)
       {
-         super(c);
+         log.debug("No MBeanServer, create one ...");
+         mbeanServer = MBeanServerFactory.createMBeanServer();
       }
+
+      return mbeanServer;
    }
 }

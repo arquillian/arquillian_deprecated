@@ -29,7 +29,7 @@ public class OSGiRemoteConfiguration implements ContainerConfiguration
 {
    public ContainerProfile getContainerProfile()
    {
-      return ContainerProfile.STANDALONE;
+      return ContainerProfile.CLIENT;
    }
 
 }

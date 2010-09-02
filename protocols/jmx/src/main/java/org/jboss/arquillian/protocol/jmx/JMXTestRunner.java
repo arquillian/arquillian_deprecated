@@ -16,10 +16,8 @@
  */
 package org.jboss.arquillian.protocol.jmx;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectOutputStream;
 
 import javax.management.JMException;
@@ -86,12 +84,12 @@ public class JMXTestRunner implements JMXTestRunnerMBean
       }
    }
 
-   public TestResult runTestMethodLocal(String className, String methodName)
+   public TestResult runTestMethod(String className, String methodName)
    {
       return runTestMethodInternal(className, methodName);
    }
 
-   public InputStream runTestMethodRemote(String className, String methodName)
+   public byte[] runTestMethodSerialized(String className, String methodName)
    {
       TestResult result = runTestMethodInternal(className, methodName);
 
@@ -103,7 +101,7 @@ public class JMXTestRunner implements JMXTestRunnerMBean
          oos.writeObject(result);
          oos.close();
 
-         return new ByteArrayInputStream(baos.toByteArray());
+         return baos.toByteArray();
       }
       catch (IOException ex)
       {

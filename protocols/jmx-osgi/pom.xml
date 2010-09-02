@@ -19,11 +19,8 @@
   <name>Arquillian Protocol JMX OSGi</name>
   <description>OSGi JMX Protocol for the Arquillian project</description>
 
-
   <!-- Properties -->
   <properties>
-
-
   </properties>
 
   <!-- Dependencies -->
@@ -33,6 +30,11 @@
     <dependency>
       <groupId>org.jboss.arquillian</groupId>
       <artifactId>arquillian-spi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-jmx</artifactId>
       <version>${project.version}</version>
     </dependency>
 

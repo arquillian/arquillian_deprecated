@@ -16,186 +16,193 @@
  */
 package org.jboss.arquillian.container.osgi.remote;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
 
-import org.jboss.arquillian.packager.osgi.OSGiDeploymentPackager;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServerConnection;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.TabularData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
+import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.framework.OSGiBootstrap;
-import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
+import org.jboss.osgi.jmx.JMXServiceURLFactory;
+import org.jboss.osgi.spi.util.BundleInfo;
+import org.jboss.osgi.testing.OSGiTestHelper;
+import org.jboss.osgi.testing.internal.ManagementSupport;
+import org.jboss.osgi.vfs.AbstractVFS;
+import org.jboss.osgi.vfs.VirtualFile;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.launch.Framework;
+import org.osgi.jmx.framework.BundleStateMBean;
+import org.osgi.jmx.framework.FrameworkMBean;
 
 /**
- * OSGiRemoteContainer
+ * The remote OSGi container.
  *
  * @author thomas.diesler@jboss.com
- * @since 01-Sep-2010
+ * @version $Revision: $
  */
-public class OSGiRemoteContainer implements DeployableContainer
+public class OSGiRemoteContainer extends AbstractOSGiContainer
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiRemoteContainer.class);
 
-   private Framework framework;
+   private JMXConnector jmxConnector;
+   private ManagementSupport jmxSupport;
 
-   public void setup(Context context, Configuration configuration)
-   {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // bootstrapFramework(context);
-   }
-
+   @Override
    public void start(Context context) throws LifecycleException
    {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // startFramework(context);
+      MBeanServerConnection mbeanServer = getMBeanServer();
+      jmxSupport = new ManagementSupport(mbeanServer);
+      
+      super.start(context);
+      
+      installSupportBundles();
    }
 
+   @Override
    public void stop(Context context) throws LifecycleException
    {
-      // [ARQ-236] Configure the Container lifecycle based on the Test events
-      // stopFramework();
-   }
+      super.stop(context);
 
-   private void bootstrapFramework(Context context)
-   {
-      log.debug("Bootstrap framework ...");
-      OSGiBootstrapProvider provider = OSGiBootstrap.getBootstrapProvider();
-      framework = provider.getFramework();
-      context.add(Framework.class, framework);
-   }
-
-   private void startFramework(Context context) 
-   {
-      log.debug("Start framework: " + framework);
-      try
-      {
-         framework.start();
-         context.add(BundleContext.class, framework.getBundleContext());
-
-         Bundle[] bundles = framework.getBundleContext().getBundles();
-         if (getInstalledBundle(bundles, "osgi.cmpn") == null)
-            installSupportBundle("org.osgi.compendium", false);
-
-         if (getInstalledBundle(bundles, "arquillian-protocol-jmx-osgi-bundle") == null)
-            installSupportBundle("arquillian-protocol-jmx-osgi-bundle", true);
-      }
-      catch (BundleException ex)
-      {
-         throw new IllegalStateException("Cannot start embedded OSGi Framework", ex);
-      }
-   }
-
-   private void stopFramework() 
-   {
-      log.debug("Stop framework: " + framework);
-      try
-      {
-         framework.stop();
-         framework.waitForStop(3000);
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
-      }
-      catch (Exception ex)
-      {
-         throw new IllegalStateException("Cannot stop embedded OSGi Framework", ex);
-      }
-      finally
-      {
-         framework = null;
-      }
-   }
-
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
-   {
-      // start the framework lazily as part of @BeforeClass
-      if (framework == null)
-      {
-         bootstrapFramework(context);
-         startFramework(context);
-      }
-      
-      // Generate the auxiliary archives. This is a hack and should be done previously through public API
-      OSGiDeploymentPackager packager = (OSGiDeploymentPackager)context.getServiceLoader().onlyOne(DeploymentPackager.class);
-      TestDeployment deployment = context.get(TestDeployment.class);
-      packager.generateAuxiliaryArchives(context, deployment);
-
-      // Install the application archive
-      Bundle bundle = installBundle(context, archive);
-      BundleList bundleList = new BundleList(Collections.singletonList(bundle));
-      context.add(BundleList.class, bundleList);
-
-      // Install the auxiliary archives
-      for (Archive<?> aux : deployment.getAuxiliaryArchives())
-      {
-         if (OSGiDeploymentPackager.isValidBundleArchive(aux))
-         {
-            Bundle auxBundle = installBundle(context, aux);
-            bundleList.add(auxBundle);
-         }
-      }
-      return new JMXMethodExecutor();
-   }
-
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
-   {
-      // Uninstall all deployed bundles
-      BundleList bundleList = context.get(BundleList.class);
-      for (Bundle bundle : bundleList)
+      // Close the JMXConnector
+      if (jmxConnector != null)
       {
          try
          {
-            if (bundle.getState() != Bundle.UNINSTALLED)
-            {
-               log.debug("Undeploy: " + bundle.getSymbolicName());
-               bundle.uninstall();
-            }
+            jmxConnector.close();
          }
-         catch (BundleException ex)
+         catch (IOException ex)
          {
-            log.error("Cannot undeploy: " + archive, ex);
+            log.warn("Cannot close JMXConnector", ex);
          }
       }
-      
-      // Stop the Framework as part of @AfterClass
-      bundleList.clear();
-      stopFramework();
    }
 
-   private Bundle installBundle(Context context, final Archive<?> archive) throws DeploymentException
+   @Override
+   public ContainerMethodExecutor getMethodExecutor()
+   {
+      MBeanServerConnection mbeanServer = getMBeanServer();
+      return new JMXMethodExecutor(mbeanServer, false);
+   }
+
+   @Override
+   public BundleHandle installBundle(Archive<?> archive) throws BundleException, IOException
+   {
+      VirtualFile virtualFile = OSGiTestHelper.toVirtualFile(archive);
+      return installBundle(virtualFile);
+   }
+
+   @Override
+   public BundleHandle installBundle(URL bundleURL) throws BundleException, IOException
+   {
+      VirtualFile virtualFile = AbstractVFS.getRoot(bundleURL);
+      return installBundle(virtualFile);
+   }
+
+   private BundleHandle installBundle(VirtualFile virtualFile) throws BundleException, IOException
+   {
+      BundleInfo info = BundleInfo.createBundleInfo(virtualFile);
+      String streamURL = info.getRoot().getStreamURL().toExternalForm();
+      FrameworkMBean frameworkMBean = jmxSupport.getFrameworkMBean();
+      long bundleId = frameworkMBean.installBundleFromURL(info.getLocation(), streamURL);
+      return new BundleHandle(bundleId, info.getSymbolicName());
+   }
+
+   @Override
+   public void uninstallBundle(BundleHandle handle) throws BundleException, IOException
+   {
+      FrameworkMBean frameworkMBean = jmxSupport.getFrameworkMBean();
+      frameworkMBean.uninstallBundle(handle.getBundleId());
+   }
+
+   @Override
+   public int getBundleState(BundleHandle handle)
    {
       try
       {
-         // Export the bundle bytes
-         ZipExporter exporter = archive.as(ZipExporter.class);
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         exporter.exportZip(baos);
+         BundleStateMBean bundleState = jmxSupport.getBundleStateMBean();
+         String state = bundleState.getState(handle.getBundleId());
+         if ("INSTALLED".equals(state))
+            return Bundle.INSTALLED;
+         if ("RESOLVED".equals(state))
+            return Bundle.RESOLVED;
+         if ("STARTING".equals(state))
+            return Bundle.STARTING;
+         if ("ACTIVE".equals(state))
+            return Bundle.ACTIVE;
+         if ("STOPPING".equals(state))
+            return Bundle.STOPPING;
+         if ("UNINSTALLED".equals(state))
+            return Bundle.UNINSTALLED;
+         else
+            throw new IllegalStateException("Unsupported state: " + state);
+      }
+      catch (Exception ex)
+      {
+         Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+         if (cause instanceof InstanceNotFoundException == false)
+            log.warn("Cannot get state for bundle: " + this, cause);
 
-         log.debug("Deploy: " + archive.getName());
-         BundleContext sysContext = framework.getBundleContext();
-         InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
-         Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
-         return bundle;
+         return Bundle.UNINSTALLED;
+      }
+   }
+
+   @Override
+   public void startBundle(BundleHandle handle) throws BundleException
+   {
+      try
+      {
+         FrameworkMBean frameworkMBean = jmxSupport.getFrameworkMBean();
+         frameworkMBean.startBundle(handle.getBundleId());
+      }
+      catch (IOException ex)
+      {
+         throw new BundleException("Cannot start bundle: " + handle, ex);
+      }
+   }
+
+   @Override
+   public void stopBundle(BundleHandle handle) throws BundleException
+   {
+      try
+      {
+         FrameworkMBean frameworkMBean = jmxSupport.getFrameworkMBean();
+         frameworkMBean.stopBundle(handle.getBundleId());
+      }
+      catch (IOException ex)
+      {
+         throw new BundleException("Cannot start bundle: " + handle, ex);
+      }
+   }
+
+   @Override
+   public boolean isBundleInstalled(String symbolicName)
+   {
+      try
+      {
+         BundleStateMBean bundleStateMBean = jmxSupport.getBundleStateMBean();
+         TabularData listBundles = bundleStateMBean.listBundles();
+         Iterator<?> iterator = listBundles.values().iterator();
+         while (iterator.hasNext())
+         {
+            CompositeData bundleType = (CompositeData)iterator.next();
+            String bsn = (String)bundleType.get(BundleStateMBean.SYMBOLIC_NAME);
+            if (bsn.equals(symbolicName))
+               return true;
+         }
+         return false;
       }
       catch (RuntimeException rte)
       {
@@ -203,58 +210,25 @@ public class OSGiRemoteContainer implements DeployableContainer
       }
       catch (Exception ex)
       {
-         throw new DeploymentException("Cannot deploy: " + archive, ex);
+         throw new IllegalStateException("Cannot obtain remote bundles", ex);
       }
    }
 
-   private Bundle getInstalledBundle(Bundle[] bundles, String symbolicName)
+   // Get the MBeanServerConnection through the JMXConnector
+   private MBeanServerConnection getMBeanServer()
    {
-      for (Bundle aux : bundles)
+      try
       {
-         if (symbolicName.equals(aux.getSymbolicName()))
-            return aux;
-      }
-      return null;
-   }
-
-   private Bundle installSupportBundle(String artifactId, boolean startBundle)
-   {
-      String classPath = System.getProperty("java.class.path");
-      if (classPath.contains(artifactId) == false)
-      {
-         log.debug("Class path does not contain '" + artifactId + "'");
-         return null;
-      }
-
-      String[] paths = classPath.split("" + File.pathSeparatorChar);
-      for (String path : paths)
-      {
-         if (path.contains(artifactId))
+         if (jmxConnector == null)
          {
-            BundleContext sysContext = framework.getBundleContext();
-            try
-            {
-               Bundle bundle = sysContext.installBundle(new File(path).toURI().toString());
-               if (startBundle == true)
-                  bundle.start();
-
-               return bundle;
-            }
-            catch (BundleException ex)
-            {
-               log.error("Cannot install bundle: " + path);
-            }
+            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", null, null);
+            jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          }
+         return jmxConnector.getMBeanServerConnection();
       }
-      return null;
-   }
-   
-   @SuppressWarnings("serial")
-   private static class BundleList extends ArrayList<Bundle>
-   {
-      public BundleList(Collection<? extends Bundle> c)
+      catch (IOException ex)
       {
-         super(c);
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
       }
    }
 }
