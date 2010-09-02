@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.protocol.jmx;
 
+import java.util.Properties;
+
 import org.jboss.arquillian.spi.TestResult;
 
 /**
@@ -32,18 +34,20 @@ public interface JMXTestRunnerMBean
    /**
     * Runs a test method on the given test class
     *
-    * @param className the test class name
-    * @param methodName the test method name
-    * @return the {@link TestResult} 
+    * @param className The test class name
+    * @param methodName The test method name
+    * @param bundleId The bundle id of the injected bundle 
+    * @return The {@link TestResult} 
     */
-   TestResult runTestMethod(String className, String methodName);
+   TestResult runTestMethod(String className, String methodName, Properties props);
    
    /**
     * Runs a test method on the given test class
     *
-    * @param className the test class name
-    * @param methodName the test method name
+    * @param className The test class name
+    * @param methodName The test method name
+    * @param bundleId The bundle id of the injected bundle 
     * @return The bytes that represent the {@link TestResult} 
     */
-   byte[] runTestMethodSerialized(String className, String methodName);
+   byte[] runTestMethodSerialized(String className, String methodName, Properties props);
 }

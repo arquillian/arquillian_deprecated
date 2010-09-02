@@ -19,6 +19,7 @@ package org.jboss.arquillian.container.osgi.remote;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Properties;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServerConnection;
@@ -91,10 +92,11 @@ public class OSGiRemoteContainer extends AbstractOSGiContainer
    }
 
    @Override
-   public ContainerMethodExecutor getMethodExecutor()
+   public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
       MBeanServerConnection mbeanServer = getMBeanServer();
-      return new JMXMethodExecutor(mbeanServer, false);
+      props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.FALSE);
+      return new JMXMethodExecutor(mbeanServer, props);
    }
 
    @Override

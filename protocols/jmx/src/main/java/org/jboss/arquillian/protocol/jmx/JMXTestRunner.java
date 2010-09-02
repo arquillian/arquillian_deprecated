@@ -19,6 +19,7 @@ package org.jboss.arquillian.protocol.jmx;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Properties;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
@@ -46,6 +47,13 @@ public class JMXTestRunner implements JMXTestRunnerMBean
    public interface TestClassLoader
    {
       Class<?> loadTestClass(String className) throws ClassNotFoundException;
+   }
+
+   // [TODO] Remove this hack which is used to transport properties to the TestEnricher
+   private static ThreadLocal<Properties> propertiesAssociation = new ThreadLocal<Properties>();
+   public static Properties getAssociatedProperties()
+   {
+      return propertiesAssociation.get();
    }
    
    public JMXTestRunner(TestClassLoader classLoader)
@@ -84,14 +92,14 @@ public class JMXTestRunner implements JMXTestRunnerMBean
       }
    }
 
-   public TestResult runTestMethod(String className, String methodName)
+   public TestResult runTestMethod(String className, String methodName, Properties props)
    {
-      return runTestMethodInternal(className, methodName);
+      return runTestMethodInternal(className, methodName, props);
    }
 
-   public byte[] runTestMethodSerialized(String className, String methodName)
+   public byte[] runTestMethodSerialized(String className, String methodName, Properties props)
    {
-      TestResult result = runTestMethodInternal(className, methodName);
+      TestResult result = runTestMethodInternal(className, methodName, props);
 
       // Marshall the TestResult
       try
@@ -109,12 +117,14 @@ public class JMXTestRunner implements JMXTestRunnerMBean
       }
    }
 
-   private TestResult runTestMethodInternal(String className, String methodName)
+   private TestResult runTestMethodInternal(String className, String methodName, Properties props)
    {
       try
       {
          TestRunner runner = TestRunners.getTestRunner(JMXTestRunner.class.getClassLoader());
          Class<?> testClass = testClassLoader.loadTestClass(className);
+         
+         propertiesAssociation.set(props);
          
          TestResult testResult = runner.execute(testClass, methodName);
          return testResult;

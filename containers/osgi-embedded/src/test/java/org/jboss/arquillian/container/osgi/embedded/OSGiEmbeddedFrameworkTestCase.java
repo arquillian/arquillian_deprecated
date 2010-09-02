@@ -91,15 +91,10 @@ public class OSGiEmbeddedFrameworkTestCase
       // Note when the test bundle contains the test case it 
       // must be resolved already when this test method is called
       assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
-      assertEquals(OSGiEmbeddedFrameworkTestCase.class.getSimpleName(), bundle.getSymbolicName());
-      
-      // The application bundle is installed before the generated test bundle
-      Bundle appBundle = context.getBundle(bundle.getBundleId() - 1);
-      assertEquals("osgi-simple-embedded", appBundle.getSymbolicName());
-      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, appBundle.getState());
-      
-      appBundle.start();
-      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, appBundle.getState());
+      assertEquals("osgi-simple-embedded", bundle.getSymbolicName());
+     
+      bundle.start();
+      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
       
       // Get the service reference
       ServiceReference sref = context.getServiceReference(SimpleService.class.getName());

@@ -59,8 +59,6 @@ packagers/javaee/.settings
 packagers/javaee/target
 protocols/jmx/.classpath
 protocols/jmx/target
-protocols/jmx-osgi-bundle/.classpath
-protocols/jmx-osgi/.classpath
 protocols/local/.classpath
 protocols/local/target
 protocols/servlet-2.5/target
@@ -79,4 +77,3 @@ testenrichers/osgi/target
 testenrichers/resource/.classpath
 testenrichers/resource/target
 testng/target
-

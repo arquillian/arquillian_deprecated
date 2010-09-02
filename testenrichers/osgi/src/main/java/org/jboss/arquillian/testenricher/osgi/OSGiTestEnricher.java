@@ -19,6 +19,7 @@ package org.jboss.arquillian.testenricher.osgi;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.management.JMException;
@@ -27,13 +28,13 @@ import javax.management.MBeanServerFactory;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
+import org.jboss.arquillian.container.osgi.BundleContextHolder;
+import org.jboss.arquillian.protocol.jmx.JMXTestRunner;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * The OSGi TestEnricher
@@ -55,7 +56,7 @@ public class OSGiTestEnricher implements TestEnricher
 {
    // Provide logging
    private static Logger log = Logger.getLogger(OSGiTestEnricher.class);
-
+   
    public void enrich(Context context, Object testCase)
    {
       Class<? extends Object> testClass = testCase.getClass();
@@ -117,16 +118,16 @@ public class OSGiTestEnricher implements TestEnricher
 
    private Bundle getTestBundle(Context context, Class<?> testClass)
    {
-      Bundle testbundle = context.get(Bundle.class);
-      if (testbundle == null)
+      Bundle testBundle = context.get(Bundle.class);
+      if (testBundle == null)
       {
-         // Get the test bundle from PackageAdmin with the test class as key 
+         // Get the test bundle from the ThreadLoacal associated properties 
+         Properties props = JMXTestRunner.getAssociatedProperties();
+         Long bundleId = (Long)props.get("TestBundleId");
          BundleContext bundleContext = getSystemBundleContext(context);
-         ServiceReference sref = bundleContext.getServiceReference(PackageAdmin.class.getName());
-         PackageAdmin pa = (PackageAdmin)bundleContext.getService(sref);
-         testbundle = pa.getBundle(testClass);
+         testBundle = bundleContext.getBundle(bundleId);
       }
-      return testbundle;
+      return testBundle;
    }
 
    /**

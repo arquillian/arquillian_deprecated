@@ -34,7 +34,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 
 /**
  * [ARQ-193] Create auxillary OSGi test bundle
@@ -63,28 +62,21 @@ public class ARQ193GeneratedTestCase
    }
    
    @Inject
-   public Bundle auxBundle;
+   public Bundle bundle;
    
    @Test
    public void testBundleInjection() throws Exception
    {
-      assertNotNull("Bundle injected", auxBundle);
-      assertEquals("Bundle INSTALLED", Bundle.RESOLVED, auxBundle.getState());
+      assertNotNull("Bundle injected", bundle);
+      assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
       
-      auxBundle.start();
-      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, auxBundle.getState());
+      bundle.start();
+      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
       
-      // The injected bundle is the one that contains the test case
-      assertEquals(ARQ193GeneratedTestCase.class.getSimpleName(), auxBundle.getSymbolicName());
-      auxBundle.loadClass(ARQ193GeneratedTestCase.class.getName());
-      
-      // The application bundle is installed before the generated test bundle
-      BundleContext auxContext = auxBundle.getBundleContext();
-      Bundle appBundle = auxContext.getBundle(auxBundle.getBundleId() - 1);
-      assertEquals("empty-bundle", appBundle.getSymbolicName());
+      assertEquals("empty-bundle", bundle.getSymbolicName());
       try
       {
-         appBundle.loadClass(ARQ193GeneratedTestCase.class.getName());
+         bundle.loadClass(ARQ193GeneratedTestCase.class.getName());
          fail("ClassNotFoundException expected");
       }
       catch (ClassNotFoundException ex)
@@ -92,10 +84,10 @@ public class ARQ193GeneratedTestCase
          // ignore
       }
       
-      auxBundle.stop();
-      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, auxBundle.getState());
+      bundle.stop();
+      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
       
-      auxBundle.uninstall();
-      assertEquals("Bundle UNINSTALLED", Bundle.UNINSTALLED, auxBundle.getState());
+      bundle.uninstall();
+      assertEquals("Bundle UNINSTALLED", Bundle.UNINSTALLED, bundle.getState());
    }
 }

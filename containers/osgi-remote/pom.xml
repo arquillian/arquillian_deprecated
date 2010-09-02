@@ -78,12 +78,12 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-jmx-osgi</artifactId>
+      <artifactId>arquillian-protocol-osgi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-jmx-osgi-bundle</artifactId>
+      <artifactId>arquillian-osgi-bundle</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -120,10 +121,11 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
    }
 
    @Override
-   public ContainerMethodExecutor getMethodExecutor()
+   public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
       MBeanServer mbeanServer = findOrCreateMBeanServer();
-      return new JMXMethodExecutor(mbeanServer, true);
+      props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.TRUE);
+      return new JMXMethodExecutor(mbeanServer, props);
    }
 
    @Override
@@ -160,7 +162,7 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
    public int getBundleState(BundleHandle handle)
    {
       Bundle bundle = getBundle(handle);
-      return bundle.getState();
+      return bundle != null ? bundle.getState() : Bundle.UNINSTALLED;
    }
    
    @Override

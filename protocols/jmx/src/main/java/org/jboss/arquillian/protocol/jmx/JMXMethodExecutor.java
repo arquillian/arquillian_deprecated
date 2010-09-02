@@ -18,6 +18,7 @@ package org.jboss.arquillian.protocol.jmx;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
+import java.util.Properties;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MBeanServerInvocationHandler;
@@ -36,16 +37,18 @@ import org.jboss.arquillian.spi.TestResult.Status;
  */
 public class JMXMethodExecutor implements ContainerMethodExecutor
 {
-   private MBeanServerConnection mbeanServer;
-   private boolean embeddedExecution;
+   public static final String EMBEDDED_EXECUTION = "embeddedExecution";
    
-   public JMXMethodExecutor(MBeanServerConnection mbeanServer, boolean embeddedExecution)
+   private MBeanServerConnection mbeanServer;
+   private Properties properties;
+   
+   public JMXMethodExecutor(MBeanServerConnection mbeanServer, Properties props)
    {
       if (mbeanServer == null)
          throw new IllegalArgumentException("Null mbeanServer");
       
       this.mbeanServer = mbeanServer;
-      this.embeddedExecution = embeddedExecution;
+      this.properties = props;
    }
 
    public TestResult invoke(TestMethodExecutor testMethodExecutor)
@@ -62,16 +65,17 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
          ObjectName objectName = new ObjectName(JMXTestRunnerMBean.OBJECT_NAME);
          JMXTestRunnerMBean testRunner = getMBeanProxy(objectName, JMXTestRunnerMBean.class);
 
-         if (embeddedExecution == true)
+         Boolean embedded = (Boolean)properties.get(EMBEDDED_EXECUTION);
+         if (embedded == true)
          {
-            byte[] resultBytes = testRunner.runTestMethodSerialized(testClass, testMethod);
+            byte[] resultBytes = testRunner.runTestMethodSerialized(testClass, testMethod, properties);
             ByteArrayInputStream resultStream = new ByteArrayInputStream(resultBytes);
             ObjectInputStream ois = new ObjectInputStream(resultStream);
             result = (TestResult)ois.readObject();
          }
          else
          {
-            result = testRunner.runTestMethod(testClass, testMethod);
+            result = testRunner.runTestMethod(testClass, testMethod, properties);
          }
       }
       catch (final Throwable e) 

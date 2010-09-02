@@ -14,9 +14,9 @@
 
   <!-- Artifact Configuration -->
   <groupId>org.jboss.arquillian.protocol</groupId>
-  <artifactId>arquillian-protocol-jmx-osgi-bundle</artifactId>
-  <name>Arquillian Protocol JMX OSGi Bundle</name>
-  <description>Arquillian OSGi Bundle for JMX MBean registration</description>
+  <artifactId>arquillian-osgi-bundle</artifactId>
+  <name>Arquillian OSGi Bundle</name>
+  <description>Arquillian OSGi Bundle</description>
   <packaging>bundle</packaging>
 
   <!-- Properties -->
@@ -55,6 +55,7 @@
               arquillian-impl-base;inline=false,
               arquillian-junit;inline=false,
               arquillian-protocol-jmx;inline=false,
+              arquillian-protocol-osgi;inline=false,
               arquillian-testenricher-osgi;inline=false,
               arquillian-spi;inline=false,
               shrinkwrap-api;inline=false,
@@ -105,6 +106,11 @@
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-jmx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-osgi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

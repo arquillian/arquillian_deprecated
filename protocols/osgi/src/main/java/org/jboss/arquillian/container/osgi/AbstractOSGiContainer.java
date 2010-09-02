@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Properties;
 
 import org.jboss.arquillian.packager.osgi.OSGiDeploymentPackager;
 import org.jboss.arquillian.spi.Configuration;
@@ -76,9 +77,9 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
             supportBundles.add(handle);
          }
 
-         if (isBundleInstalled("arquillian-protocol-jmx-osgi-bundle") == false)
+         if (isBundleInstalled("arquillian-osgi-bundle") == false)
          {
-            BundleHandle handle = installSupportBundle("arquillian-protocol-jmx-osgi-bundle", true);
+            BundleHandle handle = installSupportBundle("arquillian-osgi-bundle", true);
             supportBundles.add(handle);
          }
       }
@@ -103,19 +104,23 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
       context.add(BundleList.class, bundleList);
 
       // Install the application archive
-      BundleHandle handle = installInternal(context, archive);
-      bundleList.add(handle);
+      BundleHandle appHandle = installInternal(context, archive);
+      bundleList.add(appHandle);
 
       // Install the auxiliary archives
-      for (Archive<?> aux : deployment.getAuxiliaryArchives())
+      for (Archive<?> auxArchive : deployment.getAuxiliaryArchives())
       {
-         if (OSGiDeploymentPackager.isValidBundleArchive(aux))
+         if (OSGiDeploymentPackager.isValidBundleArchive(auxArchive))
          {
-            BundleHandle auxBundle = installInternal(context, aux);
-            bundleList.add(auxBundle);
+            BundleHandle auxHandle = installInternal(context, auxArchive);
+            bundleList.add(auxHandle);
          }
       }
-      return getMethodExecutor();
+      
+      Properties props = new Properties();
+      props.put("TestBundleId", appHandle.getBundleId());
+      
+      return getMethodExecutor(props);
    }
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
@@ -169,7 +174,7 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
       }
    }
 
-   public abstract ContainerMethodExecutor getMethodExecutor();
+   public abstract ContainerMethodExecutor getMethodExecutor(Properties props);
    
    public abstract BundleHandle installBundle(Archive<?> archive) throws BundleException, IOException;
 
