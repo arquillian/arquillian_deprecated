@@ -117,7 +117,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
 
       // Generate the imported packages
       // [TODO] use bnd or another tool to do this more inteligently
-      builder.addImportPackages("org.jboss.arquillian.junit");
+      builder.addImportPackages("org.jboss.arquillian.junit", "org.jboss.arquillian.spi.util");
       builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
       builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
       builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");

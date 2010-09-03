@@ -16,6 +16,10 @@
  */
 package org.jboss.arquillian.impl;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
 import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
@@ -38,12 +42,16 @@ import org.junit.Test;
  */
 public class DeploymentAnnotationArchiveGeneratorTestCase
 {
-
-   @Test(expected = IllegalArgumentException.class)
-   public void shouldThrowExceptionOnDeploymentNotPresent() throws Exception
+   public void shouldGenerateArchiveOnDeploymentNotPresent() throws Exception
    {
-      new DeploymentAnnotationArchiveGenerator().generateApplicationArchive(
-            new TestClass(DeploymentNotPresent.class));
+      DeploymentAnnotationArchiveGenerator generator = new DeploymentAnnotationArchiveGenerator();
+      TestClass testCase = new TestClass(DeploymentNotPresent.class);
+      
+      Archive<?> archive = generator.generateApplicationArchive(testCase);
+      assertNotNull("Archive generated", archive);
+      assertEquals(DeploymentAnnotationArchiveGeneratorTestCase.class.getSimpleName(), archive.getName());
+      ArchivePath path = createArchivePath(DeploymentAnnotationArchiveGeneratorTestCase.class);
+      assertTrue("Contains " + path, archive.contains(path));
    }
 
    @Test(expected = IllegalArgumentException.class)

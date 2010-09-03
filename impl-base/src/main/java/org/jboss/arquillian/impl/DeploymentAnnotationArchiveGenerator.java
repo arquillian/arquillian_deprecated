@@ -25,7 +25,9 @@ import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.spi.ApplicationArchiveGenerator;
 import org.jboss.arquillian.spi.TestClass;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.container.ClassContainer;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 /**
  * UserCreatedArchiveGenerator
@@ -38,33 +40,37 @@ public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveG
    public Archive<?> generateApplicationArchive(TestClass testCase)
    {
       Validate.notNull(testCase, "TestCase must be specified");
-
-      Method deploymentMethod = testCase.getMethod(Deployment.class);
-      if (deploymentMethod == null)
-      {
-         throw new IllegalArgumentException("No method annotated with " + Deployment.class.getName() + " found");
-      }
-      if (!Modifier.isStatic(deploymentMethod.getModifiers()))
-      {
-         throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " is not static");
-      }
-      if (!Archive.class.isAssignableFrom(deploymentMethod.getReturnType()))
-      {
-         throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " must have return type " + Archive.class.getName());
-      }
-
+      
       Archive<?> archive;
-      try 
+      
+      Method deploymentMethod = testCase.getMethod(Deployment.class);
+      if (deploymentMethod != null)
       {
-         archive = (Archive<?>)deploymentMethod.invoke(null);
-      } 
-      catch (RuntimeException rte) 
-      {
-         throw rte;
+         if (!Modifier.isStatic(deploymentMethod.getModifiers()))
+         {
+            throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " is not static");
+         }
+         if (!Archive.class.isAssignableFrom(deploymentMethod.getReturnType()))
+         {
+            throw new IllegalArgumentException("Method annotated with " + Deployment.class.getName() + " must have return type " + Archive.class.getName());
+         }
+
+         try 
+         {
+            archive = (Archive<?>)deploymentMethod.invoke(null);
+         } 
+         catch (RuntimeException rte) 
+         {
+            throw rte;
+         }
+         catch (Exception e) 
+         {
+            throw new RuntimeException("Could not get Deployment", e);
+         }
       }
-      catch (Exception e) 
+      else
       {
-         throw new RuntimeException("Could not get Deployment", e);
+         archive = ShrinkWrap.create(JavaArchive.class, testCase.getSimpleName());
       }
 
       try 

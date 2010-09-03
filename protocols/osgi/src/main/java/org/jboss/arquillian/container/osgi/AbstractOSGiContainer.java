@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.container.osgi;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,10 +29,14 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.arquillian.spi.TestDeployment;
+import org.jboss.arquillian.spi.util.ArquillianHelper;
 import org.jboss.logging.Logger;
+import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 
 /**
  * An abstract OSGi container
@@ -182,49 +185,49 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
 
    private BundleHandle installSupportBundle(String artifactId, boolean startBundle) throws BundleException, IOException
    {
-      // Check the class path for the the bundle artifact 
-      String classPath = System.getProperty("java.class.path");
-      if (classPath.contains(artifactId) == true)
+      URL artifactURL = ArquillianHelper.getArtifactURL(null, artifactId, null);
+      if (artifactURL != null)
       {
-         String[] paths = classPath.split("" + File.pathSeparatorChar);
-         for (String path : paths)
-         {
-            if (path.contains(artifactId))
-            {
-               BundleHandle handle = installSupportFile(new File(path), startBundle);
-               return handle;
-            }
-         }
-      }
-
-      String archiveDir = System.getProperty("test.archive.directory");
-      if (archiveDir != null)
-      {
-         // Check "target/test-libs" for the the bundle artifact 
-         File file = new File(archiveDir + File.separator + artifactId + ".jar");
-         if (file.exists())
-         {
-            BundleHandle handle = installSupportFile(file, startBundle);
-            return handle;
-         }
-
-         // Check "target/test-libs/bundles" for the the bundle artifact 
-         file = new File(archiveDir + File.separator + "bundles" + File.separator + artifactId + ".jar");
-         if (file.exists())
-         {
-            BundleHandle handle = installSupportFile(file, startBundle);
-            return handle;
-         }
+         BundleHandle handle = installSupportFile(artifactURL, startBundle);
+         return handle;
       }
       return null;
    }
 
-   private BundleHandle installSupportFile(File bundleFile, boolean startBundle) throws BundleException, IOException
+   private BundleHandle installSupportFile(URL bundleURL, boolean startBundle) throws BundleException, IOException
    {
-      BundleHandle handle = installBundle(bundleFile.toURI().toURL());
+      BundleHandle handle = installBundle(bundleURL);
       if (startBundle == true)
          startBundle(handle);
       return handle;
+   }
+   
+   public static Bundle installBundle(BundleContext context, String groupId, String artifactId, Version version) throws BundleException
+   {
+      URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, version.toString());
+      if (artifactId == null)
+         return null;
+      
+      // Verify that the artifact is a bundle
+      BundleInfo info = BundleInfo.createBundleInfo(artifactURL);
+      Bundle bundle = getBundle(context, info.getSymbolicName(), info.getVersion());
+      if (bundle != null)
+         return bundle;
+      
+      bundle = context.installBundle(artifactURL.toExternalForm());
+      return bundle;
+   }
+
+   public static Bundle getBundle(BundleContext context, String symbolicName, Version version) throws BundleException
+   {
+      for (Bundle bundle : context.getBundles())
+      {
+         boolean artefactMatch = symbolicName.equals(bundle.getSymbolicName());
+         boolean versionMatch = version == null || version.equals(bundle.getVersion());
+         if (artefactMatch && versionMatch)
+            return bundle;
+      }
+      return null;
    }
 
    public static class BundleHandle
