@@ -46,7 +46,7 @@ public class ServletProtocolDeploymentPackagerTestCase
    public void shouldHandleJavaArchive() throws Exception
    {
       Archive<?> archive = new ServletProtocolDeploymentPackager().generateDeployment(
-            new TestDeployment(
+            null, new TestDeployment(
                   ShrinkWrap.create(JavaArchive.class, "applicationArchive.jar"), 
                   createAuxiliaryArchives()));
       
@@ -71,7 +71,7 @@ public class ServletProtocolDeploymentPackagerTestCase
    public void shouldHandleWebArchive() throws Exception
    {
       Archive<?> archive = new ServletProtocolDeploymentPackager().generateDeployment(
-            new TestDeployment(
+            null, new TestDeployment(
                   ShrinkWrap.create(WebArchive.class, "applicationArchive.war"), 
                   createAuxiliaryArchives()));
       
@@ -96,7 +96,7 @@ public class ServletProtocolDeploymentPackagerTestCase
    public void shouldHandleEnterpriseArchive() throws Exception
    {
       Archive<?> archive = new ServletProtocolDeploymentPackager().generateDeployment(
-            new TestDeployment(
+            null, new TestDeployment(
                   ShrinkWrap.create(EnterpriseArchive.class, "applicationArchive.ear"), 
                   createAuxiliaryArchives()));
       
@@ -118,7 +118,7 @@ public class ServletProtocolDeploymentPackagerTestCase
    public void shouldHandleEnterpriseArchiveWithExistingWAR() throws Exception
    {
       Archive<?> archive = new ServletProtocolDeploymentPackager().generateDeployment(
-            new TestDeployment(
+            null, new TestDeployment(
                   ShrinkWrap.create(EnterpriseArchive.class, "applicationArchive.ear")
                             .addModule(
                                   ShrinkWrap.create(WebArchive.class, "test.war")

@@ -18,6 +18,7 @@ package org.jboss.arquillian.protocol.servlet_2_5;
 
 import java.util.Collection;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -37,7 +38,7 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeploymentPackager#generateDeployment(org.jboss.arquillian.spi.TestDeployment)
     */
-   public Archive<?> generateDeployment(TestDeployment testDeployment)
+   public Archive<?> generateDeployment(Context context, TestDeployment testDeployment)
    {
       WebArchive protocol = WebArchive.class.cast(
             new ProtocolDeploymentAppender().createAuxiliaryArchive());

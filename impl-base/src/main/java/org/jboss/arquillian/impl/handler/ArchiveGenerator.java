@@ -56,7 +56,7 @@ public class ArchiveGenerator implements EventHandler<ClassEvent>
       Validate.stateNotNull(generator, "No " + DeploymentGenerator.class.getName() + " found in context");
       
       TestDeployment deployment = generator.generate(event.getTestClass());
-      Archive<?> archive = packager.generateDeployment(deployment);
+      Archive<?> archive = packager.generateDeployment(context, deployment);
       
       context.add(TestDeployment.class, deployment);
       context.add(Archive.class, archive);

@@ -30,8 +30,9 @@ import org.jboss.shrinkwrap.api.Archive;
 public interface DeploymentPackager
 {
    /**
+    * @param context The test lifecycle context
     * @param testDeployment Value object containing the application {@link Archive} and other auxiliary library {@link Archive}s. 
     * @return The prepared archive for deployment.
     */
-   Archive<?> generateDeployment(TestDeployment testDeployment);
+   Archive<?> generateDeployment(Context context, TestDeployment testDeployment);
 }

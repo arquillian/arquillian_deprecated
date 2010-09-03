@@ -18,18 +18,13 @@ package org.jboss.arquillian.container.osgi.arq193;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.io.InputStream;
 
 import javax.inject.Inject;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,46 +42,27 @@ public class ARQ193GeneratedTestCase
    @Deployment
    public static Archive<?> createDeployment()
    {
-      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "empty-bundle");
-      archive.setManifest(new Asset()
-      {
-         public InputStream openStream()
-         {
-            OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
-            builder.addBundleSymbolicName(archive.getName());
-            builder.addBundleManifestVersion(2);
-            return builder.openStream();
-         }
-      });
-      return archive;
+      return ShrinkWrap.create(JavaArchive.class, "empty-bundle");
    }
-   
+
    @Inject
    public Bundle bundle;
-   
+
    @Test
    public void testBundleInjection() throws Exception
    {
       assertNotNull("Bundle injected", bundle);
-      assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
-      
+      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
+
       bundle.start();
       assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
-      
+
       assertEquals("empty-bundle", bundle.getSymbolicName());
-      try
-      {
-         bundle.loadClass(ARQ193GeneratedTestCase.class.getName());
-         fail("ClassNotFoundException expected");
-      }
-      catch (ClassNotFoundException ex)
-      {
-         // ignore
-      }
-      
+      bundle.loadClass(ARQ193GeneratedTestCase.class.getName());
+
       bundle.stop();
       assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
-      
+
       bundle.uninstall();
       assertEquals("Bundle UNINSTALLED", Bundle.UNINSTALLED, bundle.getState());
    }

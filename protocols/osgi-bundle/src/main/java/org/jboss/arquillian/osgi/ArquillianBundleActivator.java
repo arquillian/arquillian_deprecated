@@ -27,9 +27,9 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
-import org.jboss.arquillian.container.osgi.BundleContextHolder;
 import org.jboss.arquillian.protocol.jmx.JMXTestRunner;
 import org.jboss.arquillian.protocol.jmx.JMXTestRunner.TestClassLoader;
+import org.jboss.arquillian.testenricher.osgi.BundleContextHolder;
 import org.jboss.arquillian.testenricher.osgi.OSGiTestEnricher;
 import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;

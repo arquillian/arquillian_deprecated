@@ -21,22 +21,21 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map.Entry;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestDeployment;
-import org.jboss.osgi.metadata.PackageAttribute;
-import org.jboss.osgi.metadata.internal.OSGiManifestMetaData;
 import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.osgi.framework.Constants;
 
 /**
  * Packager for running Arquillian against OSGi containers.
@@ -46,90 +45,106 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public class OSGiDeploymentPackager implements DeploymentPackager
 {
-   public Archive<?> generateDeployment(TestDeployment testDeployment)
+   public Archive<?> generateDeployment(Context context, TestDeployment testDeployment)
    {
+      // Arquillian generates auxiliary archives that aren't bundles
+      Collection<Archive<?>> auxArchives = testDeployment.getAuxiliaryArchives();
+      auxArchives.clear();
+      
       Archive<?> appArchive = testDeployment.getApplicationArchive();
+      if ((appArchive instanceof JavaArchive) == false)
+         throw new IllegalStateException("JavaArchive expected: " + appArchive);
+      
+      enhanceApplicationArchive(context, (JavaArchive)appArchive);
       assertValidateBundleArchive(appArchive);
+      
       return appArchive;
    }
 
    /*
-    * 
+    * Add or modify the manifest such that it exports the test class package and
+    * imports all types that are used in fields, methods, annotations 
     */
-   public void generateAuxiliaryArchives(Context context, TestDeployment testDeployment)
+   private void enhanceApplicationArchive(Context context, JavaArchive appArchive)
    {
       final TestClass testClass = context.get(TestClass.class);
       final Class<?> javaClass = testClass.getJavaClass();
-      final Archive<?> appArchive = testDeployment.getApplicationArchive();
 
       // Check if the application archive already contains the test class
       String path = javaClass.getName().replace('.', '/') + ".class";
       if (appArchive.contains(path) == false)
+         appArchive.addClass(javaClass);
+
+      final OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
+      Manifest manifest = getBundleManifest(appArchive);
+      if (manifest != null)
       {
-         // Generate the auxiliary archive that contains the test case
-         final JavaArchive auxArchive = ShrinkWrap.create(JavaArchive.class, testClass.getSimpleName());
-         auxArchive.addClass(javaClass);
-
-         // Build the manifest
-         final OSGiManifestBuilder builder = OSGiManifestBuilder.newInstance();
-         builder.addBundleSymbolicName(auxArchive.getName());
-         builder.addBundleManifestVersion(2);
-         builder.addExportPackages(javaClass);
-         auxArchive.setManifest(new Asset()
+         Attributes attributes = manifest.getMainAttributes();
+         for (Entry<Object, Object> entry : attributes.entrySet())
          {
-            public InputStream openStream()
+            String key = entry.getKey().toString();
+            String value = (String)entry.getValue();
+            if (key.equals(Attributes.Name.MANIFEST_VERSION))
+               continue;
+            
+            if (key.equals(Constants.IMPORT_PACKAGE))
             {
-               return builder.openStream();
+               String[] imports = value.split(",");
+               builder.addImportPackages(imports);
+               continue;
             }
-         });
-
-         // Generate the imported packages
-         // [TODO] use bnd or another tool to do this more inteligently
-         builder.addImportPackages("org.jboss.arquillian.junit");
-         builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
-         builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
-         builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");
-         for (Annotation anno : javaClass.getDeclaredAnnotations())
-         {
-            addImportPackage(builder, anno.annotationType());
+            
+            builder.addManifestHeader(key, value);
          }
-         for (Field field : javaClass.getDeclaredFields())
-         {
-            Class<?> type = field.getType();
-            addImportPackage(builder, type);
-         }
-         for (Method method : javaClass.getDeclaredMethods())
-         {
-            Class<?> returnType = method.getReturnType();
-            if (returnType != Void.TYPE)
-               addImportPackage(builder, returnType);
-            for (Class<?> paramType : method.getParameterTypes())
-               addImportPackage(builder, paramType);
-         }
-         
-         // Add the exported packages from the application archive
-         Manifest manifest = getBundleManifest(appArchive);
-         OSGiManifestMetaData metaData = new OSGiManifestMetaData(manifest);
-         List<PackageAttribute> exportPackages = metaData.getExportPackages();
-         if (exportPackages != null)
-         {
-            for (PackageAttribute exp : exportPackages)
-            {
-               String packageName = exp.getPackageName();
-               builder.addImportPackages(packageName);
-            }
-         }
-
-         Collection<Archive<?>> auxArchives = testDeployment.getAuxiliaryArchives();
-         auxArchives.add(auxArchive);
       }
+      else
+      {
+         builder.addBundleManifestVersion(2);
+         builder.addBundleSymbolicName(appArchive.getName());
+      }
+      
+      // Export the test class package
+      builder.addExportPackages(javaClass);
+
+      // Generate the imported packages
+      // [TODO] use bnd or another tool to do this more inteligently
+      builder.addImportPackages("org.jboss.arquillian.junit");
+      builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
+      builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
+      builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");
+      for (Annotation anno : javaClass.getDeclaredAnnotations())
+      {
+         addImportPackage(builder, anno.annotationType());
+      }
+      for (Field field : javaClass.getDeclaredFields())
+      {
+         Class<?> type = field.getType();
+         addImportPackage(builder, type);
+      }
+      for (Method method : javaClass.getDeclaredMethods())
+      {
+         Class<?> returnType = method.getReturnType();
+         if (returnType != Void.TYPE)
+            addImportPackage(builder, returnType);
+         for (Class<?> paramType : method.getParameterTypes())
+            addImportPackage(builder, paramType);
+      }
+
+      // Add the manifest to the archive
+      appArchive.setManifest(new Asset()
+      {
+         public InputStream openStream()
+         {
+            return builder.openStream();
+         }
+      });
    }
 
    private void addImportPackage(final OSGiManifestBuilder builder, final Class<?> type)
    {
       if (type.getName().startsWith("java.") == false)
          builder.addImportPackages(type);
-      
+
       for (Annotation anno : type.getDeclaredAnnotations())
       {
          Class<?> anType = anno.annotationType();
@@ -138,20 +153,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       }
    }
 
-   public static boolean isValidBundleArchive(Archive<?> archive)
-   {
-      try
-      {
-         assertValidateBundleArchive(archive);
-         return true;
-      }
-      catch (Exception ex)
-      {
-         return false;
-      }
-   }
-
-   public static void assertValidateBundleArchive(Archive<?> archive)
+   private void assertValidateBundleArchive(Archive<?> archive)
    {
       try
       {
@@ -167,12 +169,15 @@ public class OSGiDeploymentPackager implements DeploymentPackager
          throw new IllegalArgumentException("Not a valid OSGi bundle: " + archive, ex);
       }
    }
-   
-   private static Manifest getBundleManifest(Archive<?> archive)
+
+   private Manifest getBundleManifest(Archive<?> archive)
    {
       try
       {
          Node node = archive.get("META-INF/MANIFEST.MF");
+         if (node == null)
+            return null;
+         
          Manifest manifest = new Manifest(node.getAsset().openStream());
          return manifest;
       }

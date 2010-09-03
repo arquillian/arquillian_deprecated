@@ -67,9 +67,6 @@ public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveG
          throw new RuntimeException("Could not get Deployment", e);
       }
 
-      /*
-       * For OSGi it is incorrect to always add the test class 
-       * 
       try 
       {
          // TODO: handle deployment attributes like autoAddPakcage etc..
@@ -105,7 +102,6 @@ public class DeploymentAnnotationArchiveGenerator implements ApplicationArchiveG
       {
          throw new RuntimeException("Could not get Deployment", e);
       }
-      */
       
       return archive;
    }

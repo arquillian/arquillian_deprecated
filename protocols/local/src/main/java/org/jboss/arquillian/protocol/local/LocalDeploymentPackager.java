@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.protocol.local;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.Archive;
@@ -31,7 +32,7 @@ public class LocalDeploymentPackager implements DeploymentPackager
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeploymentPackager#generateDeployment(org.jboss.arquillian.spi.TestDeployment)
     */
-   public Archive<?> generateDeployment(TestDeployment testDeployment)
+   public Archive<?> generateDeployment(Context context, TestDeployment testDeployment)
    {
       return testDeployment.getApplicationArchive();
    }

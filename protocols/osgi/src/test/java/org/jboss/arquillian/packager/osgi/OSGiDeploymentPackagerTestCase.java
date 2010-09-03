@@ -22,13 +22,16 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestClass;
+import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * OSGiDeploymentPackagerTestCase
@@ -53,7 +56,26 @@ public class OSGiDeploymentPackagerTestCase
          }
       });
       
-      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, new ArrayList<Archive<?>>()));
+      TestClass testClass = new TestClass(getClass());
+      Context context = Mockito.mock(Context.class);
+      Mockito.when(context.get(TestClass.class)).thenReturn(testClass);
+
+      TestDeployment deployment = new TestDeployment(archive, new ArrayList<Archive<?>>());
+      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(context, deployment);
+      assertNotNull("Result archive not null", result);
+   }
+   
+   @Test
+   public void testEmptyBundle() throws Exception
+   {
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class);
+      
+      TestClass testClass = new TestClass(getClass());
+      Context context = Mockito.mock(Context.class);
+      Mockito.when(context.get(TestClass.class)).thenReturn(testClass);
+
+      TestDeployment deployment = new TestDeployment(archive, new ArrayList<Archive<?>>());
+      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(context, deployment);
       assertNotNull("Result archive not null", result);
    }
    
@@ -69,9 +91,15 @@ public class OSGiDeploymentPackagerTestCase
             return builder.openStream();
          }
       });
+      
+      TestClass testClass = new TestClass(getClass());
+      Context context = Mockito.mock(Context.class);
+      Mockito.when(context.get(TestClass.class)).thenReturn(testClass);
+
       try
       {
-         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, new ArrayList<Archive<?>>()));
+         TestDeployment deployment = new TestDeployment(archive, new ArrayList<Archive<?>>());
+         new OSGiDeploymentPackager().generateDeployment(context, deployment);
          fail("RuntimeException expected");
       }
       catch (RuntimeException ex)

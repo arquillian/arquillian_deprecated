@@ -67,15 +67,15 @@ public class ArchiveGeneratorTestCase
       final Archive archive = ShrinkWrap.create(JavaArchive.class, "test.jar");
       final TestDeployment deployment = new TestDeployment(archive);
       
-      TestClass testClass = new TestClass(getClass());
-      Mockito.when(generator.generate(testClass)).thenReturn(deployment);
-      Mockito.when(serviceLoader.onlyOne(DeploymentPackager.class)).thenReturn(packager);
-      Mockito.when(packager.generateDeployment(deployment)).thenReturn(archive);
-      
       ClassContext context = new ClassContext(new SuiteContext(serviceLoader));
       context.add(ServiceLoader.class, serviceLoader);
       context.add(DeploymentGenerator.class, generator);
 
+      TestClass testClass = new TestClass(getClass());
+      Mockito.when(generator.generate(testClass)).thenReturn(deployment);
+      Mockito.when(serviceLoader.onlyOne(DeploymentPackager.class)).thenReturn(packager);
+      Mockito.when(packager.generateDeployment(context, deployment)).thenReturn(archive);
+      
       ArchiveGenerator handler = new ArchiveGenerator();
       handler.callback(context, new ClassEvent(testClass));
       

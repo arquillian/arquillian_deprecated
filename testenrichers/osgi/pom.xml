@@ -32,16 +32,6 @@
       <artifactId>arquillian-spi</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-jmx</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-osgi</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>javax.inject</groupId>

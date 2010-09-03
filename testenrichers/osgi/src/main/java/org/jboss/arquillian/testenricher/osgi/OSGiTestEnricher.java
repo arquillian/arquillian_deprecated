@@ -19,7 +19,6 @@ package org.jboss.arquillian.testenricher.osgi;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.management.JMException;
@@ -28,13 +27,13 @@ import javax.management.MBeanServerFactory;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
-import org.jboss.arquillian.container.osgi.BundleContextHolder;
-import org.jboss.arquillian.protocol.jmx.JMXTestRunner;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * The OSGi TestEnricher
@@ -121,11 +120,11 @@ public class OSGiTestEnricher implements TestEnricher
       Bundle testBundle = context.get(Bundle.class);
       if (testBundle == null)
       {
-         // Get the test bundle from the ThreadLoacal associated properties 
-         Properties props = JMXTestRunner.getAssociatedProperties();
-         Long bundleId = (Long)props.get("TestBundleId");
+         // Get the test bundle from PackageAdmin with the test class as key 
          BundleContext bundleContext = getSystemBundleContext(context);
-         testBundle = bundleContext.getBundle(bundleId);
+         ServiceReference sref = bundleContext.getServiceReference(PackageAdmin.class.getName());
+         PackageAdmin pa = (PackageAdmin)bundleContext.getService(sref);
+         testBundle = pa.getBundle(testClass);
       }
       return testBundle;
    }

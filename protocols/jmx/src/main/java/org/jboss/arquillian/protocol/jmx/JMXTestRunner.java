@@ -49,13 +49,6 @@ public class JMXTestRunner implements JMXTestRunnerMBean
       Class<?> loadTestClass(String className) throws ClassNotFoundException;
    }
 
-   // [TODO] Remove this hack which is used to transport properties to the TestEnricher
-   private static ThreadLocal<Properties> propertiesAssociation = new ThreadLocal<Properties>();
-   public static Properties getAssociatedProperties()
-   {
-      return propertiesAssociation.get();
-   }
-   
    public JMXTestRunner(TestClassLoader classLoader)
    {
       this.testClassLoader = classLoader;
@@ -123,8 +116,6 @@ public class JMXTestRunner implements JMXTestRunnerMBean
       {
          TestRunner runner = TestRunners.getTestRunner(JMXTestRunner.class.getClassLoader());
          Class<?> testClass = testClassLoader.loadTestClass(className);
-         
-         propertiesAssociation.set(props);
          
          TestResult testResult = runner.execute(testClass, methodName);
          return testResult;

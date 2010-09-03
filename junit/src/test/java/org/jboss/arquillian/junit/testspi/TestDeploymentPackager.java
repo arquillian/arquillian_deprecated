@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.junit.testspi;
 
+import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.shrinkwrap.api.Archive;
@@ -31,7 +32,7 @@ public class TestDeploymentPackager implements DeploymentPackager
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeploymentPackager#generateDeployment(org.jboss.shrinkwrap.api.Archive, java.util.Collection)
     */
-   public Archive<?> generateDeployment(TestDeployment deploymentMetadata)
+   public Archive<?> generateDeployment(Context context, TestDeployment deploymentMetadata)
    {
       return deploymentMetadata.getApplicationArchive();
    }
