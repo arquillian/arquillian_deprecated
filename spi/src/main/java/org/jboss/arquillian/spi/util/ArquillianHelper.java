@@ -79,9 +79,9 @@ public final class ArquillianHelper
          String[] paths = classPath.split("" + File.pathSeparatorChar);
          for (String path : paths)
          {
-            boolean groupMatch = groupPath == null || path.contains(groupPath);
-            boolean versionMatch = version == null || path.contains(version);
-            if (groupMatch && path.contains(artifactId) && versionMatch)
+            boolean groupMatch = groupPath == null || path.contains(File.separatorChar + groupPath + File.separator);
+            boolean artifactMatch = path.contains(File.separatorChar + artifactId + File.separator);
+            if (groupMatch && artifactMatch)
                return failsafeURL(path);
          }
       }

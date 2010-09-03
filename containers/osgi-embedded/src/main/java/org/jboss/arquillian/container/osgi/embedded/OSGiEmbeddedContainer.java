@@ -16,10 +16,7 @@
  */
 package org.jboss.arquillian.container.osgi.embedded;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -28,6 +25,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
 import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
+import org.jboss.arquillian.osgi.OSGiContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
@@ -36,7 +34,6 @@ import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -131,15 +128,8 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
    @Override
    public BundleHandle installBundle(Archive<?> archive) throws BundleException
    {
-      // Export the bundle bytes
-      ZipExporter exporter = archive.as(ZipExporter.class);
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      exporter.exportZip(baos);
-
-      InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
-
-      BundleContext sysContext = framework.getBundleContext();
-      Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
+      BundleContext context = framework.getBundleContext();
+      Bundle bundle = OSGiContainer.installBundle(context, archive);
       return new BundleHandle(bundle.getBundleId(), bundle.getSymbolicName());
    }
 

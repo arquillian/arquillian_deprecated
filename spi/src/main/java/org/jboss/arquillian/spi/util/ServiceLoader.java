@@ -45,8 +45,14 @@ import java.util.Set;
  */
 public class ServiceLoader<S> implements Iterable<S>
 {
-   
    private static final String SERVICES = "META-INF/services";
+   
+   private static boolean ignoreThreadContextLoader;
+   
+   public static void setIgnoreThreadContextLoader(boolean flag)
+   {
+      ignoreThreadContextLoader = flag;
+   }
 
    /**
     * Creates a new service loader for the given service type, using the current
@@ -66,7 +72,11 @@ public class ServiceLoader<S> implements Iterable<S>
     */
    public static <S> ServiceLoader<S> load(Class<S> service)
    {
-      return load(service, Thread.currentThread().getContextClassLoader());
+      ClassLoader ctxLoader = null;
+      if (ignoreThreadContextLoader == false)
+         ctxLoader = Thread.currentThread().getContextClassLoader();
+      
+      return load(service, ctxLoader);
    }
 
    /**

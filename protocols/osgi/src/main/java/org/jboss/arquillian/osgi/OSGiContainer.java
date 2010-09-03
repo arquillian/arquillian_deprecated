@@ -16,10 +16,15 @@
  */
 package org.jboss.arquillian.osgi;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.jboss.arquillian.spi.util.ArquillianHelper;
 import org.jboss.osgi.spi.util.BundleInfo;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -38,6 +43,18 @@ public final class OSGiContainer
    {
    }
 
+   public static Bundle installBundle(BundleContext context, Archive<?> archive) throws BundleException
+   {
+      // Export the bundle bytes
+      ZipExporter exporter = archive.as(ZipExporter.class);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      exporter.exportZip(baos);
+
+      InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
+      Bundle bundle = context.installBundle(archive.getName(), inputStream);
+      return bundle;
+   }
+   
    public static Bundle installBundle(BundleContext context, String artifactId) throws BundleException
    {
       return installBundle(context, null, artifactId, null);
@@ -46,7 +63,7 @@ public final class OSGiContainer
    public static Bundle installBundle(BundleContext context, String groupId, String artifactId, String version) throws BundleException
    {
       URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, version);
-      if (artifactId == null)
+      if (artifactURL == null)
          return null;
       
       // Verify that the artifact is a bundle
@@ -66,6 +83,11 @@ public final class OSGiContainer
    
    public static Bundle getBundle(BundleContext context, String symbolicName, Version version) throws BundleException
    {
+      if (context == null)
+         throw new IllegalArgumentException("Null context");
+      if (symbolicName == null)
+         throw new IllegalArgumentException("Null symbolicName");
+      
       for (Bundle bundle : context.getBundles())
       {
          boolean artefactMatch = symbolicName.equals(bundle.getSymbolicName());

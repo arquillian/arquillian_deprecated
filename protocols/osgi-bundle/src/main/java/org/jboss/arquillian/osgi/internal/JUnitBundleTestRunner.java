@@ -18,6 +18,7 @@ package org.jboss.arquillian.osgi.internal;
 
 import org.jboss.arquillian.junit.JUnitTestRunner;
 import org.jboss.arquillian.spi.TestResult;
+import org.jboss.arquillian.spi.util.ServiceLoader;
 
 /**
  * A JUnitTestRunner for OSGi
@@ -30,16 +31,7 @@ public class JUnitBundleTestRunner extends JUnitTestRunner
    @Override
    public TestResult execute(Class<?> testClass, String methodName)
    {
-      ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-      try
-      {
-         // Make sure we run in the context of the arquillian-bundle class loader
-         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-         return super.execute(testClass, methodName);
-      }
-      finally
-      {
-         Thread.currentThread().setContextClassLoader(ctxLoader);
-      }
+      ServiceLoader.setIgnoreThreadContextLoader(true);
+      return super.execute(testClass, methodName);
    }
 }
