@@ -52,8 +52,6 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       auxArchives.clear();
       
       Archive<?> appArchive = testDeployment.getApplicationArchive();
-      if ((appArchive instanceof JavaArchive) == false)
-         throw new IllegalStateException("JavaArchive expected: " + appArchive);
       
       enhanceApplicationArchive(context, (JavaArchive)appArchive);
       assertValidateBundleArchive(appArchive);
@@ -65,10 +63,14 @@ public class OSGiDeploymentPackager implements DeploymentPackager
     * Add or modify the manifest such that it exports the test class package and
     * imports all types that are used in fields, methods, annotations 
     */
-   private void enhanceApplicationArchive(Context context, JavaArchive appArchive)
+   private void enhanceApplicationArchive(Context context, Archive<?> archive)
    {
-      final TestClass testClass = context.get(TestClass.class);
-      final Class<?> javaClass = testClass.getJavaClass();
+      if (JavaArchive.class.isAssignableFrom(archive.getClass()) == false)
+         throw new IllegalArgumentException("JavaArchive expected: " + archive);
+      
+      JavaArchive appArchive = JavaArchive.class.cast(archive);
+      TestClass testClass = context.get(TestClass.class);
+      Class<?> javaClass = testClass.getJavaClass();
 
       // Check if the application archive already contains the test class
       String path = javaClass.getName().replace('.', '/') + ".class";
