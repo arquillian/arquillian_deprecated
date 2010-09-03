@@ -86,13 +86,20 @@ public class OSGiDeploymentPackager implements DeploymentPackager
          {
             String key = entry.getKey().toString();
             String value = (String)entry.getValue();
-            if (key.equals(Attributes.Name.MANIFEST_VERSION))
+            if (key.equals("Manifest-Version"))
                continue;
             
             if (key.equals(Constants.IMPORT_PACKAGE))
             {
                String[] imports = value.split(",");
                builder.addImportPackages(imports);
+               continue;
+            }
+            
+            if (key.equals(Constants.EXPORT_PACKAGE))
+            {
+               String[] exports = value.split(",");
+               builder.addExportPackages(exports);
                continue;
             }
             
