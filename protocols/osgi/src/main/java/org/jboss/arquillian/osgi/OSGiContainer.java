@@ -43,9 +43,9 @@ public final class OSGiContainer
       return installBundle(context, null, artifactId, null);
    }
    
-   public static Bundle installBundle(BundleContext context, String groupId, String artifactId, Version version) throws BundleException
+   public static Bundle installBundle(BundleContext context, String groupId, String artifactId, String version) throws BundleException
    {
-      URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, (version != null ? version.toString() : null));
+      URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, version);
       if (artifactId == null)
          return null;
       

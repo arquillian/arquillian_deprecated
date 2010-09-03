@@ -58,7 +58,7 @@ public class ARQ198TestCase
       assertTrue("java.class.path contains " + artifactId, classPath.contains(artifactId));
       
       URL artifactURL = ArquillianHelper.getArtifactURL(artifactId);
-      assertNotNull("artifactURL not null", artifactURL);
+      assertNotNull("artifactURL not null: " + artifactId, artifactURL);
    }
    
    @Test
@@ -66,7 +66,7 @@ public class ARQ198TestCase
    {
       String artifactId = "arquillian-protocol-local";
       URL artifactURL = ArquillianHelper.getArtifactURL("org.jboss.arquillian.protocol", artifactId, getArquilianVersion());
-      assertNotNull("artifactURL not null", artifactURL);
+      assertNotNull("artifactURL not null: " + artifactId, artifactURL);
    }
    
    @Test
@@ -91,7 +91,7 @@ public class ARQ198TestCase
       Bundle result = OSGiContainer.installBundle(context, ARQUILLIAN_OSGI_BUNDLE);
       assertEquals(arqBundle, result);
       
-      result = OSGiContainer.installBundle(context, "org.jboss.arquillian.protocol", ARQUILLIAN_OSGI_BUNDLE, arqBundle.getVersion());
+      result = OSGiContainer.installBundle(context, "org.jboss.arquillian.protocol", ARQUILLIAN_OSGI_BUNDLE, getArquilianVersion());
       assertEquals(arqBundle, result);
    }
 
@@ -108,7 +108,7 @@ public class ARQ198TestCase
    private String getArquilianVersion() throws BundleException
    {
       URL artifactURL = ArquillianHelper.getArtifactURL(ARQUILLIAN_OSGI_BUNDLE);
-      assertNotNull("artifactURL not null", artifactURL);
+      assertNotNull("artifactURL not null: " + ARQUILLIAN_OSGI_BUNDLE, artifactURL);
       
       BundleInfo info = BundleInfo.createBundleInfo(artifactURL);
       Version version = info.getVersion();
