@@ -32,7 +32,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Bundle-Activator>org.jboss.arquillian.osgi.ArquillianBundleActivator</Bundle-Activator>
+            <Bundle-Activator>org.jboss.arquillian.osgi.internal.ArquillianBundleActivator</Bundle-Activator>
             <Export-Package></Export-Package>
             <Import-Package>
               javax.management*,
@@ -46,7 +46,7 @@
               org.osgi.util.tracker;version="[1.4,2.0)",
             </Import-Package>
             <Private-Package>
-              org.jboss.arquillian.osgi,
+              org.jboss.arquillian.osgi.internal,
             </Private-Package>
             <DynamicImport-Package>*</DynamicImport-Package>
             <Embed-Transitive>true</Embed-Transitive>
@@ -67,6 +67,7 @@
             <_exportcontents>
               javax.inject;version=${version.javax.inject_javax.inject},
               org.jboss.arquillian.junit;version=${project.version},
+              org.jboss.arquillian.osgi;version=${project.version},
               org.jboss.arquillian.spi.util;version=${project.version},
               org.jboss.shrinkwrap.api;version=${version.shrinkwrap_shrinkwrap},
               org.jboss.shrinkwrap.api.asset;version=${version.shrinkwrap_shrinkwrap},

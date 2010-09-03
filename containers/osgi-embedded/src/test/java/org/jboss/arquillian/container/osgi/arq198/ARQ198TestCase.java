@@ -18,14 +18,23 @@ package org.jboss.arquillian.container.osgi.arq198;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URL;
 
 import javax.inject.Inject;
 
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.osgi.OSGiContainer;
+import org.jboss.arquillian.spi.util.ArquillianHelper;
+import org.jboss.osgi.spi.util.BundleInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 
 /**
  * [ARQ-198] Install bundle from maven dependencies
@@ -36,25 +45,79 @@ import org.osgi.framework.BundleContext;
 @RunWith(Arquillian.class)
 public class ARQ198TestCase
 {
+   private static String ARQUILLIAN_OSGI_BUNDLE = "arquillian-osgi-bundle";
+   
    @Inject
    public static BundleContext context;
    
-   @Inject
-   public Bundle bundle;
+   @Test
+   public void testArtifactFromClaspath() throws Exception
+   {
+      String artifactId = "org.apache.aries.jmx";
+      String classPath = System.getProperty("java.class.path");
+      assertTrue("java.class.path contains " + artifactId, classPath.contains(artifactId));
+      
+      URL artifactURL = ArquillianHelper.getArtifactURL(artifactId);
+      assertNotNull("artifactURL not null", artifactURL);
+   }
+   
+   @Test
+   public void testArtifactFromRepository() throws Exception
+   {
+      String artifactId = "arquillian-protocol-local";
+      URL artifactURL = ArquillianHelper.getArtifactURL("org.jboss.arquillian.protocol", artifactId, getArquilianVersion());
+      assertNotNull("artifactURL not null", artifactURL);
+   }
+   
+   @Test
+   public void testGetBundle() throws Exception
+   {
+      Bundle bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      assertNotNull("ARQ bundle installed", bundle);
+      
+      bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE, bundle.getVersion());
+      assertNotNull("ARQ bundle installed", bundle);
+      
+      bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE, Version.parseVersion("0.0.0"));
+      assertNull("ARQ bundle not installed", bundle);
+   }
 
    @Test
-   public void testBundleInjection() throws Exception
+   public void testInstallBundleAlreadyInstalled() throws Exception
    {
-      assertNotNull("Bundle injected", bundle);
-      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
+      Bundle arqBundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      assertNotNull("ARQ bundle installed", arqBundle);
+      
+      Bundle result = OSGiContainer.installBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      assertEquals(arqBundle, result);
+      
+      result = OSGiContainer.installBundle(context, "org.jboss.arquillian.protocol", ARQUILLIAN_OSGI_BUNDLE, arqBundle.getVersion());
+      assertEquals(arqBundle, result);
+   }
 
-      assertEquals(ARQ198TestCase.class.getSimpleName(), bundle.getSymbolicName());
-      bundle.loadClass(ARQ198TestCase.class.getName());
+   @Test
+   public void testInstallBundleNotYetInstalled() throws Exception
+   {
+      Bundle utilBundle = OSGiContainer.installBundle(context, "org.apache.aries.util");
+      assertNotNull("Aries Util installed", utilBundle);
+      
+      Bundle jmxBundle = OSGiContainer.installBundle(context, "org.apache.aries.jmx");
+      assertNotNull("Aries JMX installed", jmxBundle);
+   }
 
-      bundle.stop();
-      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
-
-      bundle.uninstall();
-      assertEquals("Bundle UNINSTALLED", Bundle.UNINSTALLED, bundle.getState());
+   private String getArquilianVersion() throws BundleException
+   {
+      URL artifactURL = ArquillianHelper.getArtifactURL(ARQUILLIAN_OSGI_BUNDLE);
+      assertNotNull("artifactURL not null", artifactURL);
+      
+      BundleInfo info = BundleInfo.createBundleInfo(artifactURL);
+      Version version = info.getVersion();
+      
+      String result = version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
+      String qualifier = version.getQualifier();
+      if (qualifier != null)
+         result += "-" + qualifier;
+      
+      return result;
    }
 }

@@ -31,12 +31,9 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.arquillian.spi.util.ArquillianHelper;
 import org.jboss.logging.Logger;
-import org.jboss.osgi.spi.util.BundleInfo;
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Version;
 
 /**
  * An abstract OSGi container
@@ -202,34 +199,6 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
       return handle;
    }
    
-   public static Bundle installBundle(BundleContext context, String groupId, String artifactId, Version version) throws BundleException
-   {
-      URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, version.toString());
-      if (artifactId == null)
-         return null;
-      
-      // Verify that the artifact is a bundle
-      BundleInfo info = BundleInfo.createBundleInfo(artifactURL);
-      Bundle bundle = getBundle(context, info.getSymbolicName(), info.getVersion());
-      if (bundle != null)
-         return bundle;
-      
-      bundle = context.installBundle(artifactURL.toExternalForm());
-      return bundle;
-   }
-
-   public static Bundle getBundle(BundleContext context, String symbolicName, Version version) throws BundleException
-   {
-      for (Bundle bundle : context.getBundles())
-      {
-         boolean artefactMatch = symbolicName.equals(bundle.getSymbolicName());
-         boolean versionMatch = version == null || version.equals(bundle.getVersion());
-         if (artefactMatch && versionMatch)
-            return bundle;
-      }
-      return null;
-   }
-
    public static class BundleHandle
    {
       private long bundleId;

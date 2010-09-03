@@ -12,7 +12,6 @@
   
     <!-- bundle -->
     <dependencySet>
-      <outputDirectory>bundles</outputDirectory>
       <outputFileNameMapping>${artifact.artifactId}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
       <includes>
         <include>*:arquillian-osgi-bundle:jar</include>

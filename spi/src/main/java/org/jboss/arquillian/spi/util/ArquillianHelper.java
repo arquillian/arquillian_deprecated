@@ -33,6 +33,23 @@ public final class ArquillianHelper
    {
    }
 
+
+   /**
+    * Get the URL for the given artifact from the 'java.class.path'.
+    * 
+    * If not found, fall back to the directory named by the 
+    * system property 'test.archive.directory'.
+    * 
+    * If not found, fall back to the users local maven repository
+    * 
+    * @param artifactId The maven artefactId 
+    * @return The URL to the artefact or null
+    */
+   public static URL getArtifactURL(String artifactId)
+   {
+      return getArtifactURL(null, artifactId, null);
+   }
+   
    /**
     * Get the URL for the given artifact from the 'java.class.path'.
     * 
@@ -77,14 +94,16 @@ public final class ArquillianHelper
          if (file.exists())
             return failsafeURL(file.getAbsolutePath());
       }
-      
+
       // Check ~/.m2/repository/groupId/version/artefactId
       String userHome = System.getProperty("user.home");
       File repositoryDir = new File(userHome + File.separator + ".m2" + File.separator + "repository");
       File groupDir = new File(repositoryDir + File.separator + groupPath);
       if (groupDir.exists() && version != null)
       {
-         File file = new File(groupDir + File.separator + version + File.separator + artifactId + ".jar");
+         String pathname = groupDir + File.separator + artifactId + File.separator;
+         pathname += version + File.separator + artifactId + "-" + version + ".jar";
+         File file = new File(pathname);
          if (file.exists())
             return failsafeURL(file.getAbsolutePath());
       }
@@ -113,7 +132,7 @@ public final class ArquillianHelper
       {
          // ignore
       }
-      
+
       throw new IllegalArgumentException("Invalid path: " + path);
    }
 }

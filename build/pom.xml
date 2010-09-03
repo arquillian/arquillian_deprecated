@@ -28,6 +28,8 @@
 	<version.surefire.plugin>2.5</version.surefire.plugin>
 
     <!-- Versioning -->
+    <version.apache.aries.jmx>0.1-incubating</version.apache.aries.jmx>
+    <version.apache.aries.util>0.1-incubating</version.apache.aries.util>
     <version.javax.inject_javax.inject>1</version.javax.inject_javax.inject>
     <version.javaee_api>6.0</version.javaee_api>
     <version.jboss_embedded>1.0.0-alpha-1</version.jboss_embedded>
@@ -216,6 +218,16 @@
         <groupId>org.jboss.logging</groupId>
         <artifactId>jboss-logging-log4j</artifactId>
         <version>${version.jboss_logging}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.aries.jmx</groupId>
+        <artifactId>org.apache.aries.jmx</artifactId>
+        <version>${version.apache.aries.jmx}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.aries</groupId>
+        <artifactId>org.apache.aries.util</artifactId>
+        <version>${version.apache.aries.util}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.osgi</groupId>
