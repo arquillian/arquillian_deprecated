@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSessionContext;
  * 
  * @author Dan Allen
  */
+@SuppressWarnings("deprecation")
 public class MockHttpSession implements HttpSession
 {
    private String id;
@@ -105,7 +106,6 @@ public class MockHttpSession implements HttpSession
       return servletContext;
    }
 
-   @SuppressWarnings("deprecation")
    public HttpSessionContext getSessionContext()
    {
       throw new UnsupportedOperationException();

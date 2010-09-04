@@ -28,7 +28,6 @@ import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,8 +37,7 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-// Revert until 1.1 Weld is released.. https://jira.jboss.org/browse/ARQ-185
-@Ignore // Can't guarantee method order in JUnit
+//@Ignore // Can't guarantee method order in JUnit
 @RunWith(Arquillian.class)
 public class WeldEmbeddedIntegrationConversationScopeTestCase
 {
