@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2010, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.weld.ee.embedded_1_1;
+package org.jboss.arquillian.container.weld.ee.embedded_1_1.mock;
 
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
+
+import org.jboss.weld.injection.spi.ResourceInjectionServices;
 
 /**
- * BeanUtils
+ * @author Pete Muir
  *
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
- * @version $Revision: $
  */
-final class BeanUtils
+public class MockResourceInjectionServices implements ResourceInjectionServices
 {
-   private BeanUtils() {}
-   
-   @SuppressWarnings("unchecked")
-   static <T> T getBeanReference(BeanManager manager, Class<T> type) 
-   {
-      Bean bean = manager.resolve(manager.getBeans(type));
-      return (T)manager.getReference(
-            bean, 
-            type,
-            manager.createCreationalContext(null));
-   }
 
+   public Object resolveResource(InjectionPoint injectionPoint)
+   {
+      return null;
+   }
+   
+   public Object resolveResource(String jndiName, String mappedName)
+   {
+      return null;
+   }
+   
+   public void cleanup() {}
+   
 }

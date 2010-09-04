@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.weld.ee.embedded_1_1.shrinkwrap;
+package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,78 +23,48 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.ejb.EnterpriseBean;
-import javax.ejb.MessageDriven;
-import javax.ejb.Singleton;
-import javax.ejb.Stateful;
-import javax.ejb.Stateless;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.arquillian.container.weld.ee.embedded_1_1.mock.MockEjbDescriptor;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
-import org.jboss.shrinkwrap.impl.base.AssignableBase;
 import org.jboss.shrinkwrap.impl.base.Validate;
 import org.jboss.shrinkwrap.impl.base.asset.ArchiveAsset;
-import org.jboss.weld.bootstrap.api.ServiceRegistry;
-import org.jboss.weld.bootstrap.api.helpers.SimpleServiceRegistry;
-import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
-import org.jboss.weld.ejb.spi.EjbDescriptor;
 
 /**
- * ShrinkwrapBeanDeploymentArchiveImpl
+ * BeanUtils
  *
- * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implements ShrinkwrapBeanDeploymentArchive 
+final class Utils
 {
-   private Archive<?> archive;
+   private Utils() {}
    
-   private ServiceRegistry serviceRegistry = new SimpleServiceRegistry();
-   
-   private ShrinkWrapClassLoader classLoader;
-   
-   public ShrinkwrapBeanDeploymentArchiveImpl(Archive<?> archive)
+   @SuppressWarnings("unchecked")
+   static <T> T getBeanReference(BeanManager manager, Class<T> type) 
    {
-      Validate.notNull(archive, "Archive must be specified");
-      this.archive = archive;
-      
-      this.classLoader = new ShrinkWrapClassLoader(archive.getClass().getClassLoader(), archive);
+      Bean bean = manager.resolve(manager.getBeans(type));
+      return (T)manager.getReference(
+            bean, 
+            type,
+            manager.createCreationalContext(null));
    }
 
-   @Override
-   protected Archive<?> getArchive()
-   {
-      return archive;
-   }
-
-   public ShrinkWrapClassLoader getClassLoader()
-   {
-      return classLoader;
-   }
-
-   public String getId()
+   public static String findArchiveId(Archive<?> archive)
    {
       return archive.getName();
    }
-
-   public ServiceRegistry getServices()
-   {
-      return serviceRegistry;
-   }
    
-   public Collection<URL> getBeansXml()
+   public static Collection<URL> findBeansXml(Archive<?> archive)
    {
-      List<URL> beanClasses = new ArrayList<URL>();
+      Validate.notNull(archive, "Archive must be specified");
+      List<URL> beansXmls = new ArrayList<URL>();
       Map<ArchivePath, Node> nestedArchives = archive.getContent(Filters.include(".*\\.jar|.*\\.war"));
       for(final Map.Entry<ArchivePath, Node> nestedArchiveEntry : nestedArchives.entrySet())
       {
@@ -108,7 +78,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
          {
             try 
             {
-               beanClasses.add(
+               beansXmls.add(
                      new URL(null, "archive://" + entry.getKey().get(), new URLStreamHandler() 
                      {
                         @Override
@@ -139,7 +109,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       {
          try 
          {
-            beanClasses.add(
+            beansXmls.add(
                   new URL(null, "archive://" + entry.getKey().get(), new URLStreamHandler() 
                   {
                      @Override
@@ -164,11 +134,12 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
             e.printStackTrace();
          }
       }
-      return beanClasses;
+      return beansXmls;
    }
 
-   public Collection<Class<?>> getBeanClasses()
+   public static Collection<Class<?>> findBeanClasses(Archive<?> archive, ClassLoader classLoader)
    {
+      Validate.notNull(archive, "Archive must be specified");
       List<Class<?>> beanClasses = new ArrayList<Class<?>>();
 
       try
@@ -184,8 +155,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
             Map<ArchivePath, Node> classes = nestedArchive.getArchive().getContent(Filters.include(".*\\.class"));
             for(Map.Entry<ArchivePath, Node> classEntry : classes.entrySet()) 
             {
-               Class<?> loadedClass = getClassLoader().loadClass(
-                     getClassName(classEntry.getKey())); 
+               Class<?> loadedClass = classLoader.loadClass(
+                     findClassName(classEntry.getKey())); 
    
                beanClasses.add(loadedClass);
             }
@@ -193,8 +164,8 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
          Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
          for(Map.Entry<ArchivePath, Node> classEntry : classes.entrySet()) 
          {
-            Class<?> loadedClass = getClassLoader().loadClass(
-                  getClassName(classEntry.getKey())); 
+            Class<?> loadedClass = classLoader.loadClass(
+                  findClassName(classEntry.getKey())); 
    
             beanClasses.add(loadedClass);
          }
@@ -205,40 +176,12 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       }
       return beanClasses;
    }
-
-   public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()
-   {
-      return Collections.emptySet();
-   }
-
-   public Collection<EjbDescriptor<?>> getEjbs()
-   {
-      List<EjbDescriptor<?>> ejbs = new ArrayList<EjbDescriptor<?>>();
-      for (Class<?> ejbClass : discoverEjbs(getBeanClasses()))
-      {
-         ejbs.add(MockEjbDescriptor.of(ejbClass));
-      }
-      return ejbs;
-   }
-
-   protected static Iterable<Class<?>> discoverEjbs(Iterable<Class<?>> webBeanClasses)
-   {
-      Set<Class<?>> ejbs = new HashSet<Class<?>>();
-      for (Class<?> clazz : webBeanClasses)
-      {
-         if (clazz.isAnnotationPresent(Stateless.class) || clazz.isAnnotationPresent(Stateful.class) || clazz.isAnnotationPresent(MessageDriven.class) || clazz.isAnnotationPresent(Singleton.class) || EnterpriseBean.class.isAssignableFrom(clazz)) 
-         {
-            ejbs.add(clazz);
-         }
-      }
-      return ejbs;
-   }
    
    /*
     *  input:  /org/MyClass.class
     *  output: org.MyClass
     */
-   public String getClassName(ArchivePath path)
+   public static String findClassName(ArchivePath path)
    {
       String className = path.get();
       className = className.replaceAll("/WEB-INF/classes/", "");
@@ -250,4 +193,5 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       className = className.replaceAll("/", ".");
       return className;
    }
+
 }
