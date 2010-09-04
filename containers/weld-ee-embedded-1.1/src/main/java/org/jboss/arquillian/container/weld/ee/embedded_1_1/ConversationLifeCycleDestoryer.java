@@ -49,7 +49,7 @@ public class ConversationLifeCycleDestoryer implements EventHandler<Event> {
          context.add(CDIConversationID.class, new CDIConversationID(null));
       }
 
-      ConversationManager2 conversationManager = BeanUtils.getBeanReference(manager, ConversationManager2.class);
+      ConversationManager2 conversationManager = Utils.getBeanReference(manager, ConversationManager2.class);
       conversationManager.teardownConversation();
    }
 }

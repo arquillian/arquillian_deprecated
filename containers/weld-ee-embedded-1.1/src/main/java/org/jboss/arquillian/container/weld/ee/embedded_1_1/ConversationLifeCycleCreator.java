@@ -41,7 +41,7 @@ public class ConversationLifeCycleCreator implements EventHandler<Event>
          throw new IllegalStateException("No " + WeldManager.class.getName() + " found in context");
       }
       
-      ConversationManager2 conversationManager = BeanUtils.getBeanReference(manager, ConversationManager2.class);      
+      ConversationManager2 conversationManager = Utils.getBeanReference(manager, ConversationManager2.class);      
       CDIConversationID id = context.get(CDIConversationID.class);
       if(id == null)
       {
