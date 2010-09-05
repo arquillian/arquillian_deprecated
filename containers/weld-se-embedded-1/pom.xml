@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.jboss.arquillian</groupId>
 		<artifactId>arquillian-build</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.Alpha4</version>
 		<relativePath>../../build/pom.xml</relativePath>
 	</parent>
 
@@ -24,7 +24,7 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.weld_core>1.1.0-SNAPSHOT</version.weld_core>
+		<version.weld_core>1.0.1-SP1</version.weld_core>
 
 	</properties>
 
