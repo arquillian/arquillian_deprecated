@@ -169,9 +169,12 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       }
    }
 
-   private void addImportPackage(final OSGiManifestBuilder builder, final Class<?> type)
+   private void addImportPackage(OSGiManifestBuilder builder, Class<?> type)
    {
-      if (type.getName().startsWith("java.") == false)
+      if (type.isArray())
+         type = type.getComponentType();
+      
+      if (type.isPrimitive() == false && type.getName().startsWith("java.") == false)
          builder.addImportPackages(type);
 
       for (Annotation anno : type.getDeclaredAnnotations())
