@@ -115,30 +115,16 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       // Export the test class package
       builder.addExportPackages(javaClass);
 
-      // Generate the imported packages
-      // [TODO] use bnd or another tool to do this more inteligently
+      // Add the imports required by the test class
+      addImportsForClass(builder, javaClass);
+
+      // Add framework imports
+      // [TODO] use bnd or another tool to do this more intelligently
       builder.addImportPackages("org.jboss.arquillian.junit", "org.jboss.arquillian.osgi", "org.jboss.arquillian.spi.util");
       builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
       builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
       builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");
-      for (Annotation anno : javaClass.getDeclaredAnnotations())
-      {
-         addImportPackage(builder, anno.annotationType());
-      }
-      for (Field field : javaClass.getDeclaredFields())
-      {
-         Class<?> type = field.getType();
-         addImportPackage(builder, type);
-      }
-      for (Method method : javaClass.getDeclaredMethods())
-      {
-         Class<?> returnType = method.getReturnType();
-         if (returnType != Void.TYPE)
-            addImportPackage(builder, returnType);
-         for (Class<?> paramType : method.getParameterTypes())
-            addImportPackage(builder, paramType);
-      }
-
+      
       // Add the manifest to the archive
       appArchive.setManifest(new Asset()
       {
@@ -147,6 +133,40 @@ public class OSGiDeploymentPackager implements DeploymentPackager
             return builder.openStream();
          }
       });
+   }
+
+   private void addImportsForClass(OSGiManifestBuilder builder, Class<?> javaClass)
+   {
+      // Interfaces
+      for (Class<?> interf : javaClass.getInterfaces())
+      {
+         addImportPackage(builder, interf);
+      }
+      // Annotations
+      for (Annotation anno : javaClass.getDeclaredAnnotations())
+      {
+         addImportPackage(builder, anno.annotationType());
+      }
+      // Declared fields
+      for (Field field : javaClass.getDeclaredFields())
+      {
+         Class<?> type = field.getType();
+         addImportPackage(builder, type);
+      }
+      // Declared methods
+      for (Method method : javaClass.getDeclaredMethods())
+      {
+         Class<?> returnType = method.getReturnType();
+         if (returnType != Void.TYPE)
+            addImportPackage(builder, returnType);
+         for (Class<?> paramType : method.getParameterTypes())
+            addImportPackage(builder, paramType);
+      }
+      // Declared classes
+      for (Class<?> declaredClass : javaClass.getDeclaredClasses())
+      {
+         addImportsForClass(builder, declaredClass);
+      }
    }
 
    private void addImportPackage(final OSGiManifestBuilder builder, final Class<?> type)
