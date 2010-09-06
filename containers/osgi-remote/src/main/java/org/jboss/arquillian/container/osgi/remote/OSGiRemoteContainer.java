@@ -64,7 +64,7 @@ public class OSGiRemoteContainer extends AbstractOSGiContainer
    @Override
    public void start(Context context) throws LifecycleException
    {
-      MBeanServerConnection mbeanServer = getMBeanServer();
+      MBeanServerConnection mbeanServer = getMBeanServerConnection();
       jmxSupport = new ManagementSupport(mbeanServer);
       
       super.start(context);
@@ -94,7 +94,7 @@ public class OSGiRemoteContainer extends AbstractOSGiContainer
    @Override
    public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
-      MBeanServerConnection mbeanServer = getMBeanServer();
+      MBeanServerConnection mbeanServer = getMBeanServerConnection();
       props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.FALSE);
       return new JMXMethodExecutor(mbeanServer, props);
    }
@@ -217,7 +217,7 @@ public class OSGiRemoteContainer extends AbstractOSGiContainer
    }
 
    // Get the MBeanServerConnection through the JMXConnector
-   private MBeanServerConnection getMBeanServer()
+   private MBeanServerConnection getMBeanServerConnection()
    {
       try
       {

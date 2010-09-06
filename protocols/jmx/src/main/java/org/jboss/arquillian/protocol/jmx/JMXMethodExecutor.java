@@ -39,15 +39,15 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
 {
    public static final String EMBEDDED_EXECUTION = "embeddedExecution";
    
-   private MBeanServerConnection mbeanServer;
+   private MBeanServerConnection jmxConnection;
    private Properties properties;
    
-   public JMXMethodExecutor(MBeanServerConnection mbeanServer, Properties props)
+   public JMXMethodExecutor(MBeanServerConnection connection, Properties props)
    {
-      if (mbeanServer == null)
-         throw new IllegalArgumentException("Null mbeanServer");
+      if (connection == null)
+         throw new IllegalArgumentException("Null connection");
       
-      this.mbeanServer = mbeanServer;
+      this.jmxConnection = connection;
       this.properties = props;
    }
 
@@ -56,7 +56,8 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
       if(testMethodExecutor == null) 
          throw new IllegalArgumentException("TestMethodExecutor null");
       
-      String testClass = testMethodExecutor.getInstance().getClass().getName();
+      Object testInstance = testMethodExecutor.getInstance();
+      String testClass = testInstance.getClass().getName();
       String testMethod = testMethodExecutor.getMethod().getName();
 
       TestResult result = null;
@@ -90,8 +91,9 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
       return result;
    }
 
+
    private <T> T getMBeanProxy(ObjectName name, Class<T> interf)
    {
-      return (T)MBeanServerInvocationHandler.newProxyInstance(mbeanServer, name, interf, false);
+      return (T)MBeanServerInvocationHandler.newProxyInstance(jmxConnection, name, interf, false);
    }
 }

@@ -27,10 +27,10 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
+import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.protocol.jmx.JMXTestRunner;
 import org.jboss.arquillian.protocol.jmx.JMXTestRunner.TestClassLoader;
 import org.jboss.arquillian.testenricher.osgi.BundleContextHolder;
-import org.jboss.arquillian.testenricher.osgi.OSGiTestEnricher;
 import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -102,6 +102,6 @@ public class ArquillianBundleActivator implements BundleActivator
       }
 
       // Find or create the MBeanServer
-      return OSGiTestEnricher.findOrCreateMBeanServer();
+      return JMXServerFactory.findOrCreateMBeanServer();
    }
 }

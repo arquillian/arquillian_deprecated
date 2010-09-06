@@ -22,12 +22,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
+
+import org.jboss.arquillian.osgi.ArchiveProvider;
+import org.jboss.arquillian.packager.osgi.InternalArchiveProvider;
+import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.arquillian.spi.util.ArquillianHelper;
 import org.jboss.logging.Logger;
@@ -109,12 +117,36 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
          bundleList.add(auxHandle);
       }
 
+      ArchiveProvider archiveProvider = processArchiveProvider(context.get(TestClass.class));
+      if (archiveProvider != null)
+         context.add(ArchiveProvider.class, archiveProvider);
+
       Properties props = new Properties();
       return getMethodExecutor(props);
    }
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
+      // Unregister ArchiveProvider
+      ArchiveProvider archiveProvider = context.get(ArchiveProvider.class);
+      if (archiveProvider != null)
+      {
+         try
+         {
+            MBeanServer mbeanServer = JMXServerFactory.findOrCreateMBeanServer();
+            ObjectName objectName = archiveProvider.getObjectName();
+            if (mbeanServer.isRegistered(objectName))
+            {
+               log.debug("Unregister: " + objectName);
+               mbeanServer.unregisterMBean(objectName);
+            }
+         }
+         catch (Exception ex)
+         {
+            log.error("Cannot unregister ArchiveProvider", ex);
+         }
+      }
+
       BundleList bundleList = context.get(BundleList.class);
       uninstallBundleList(bundleList);
    }
@@ -197,6 +229,51 @@ public abstract class AbstractOSGiContainer implements DeployableContainer
       if (startBundle == true)
          startBundle(handle);
       return handle;
+   }
+
+   private ArchiveProvider processArchiveProvider(TestClass testClass)
+   {
+      for (Class<?> innerClass : testClass.getJavaClass().getClasses())
+      {
+         if (ArchiveProvider.class.isAssignableFrom(innerClass))
+         {
+            try
+            {
+               ArchiveProvider archiveProvider = (ArchiveProvider)innerClass.newInstance();
+               ObjectName objectName = archiveProvider.getObjectName();
+               MBeanServer mbeanServer = JMXServerFactory.findOrCreateMBeanServer();
+               if (mbeanServer.isRegistered(objectName) == false)
+               {
+                  log.debug("Register: " + objectName);
+                  StandardMBean mbean = new StandardMBean(archiveProvider, ArchiveProvider.class);
+                  mbeanServer.registerMBean(mbean, objectName);
+                  return archiveProvider;
+               }
+            }
+            catch (Exception ex)
+            {
+               log.error("Cannot register ");
+            }
+         }
+      }
+      return null;
+   }
+
+   static class InternalArchiveProviderImpl<T extends ArchiveProvider> implements InternalArchiveProvider
+   {
+      private T provider;
+      
+      InternalArchiveProviderImpl(T provider)
+      {
+         this.provider = provider;
+      }
+
+      public byte[] getTestArchive(String methodName)
+      {
+         // TODO Auto-generated method stub
+         return null;
+      }
+      
    }
    
    public static class BundleHandle

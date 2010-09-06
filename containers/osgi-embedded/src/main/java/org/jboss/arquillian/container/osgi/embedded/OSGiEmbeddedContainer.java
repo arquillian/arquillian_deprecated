@@ -18,15 +18,14 @@ package org.jboss.arquillian.container.osgi.embedded;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 
 import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
 import org.jboss.arquillian.osgi.OSGiContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
+import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.DeploymentException;
@@ -120,7 +119,7 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
    @Override
    public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
-      MBeanServer mbeanServer = findOrCreateMBeanServer();
+      MBeanServer mbeanServer = JMXServerFactory.findOrCreateMBeanServer();
       props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.TRUE);
       return new JMXMethodExecutor(mbeanServer, props);
    }
@@ -154,7 +153,7 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
       Bundle bundle = getBundle(handle);
       return bundle != null ? bundle.getState() : Bundle.UNINSTALLED;
    }
-   
+
    @Override
    public void startBundle(BundleHandle handle) throws BundleException
    {
@@ -186,25 +185,5 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
       BundleContext sysContext = framework.getBundleContext();
       Bundle bundle = sysContext.getBundle(handle.getBundleId());
       return bundle;
-   }
-
-   private MBeanServer findOrCreateMBeanServer()
-   {
-      MBeanServer mbeanServer = null;
-
-      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-      if (serverArr.size() > 1)
-         log.warn("Multiple MBeanServer instances: " + serverArr);
-
-      if (serverArr.size() > 0)
-         mbeanServer = serverArr.get(0);
-
-      if (mbeanServer == null)
-      {
-         log.debug("No MBeanServer, create one ...");
-         mbeanServer = MBeanServerFactory.createMBeanServer();
-      }
-
-      return mbeanServer;
    }
 }

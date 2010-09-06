@@ -18,18 +18,16 @@ package org.jboss.arquillian.testenricher.osgi;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.management.JMException;
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
+import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
-import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -53,9 +51,6 @@ import org.osgi.service.packageadmin.PackageAdmin;
  */
 public class OSGiTestEnricher implements TestEnricher
 {
-   // Provide logging
-   private static Logger log = Logger.getLogger(OSGiTestEnricher.class);
-   
    public void enrich(Context context, Object testCase)
    {
       Class<? extends Object> testClass = testCase.getClass();
@@ -136,7 +131,7 @@ public class OSGiTestEnricher implements TestEnricher
    {
       try
       {
-         MBeanServer mbeanServer = findOrCreateMBeanServer();
+         MBeanServer mbeanServer = JMXServerFactory.findOrCreateMBeanServer();
          ObjectName oname = new ObjectName(BundleContextHolder.OBJECT_NAME);
          if (mbeanServer.isRegistered(oname) == false)
             throw new IllegalStateException("BundleContextHolder not registered");
@@ -149,28 +144,4 @@ public class OSGiTestEnricher implements TestEnricher
          throw new IllegalStateException("Cannot obtain system context", ex);
       }
    }
-
-   /**
-    * Find or create the MBeanServer
-    */
-   public static MBeanServer findOrCreateMBeanServer()
-   {
-      MBeanServer mbeanServer = null;
-
-      ArrayList<MBeanServer> serverArr = MBeanServerFactory.findMBeanServer(null);
-      if (serverArr.size() > 1)
-         log.warn("Multiple MBeanServer instances: " + serverArr);
-
-      if (serverArr.size() > 0)
-         mbeanServer = serverArr.get(0);
-
-      if (mbeanServer == null)
-      {
-         log.debug("No MBeanServer, create one ...");
-         mbeanServer = MBeanServerFactory.createMBeanServer();
-      }
-
-      return mbeanServer;
-   }
-
 }

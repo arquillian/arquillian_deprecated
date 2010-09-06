@@ -50,12 +50,12 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       // Arquillian generates auxiliary archives that aren't bundles
       Collection<Archive<?>> auxArchives = testDeployment.getAuxiliaryArchives();
       auxArchives.clear();
-      
+
       Archive<?> appArchive = testDeployment.getApplicationArchive();
-      
+
       enhanceApplicationArchive(context, (JavaArchive)appArchive);
-      assertValidateBundleArchive(appArchive);
-      
+      assertValidBundleArchive(appArchive);
+
       return appArchive;
    }
 
@@ -67,7 +67,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
    {
       if (JavaArchive.class.isAssignableFrom(archive.getClass()) == false)
          throw new IllegalArgumentException("JavaArchive expected: " + archive);
-      
+
       JavaArchive appArchive = JavaArchive.class.cast(archive);
       TestClass testClass = context.get(TestClass.class);
       Class<?> javaClass = testClass.getJavaClass();
@@ -88,21 +88,21 @@ public class OSGiDeploymentPackager implements DeploymentPackager
             String value = (String)entry.getValue();
             if (key.equals("Manifest-Version"))
                continue;
-            
+
             if (key.equals(Constants.IMPORT_PACKAGE))
             {
                String[] imports = value.split(",");
                builder.addImportPackages(imports);
                continue;
             }
-            
+
             if (key.equals(Constants.EXPORT_PACKAGE))
             {
                String[] exports = value.split(",");
                builder.addExportPackages(exports);
                continue;
             }
-            
+
             builder.addManifestHeader(key, value);
          }
       }
@@ -111,7 +111,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
          builder.addBundleManifestVersion(2);
          builder.addBundleSymbolicName(appArchive.getName());
       }
-      
+
       // Export the test class package
       builder.addExportPackages(javaClass);
 
@@ -124,7 +124,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       builder.addImportPackages("org.jboss.shrinkwrap.api", "org.jboss.shrinkwrap.api.asset", "org.jboss.shrinkwrap.api.spec");
       builder.addImportPackages("org.junit", "org.junit.runner", "javax.inject", "org.osgi.framework");
       builder.addImportPackages("org.jboss.osgi.spi.util", "org.jboss.osgi.testing");
-      
+
       // Add the manifest to the archive
       appArchive.setManifest(new Asset()
       {
@@ -173,7 +173,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
    {
       if (type.isArray())
          type = type.getComponentType();
-      
+
       if (type.isPrimitive() == false && type.getName().startsWith("java.") == false)
          builder.addImportPackages(type);
 
@@ -185,7 +185,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
       }
    }
 
-   private void assertValidateBundleArchive(Archive<?> archive)
+   private void assertValidBundleArchive(Archive<?> archive)
    {
       try
       {
@@ -209,7 +209,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
          Node node = archive.get("META-INF/MANIFEST.MF");
          if (node == null)
             return null;
-         
+
          Manifest manifest = new Manifest(node.getAsset().openStream());
          return manifest;
       }

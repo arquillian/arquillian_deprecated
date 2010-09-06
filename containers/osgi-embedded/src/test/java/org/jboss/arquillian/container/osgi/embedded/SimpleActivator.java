@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.osgi.embedded.bundle.internal;
+package org.jboss.arquillian.container.osgi.embedded;
 
-import org.jboss.arquillian.container.osgi.embedded.bundle.SimpleService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
