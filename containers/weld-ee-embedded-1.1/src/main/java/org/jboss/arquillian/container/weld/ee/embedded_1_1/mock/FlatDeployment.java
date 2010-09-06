@@ -17,21 +17,31 @@
 package org.jboss.arquillian.container.weld.ee.embedded_1_1.mock;
 
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
+import org.jboss.weld.servlet.api.ServletServices;
 
-public class MockDeployment extends AbstractMockDeployment
+public class FlatDeployment extends AbstractDeployment
 {
-
-   private final BeanDeploymentArchive archive;
-
-   public MockDeployment(BeanDeploymentArchive beanDeploymentArchive)
+   
+   public FlatDeployment(BeanDeploymentArchive beanDeploymentArchive)
    {
-      this.archive = beanDeploymentArchive;
-      getBeanDeploymentArchives().add(archive);
+      super(new BeanDeploymentArchive[] {beanDeploymentArchive});
+   }
+   
+   @Override
+   protected void configureServices()
+   {
+      super.configureServices();
+      getServices().add(ServletServices.class, new MockServletServices(getWar()));
    }
 
    public BeanDeploymentArchive loadBeanDeploymentArchive(Class<?> beanClass)
    {
-      return archive;
+      return getWar();
+   }
+   
+   protected BeanDeploymentArchive getWar()
+   {
+      return getBeanDeploymentArchives().iterator().next();
    }
 
 }

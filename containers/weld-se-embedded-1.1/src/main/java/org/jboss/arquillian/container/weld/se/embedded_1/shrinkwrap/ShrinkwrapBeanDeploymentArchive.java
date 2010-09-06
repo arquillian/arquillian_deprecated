@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc., and individual contributors
+ * Copyright 2009, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -14,29 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.weld.ee.embedded_1_1.mock;
+package org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap;
 
-import javax.enterprise.inject.spi.InjectionPoint;
-
-import org.jboss.weld.injection.spi.ResourceInjectionServices;
+import org.jboss.shrinkwrap.api.Assignable;
+import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
+import org.jboss.weld.bootstrap.api.Bootstrap;
+import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 
 /**
- * @author Pete Muir
+ * ShrinkwrapBeanDeploymentArchive
  *
+ * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
+ * @version $Revision: $
  */
-public class MockResourceServices implements ResourceInjectionServices
+public interface ShrinkwrapBeanDeploymentArchive extends BeanDeploymentArchive, Assignable
 {
-
-   public Object resolveResource(InjectionPoint injectionPoint)
-   {
-      return null;
-   }
+   ShrinkWrapClassLoader getClassLoader();
    
-   public Object resolveResource(String jndiName, String mappedName)
-   {
-      return null;
-   }
-   
-   public void cleanup() {}
-   
+   void setBootstrap(Bootstrap bootstrap);
 }

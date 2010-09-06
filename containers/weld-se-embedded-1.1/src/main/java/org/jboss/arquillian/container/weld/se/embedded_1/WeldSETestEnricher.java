@@ -14,29 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.weld.ee.embedded_1_1;
+package org.jboss.arquillian.container.weld.se.embedded_1;
 
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
+import org.jboss.weld.manager.api.WeldManager;
+
 /**
- * BeanUtils
+ * WeldSETestEnricher
  *
- * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-final class BeanUtils
+public class WeldSETestEnricher extends CDIInjectionEnricher
 {
-   private BeanUtils() {}
-   
-   @SuppressWarnings("unchecked")
-   static <T> T getBeanReference(BeanManager manager, Class<T> type) 
+   @Override
+   protected BeanManager lookupBeanManager(Context context)
    {
-      Bean bean = manager.resolve(manager.getBeans(type));
-      return (T)manager.getReference(
-            bean, 
-            type,
-            manager.createCreationalContext(null));
+      return context.get(WeldManager.class);
    }
-
 }
