@@ -45,7 +45,7 @@
          <groupId>org.seleniumhq.selenium</groupId>
          <artifactId>selenium</artifactId>
          <version>${version.selenium}</version>
-         <scope>test</scope>
+         <scope>provided</scope>
          <exclusions>
             <exclusion>
                <artifactId>selenium-firefox-driver</artifactId>
@@ -131,6 +131,11 @@
                <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                     <includes>
+                        <include>org/jboss/arquillian/selenium/example/HtmlUnitTestCase.class</include>
+                     </includes>
+                  </configuration>
                </plugin>
             </plugins>
          </build>

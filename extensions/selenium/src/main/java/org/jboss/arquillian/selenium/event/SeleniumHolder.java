@@ -18,29 +18,16 @@ import java.util.Map;
  */
 public class SeleniumHolder
 {
-   /** 
-    * The default implementation class for Selenium extension.
-    * This class is used to instantiate if no configuration is found in the arquillian.xml.
-    */ 
-   public static final String DEFAULT_SELENIUM_IMPLEMENTATION_CLASS = "org.openqa.selenium.htmlunit.HtmlUnitDriver";
-   
-   /**
-    * The default class used to hold Selenium instance in the extension.
-    * This must be an superclass of {@link SeleniumHolder#DEFAULT_SELENIUM_IMPLEMENTATION_CLASS} or the same class
-    */
-   public static final String DEFAULT_SELENIUM_CLASS = "org.openqa.selenium.WebDriver";
-
    // cache holder
    private Map<Class<?>, Object> cache = new HashMap<Class<?>, Object>();
 
    /**
     * Stores an instance of Selenium in the holder.
-    * 
-    * @param <T> Type of the instance stored
+    *
     * @param clazz The class of the instance store
     * @param instance The instance to be stored
     */
-   public <T> void hold(Class<T> clazz, T instance)
+   public void hold(Class<?> clazz, Object instance)
    {
       cache.put(clazz, instance);
    }

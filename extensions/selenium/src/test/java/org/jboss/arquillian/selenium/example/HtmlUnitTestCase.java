@@ -30,7 +30,7 @@ import org.openqa.selenium.WebDriver;
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)
-public class ArquillianSeleniumTestCase
+public class HtmlUnitTestCase
 {
    /**
     * This creates the Selenium driver before invocation of test methods
@@ -51,7 +51,7 @@ public class ArquillianSeleniumTestCase
    private static final By LOGOUT_BUTTON = By.id("loginForm:logout");
 
    /**
-    * Load already existing WAR of Weld Login JSF example
+    * Loads already existing WAR of Weld Login JSF example
     * @return WebArchive to be tested
     */
    @Deployment

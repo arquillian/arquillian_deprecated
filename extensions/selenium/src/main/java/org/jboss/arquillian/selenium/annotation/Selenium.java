@@ -22,10 +22,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.jboss.arquillian.selenium.instantiator.DefaultInstantiator;
+import org.jboss.arquillian.selenium.instantiator.Instantiator;
+
 /**
  * Selenium annotation is used to inject Selenium WebDriver, Cheiron or other
  * browser implementation into your test.
  * 
+ * Instantiator is a class which allows user to pass and arbitrary configured driver 
+ * to the test suite. 
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * @version $Revision: 1.0 $
@@ -35,4 +40,10 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface Selenium
 {
+   /**
+    * 
+    * @return Class used to determine how Selenium browser implementation will be 
+    * created
+    */
+   Class<? extends Instantiator<?>> instantiator() default DefaultInstantiator.class; 
 }
