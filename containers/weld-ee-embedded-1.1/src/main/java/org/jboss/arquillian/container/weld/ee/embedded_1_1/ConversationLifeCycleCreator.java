@@ -19,6 +19,7 @@ package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.event.Event;
 import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.weld.conversation.ConversationManager2;
 import org.jboss.weld.manager.api.WeldManager;
 
 /**
@@ -40,8 +41,7 @@ public class ConversationLifeCycleCreator implements EventHandler<Event>
          throw new IllegalStateException("No " + WeldManager.class.getName() + " found in context");
       }
       
-      /* Revert until 1.1 Weld is released.. https://jira.jboss.org/browse/ARQ-185
-      ConversationManager2 conversationManager = BeanUtils.getBeanReference(manager, ConversationManager2.class);      
+      ConversationManager2 conversationManager = Utils.getBeanReference(manager, ConversationManager2.class);      
       CDIConversationID id = context.get(CDIConversationID.class);
       if(id == null)
       {
@@ -53,6 +53,5 @@ public class ConversationLifeCycleCreator implements EventHandler<Event>
          conversationManager.setupContext();
       }
       conversationManager.setupConversation(id.getId());
-      */
    }
 }
