@@ -23,7 +23,7 @@ public class SeleniumHolder
 
    /**
     * Stores an instance of Selenium in the holder.
-    *
+    * 
     * @param clazz The class of the instance store
     * @param instance The instance to be stored
     */
@@ -54,6 +54,16 @@ public class SeleniumHolder
    public boolean contains(Class<?> clazz)
    {
       return cache.containsKey(clazz);
+   }
+
+   /**
+    * Removes the instance from holder
+    * 
+    * @param clazz Key of instance which should be removed
+    */
+   public void remove(Class<?> clazz)
+   {
+      cache.remove(clazz);
    }
 
 }

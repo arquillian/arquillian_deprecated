@@ -2,7 +2,6 @@ package org.jboss.arquillian.selenium.event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import org.jboss.arquillian.impl.Validate;
@@ -10,7 +9,6 @@ import org.jboss.arquillian.selenium.annotation.Selenium;
 import org.jboss.arquillian.selenium.instantiator.Instantiator;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestClass;
-import org.jboss.arquillian.spi.event.suite.BeforeClass;
 import org.jboss.arquillian.spi.event.suite.ClassEvent;
 import org.jboss.arquillian.spi.event.suite.EventHandler;
 

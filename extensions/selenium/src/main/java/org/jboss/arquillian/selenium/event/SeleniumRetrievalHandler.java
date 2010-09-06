@@ -44,7 +44,7 @@ public class SeleniumRetrievalHandler implements EventHandler<TestEvent>
          {
             f.setAccessible(true);            
             Object value = holder.retrieve(f.getType());
-            Validate.notNull(value, "Retrieved a null from context, which is not valid Selenium browser");
+            Validate.notNull(value, "Retrieved a null from context, which is not a valid Selenium browser");
             
             // omit setting if already set
             if (f.get(testInstance) == null)

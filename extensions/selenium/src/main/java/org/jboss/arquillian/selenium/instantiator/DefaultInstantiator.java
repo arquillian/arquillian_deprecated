@@ -10,5 +10,10 @@ public class DefaultInstantiator implements Instantiator<WebDriver>
    {
       return new HtmlUnitDriver();
    }
+   
+   public void destroy(WebDriver instance)
+   {
+      // do nothing
+   }
 
 }
