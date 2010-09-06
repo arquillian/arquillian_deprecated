@@ -22,28 +22,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-
 /**
- * Selenium annotation is used to inject Selenium WebDriver implementation into
- * your test.
- *
- * You can either specify browser in the annotation parameters or pass configuration in form of system properties.
+ * Selenium annotation is used to inject Selenium WebDriver, Cheiron or other
+ * browser implementation into your test.
  * 
- * System based properties takes precedence.
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * @version $Revision: 1.0 $
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD})
 @Inherited
-public @interface Selenium {
-
-   /**
-    * The WebDriver variant to be used as a browser for functional tests
-    * @return
-    */
-	Class<? extends WebDriver> implementation() default HtmlUnitDriver.class;
+public @interface Selenium
+{
 }
