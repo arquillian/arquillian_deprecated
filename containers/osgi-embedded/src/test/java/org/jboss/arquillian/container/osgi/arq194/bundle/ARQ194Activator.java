@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.osgi.arq194.bundle;
 
+import org.jboss.arquillian.container.osgi.arq194.ARQ194Service;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

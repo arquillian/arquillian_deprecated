@@ -14,14 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.packager.osgi;
+package org.jboss.arquillian.osgi.internal;
+
+import javax.management.JMException;
+
+import org.jboss.arquillian.osgi.ArchiveProvider;
+
 
 /**
+ * An {@link ArchiveProvider} that returns a serializable result.
  * 
  * @author thomas.diesler@jboss.com
  * @since 06-Sep-2010
  */
 public interface InternalArchiveProvider
 {
+   String ONAME_PREFIX = "jboss.arquillian:archive-provider=";
+
+   void registerMBean() throws JMException;
+   
+   void unregisterMBean();
+   
    byte[] getTestArchive(String name);
 }

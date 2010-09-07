@@ -16,15 +16,18 @@
  */
 package org.jboss.arquillian.container.osgi.embedded;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.management.MBeanServer;
 
-import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
-import org.jboss.arquillian.osgi.OSGiContainer;
+import org.jboss.arquillian.osgi.internal.AbstractDeployableContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
+import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor.ExecutionType;
 import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
@@ -33,6 +36,7 @@ import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -44,10 +48,10 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedContainer extends AbstractOSGiContainer
+public class EmbeddedDeployableContainer extends AbstractDeployableContainer
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiEmbeddedContainer.class);
+   private static final Logger log = Logger.getLogger(EmbeddedDeployableContainer.class);
 
    private Framework framework;
 
@@ -120,18 +124,29 @@ public class OSGiEmbeddedContainer extends AbstractOSGiContainer
    public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
       MBeanServer mbeanServer = JMXServerFactory.findOrCreateMBeanServer();
-      props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.TRUE);
+      props.put(ExecutionType.class, ExecutionType.EMBEDDED);
       return new JMXMethodExecutor(mbeanServer, props);
    }
 
    @Override
    public BundleHandle installBundle(Archive<?> archive) throws BundleException
    {
-      BundleContext context = framework.getBundleContext();
-      Bundle bundle = OSGiContainer.installBundle(context, archive);
+      BundleContext sysContext = framework.getBundleContext();
+      Bundle bundle = installBundle(sysContext, archive);
       return new BundleHandle(bundle.getBundleId(), bundle.getSymbolicName());
    }
 
+   private  Bundle installBundle(BundleContext context, Archive<?> archive) throws BundleException
+   {
+      // Export the bundle bytes
+      ZipExporter exporter = archive.as(ZipExporter.class);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      exporter.exportZip(baos);
+
+      InputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
+      return context.installBundle(archive.getName(), inputStream);
+   }
+   
    @Override
    public BundleHandle installBundle(URL bundleURL) throws BundleException, IOException
    {

@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 
+import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.osgi.arq194.bundle.ARQ194Activator;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.osgi.ArchiveProvider;
@@ -35,6 +36,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * [ARQ-194] Support multiple bundle deployments
@@ -43,11 +46,20 @@ import org.osgi.framework.BundleActivator;
  * @since 06-Sep-2010
  */
 @RunWith(Arquillian.class)
-public class ARQ194TestCase 
+public class ARQ194ServiceTestCase 
 {
    @Inject
    public OSGiContainer container;
 
+   @Deployment
+   public static JavaArchive createDeployment()
+   {
+      // Include and export the service interface
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arq194-main");
+      archive.addClass(ARQ194Service.class);
+      return archive;
+   }
+   
    @Test
    public void testGeneratedBundle() throws Exception
    {
@@ -60,6 +72,12 @@ public class ARQ194TestCase
       bundle.start();
       assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
 
+      BundleContext context = bundle.getBundleContext();
+      ServiceReference sref = context.getServiceReference(ARQ194Service.class.getName());
+      ARQ194Service service = (ARQ194Service)context.getService(sref);
+      int sum = service.sum(1, 2, 3);
+      assertEquals(6, sum);
+      
       bundle.stop();
       assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
 
@@ -80,7 +98,7 @@ public class ARQ194TestCase
                builder.addBundleSymbolicName(archive.getName());
                builder.addBundleManifestVersion(2);
                builder.addBundleActivator(ARQ194Activator.class.getName());
-               builder.addExportPackages(ARQ194Service.class);
+               builder.addImportPackages(ARQ194Service.class);
                builder.addImportPackages(BundleActivator.class);
                return builder.openStream();
             }

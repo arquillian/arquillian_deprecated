@@ -20,12 +20,12 @@ import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * OSGiEmbeddedConfiguration
+ * The container configuration for embedded OSGi containers 
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedConfiguration implements ContainerConfiguration
+public class EmbeddedContainerConfiguration implements ContainerConfiguration
 {
    public ContainerProfile getContainerProfile()
    {

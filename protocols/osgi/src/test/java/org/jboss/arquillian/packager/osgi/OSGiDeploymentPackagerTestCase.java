@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.jboss.arquillian.osgi.internal.OSGiDeploymentPackager;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestDeployment;

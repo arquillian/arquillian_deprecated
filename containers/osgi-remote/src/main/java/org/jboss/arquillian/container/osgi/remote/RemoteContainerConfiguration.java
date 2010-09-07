@@ -20,12 +20,12 @@ import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
 
 /**
- * OSGiRemoteConfiguration
+ * The container configuration for remote OSGi containers 
  *
  * @author thomas.diesler@jboss.com
  * @since 01-Sep-2010
  */
-public class OSGiRemoteConfiguration implements ContainerConfiguration
+public class RemoteContainerConfiguration implements ContainerConfiguration
 {
    public ContainerProfile getContainerProfile()
    {

@@ -25,8 +25,11 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
+import org.jboss.arquillian.osgi.OSGiContainer;
+import org.jboss.arquillian.osgi.internal.EmbeddedOSGiContainer;
 import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestEnricher;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -39,7 +42,7 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * The enricher supports the injection of the system BundleContext and the test Bundle.
  * 
  * <pre><code>
- *    @Inject
+ *    @Inject 
  *    BundleContext context;
  * 
  *    @Inject
@@ -47,7 +50,6 @@ import org.osgi.service.packageadmin.PackageAdmin;
  * </code></pre>
  * 
  * @author thomas.diesler@jboss.com
- * @version $Revision: $
  */
 public class OSGiTestEnricher implements TestEnricher
 {
@@ -58,11 +60,15 @@ public class OSGiTestEnricher implements TestEnricher
       {
          if (field.isAnnotationPresent(Inject.class))
          {
-            if (field.getType().isAssignableFrom(BundleContext.class))
+            if (field.getType().isAssignableFrom(OSGiContainer.class))
+            {
+               injectContainer(context, testCase, field);
+            }
+            else if (field.getType().isAssignableFrom(BundleContext.class))
             {
                injectBundleContext(context, testCase, field);
             }
-            if (field.getType().isAssignableFrom(Bundle.class))
+            else if (field.getType().isAssignableFrom(Bundle.class))
             {
                injectBundle(context, testCase, field);
             }
@@ -75,11 +81,23 @@ public class OSGiTestEnricher implements TestEnricher
       return null;
    }
 
+   private void injectContainer(Context context, Object testCase, Field field)
+   {
+      try
+      {
+         field.set(testCase, getContainer(context, testCase.getClass()));
+      }
+      catch (IllegalAccessException ex)
+      {
+         throw new IllegalStateException("Cannot inject BundleContext", ex);
+      }
+   }
+
    private void injectBundleContext(Context context, Object testCase, Field field)
    {
       try
       {
-         field.set(testCase, getSystemBundleContext(context));
+         field.set(testCase, getBundleContext(context));
       }
       catch (IllegalAccessException ex)
       {
@@ -99,7 +117,14 @@ public class OSGiTestEnricher implements TestEnricher
       }
    }
 
-   private BundleContext getSystemBundleContext(Context context)
+   private OSGiContainer getContainer(Context context, Class<?> testClass)
+   {
+      BundleContext bundleContext = getBundleContext(context);
+      EmbeddedOSGiContainer container = new EmbeddedOSGiContainer(bundleContext, new TestClass(testClass));
+      return container;
+   }
+   
+   private BundleContext getBundleContext(Context context)
    {
       BundleContext bundleContext = context.get(BundleContext.class);
       if (bundleContext == null)
@@ -116,7 +141,7 @@ public class OSGiTestEnricher implements TestEnricher
       if (testBundle == null)
       {
          // Get the test bundle from PackageAdmin with the test class as key 
-         BundleContext bundleContext = getSystemBundleContext(context);
+         BundleContext bundleContext = getBundleContext(context);
          ServiceReference sref = bundleContext.getServiceReference(PackageAdmin.class.getName());
          PackageAdmin pa = (PackageAdmin)bundleContext.getService(sref);
          testBundle = pa.getBundle(testClass);
@@ -124,9 +149,6 @@ public class OSGiTestEnricher implements TestEnricher
       return testBundle;
    }
 
-   /**
-    * Get the BundleContext associated with the arquillian-bundle
-    */
    private BundleContext getBundleContextFromHolder()
    {
       try

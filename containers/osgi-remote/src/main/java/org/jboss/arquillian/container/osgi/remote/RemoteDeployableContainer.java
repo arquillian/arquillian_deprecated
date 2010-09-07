@@ -29,8 +29,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.jboss.arquillian.container.osgi.AbstractOSGiContainer;
+import org.jboss.arquillian.osgi.internal.AbstractDeployableContainer;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
+import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor.ExecutionType;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -53,10 +54,10 @@ import org.osgi.jmx.framework.FrameworkMBean;
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiRemoteContainer extends AbstractOSGiContainer
+public class RemoteDeployableContainer extends AbstractDeployableContainer
 {
    // Provide logging
-   private static final Logger log = Logger.getLogger(OSGiRemoteContainer.class);
+   private static final Logger log = Logger.getLogger(RemoteDeployableContainer.class);
 
    private JMXConnector jmxConnector;
    private ManagementSupport jmxSupport;
@@ -95,7 +96,7 @@ public class OSGiRemoteContainer extends AbstractOSGiContainer
    public ContainerMethodExecutor getMethodExecutor(Properties props)
    {
       MBeanServerConnection mbeanServer = getMBeanServerConnection();
-      props.put(JMXMethodExecutor.EMBEDDED_EXECUTION, Boolean.FALSE);
+      props.put(ExecutionType.class, ExecutionType.REMOTE);
       return new JMXMethodExecutor(mbeanServer, props);
    }
 

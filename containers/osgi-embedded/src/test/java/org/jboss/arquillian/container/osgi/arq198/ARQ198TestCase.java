@@ -50,6 +50,9 @@ public class ARQ198TestCase
    @Inject
    public static BundleContext context;
    
+   @Inject
+   public OSGiContainer container;
+   
    @Test
    public void testArtifactFromClaspath() throws Exception
    {
@@ -72,36 +75,36 @@ public class ARQ198TestCase
    @Test
    public void testGetBundle() throws Exception
    {
-      Bundle bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      Bundle bundle = container.getBundle(ARQUILLIAN_OSGI_BUNDLE, null);
       assertNotNull("ARQ bundle installed", bundle);
       
-      bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE, bundle.getVersion());
+      bundle = container.getBundle(ARQUILLIAN_OSGI_BUNDLE, bundle.getVersion());
       assertNotNull("ARQ bundle installed", bundle);
       
-      bundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE, Version.parseVersion("0.0.0"));
+      bundle = container.getBundle(ARQUILLIAN_OSGI_BUNDLE, Version.parseVersion("0.0.0"));
       assertNull("ARQ bundle not installed", bundle);
    }
 
    @Test
    public void testInstallBundleAlreadyInstalled() throws Exception
    {
-      Bundle arqBundle = OSGiContainer.getBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      Bundle arqBundle = container.getBundle(ARQUILLIAN_OSGI_BUNDLE, null);
       assertNotNull("ARQ bundle installed", arqBundle);
       
-      Bundle result = OSGiContainer.installBundle(context, ARQUILLIAN_OSGI_BUNDLE);
+      Bundle result = container.installBundle(ARQUILLIAN_OSGI_BUNDLE);
       assertEquals(arqBundle, result);
       
-      result = OSGiContainer.installBundle(context, "org.jboss.arquillian.protocol", ARQUILLIAN_OSGI_BUNDLE, getArquilianVersion());
+      result = container.installBundle("org.jboss.arquillian.protocol", ARQUILLIAN_OSGI_BUNDLE, getArquilianVersion());
       assertEquals(arqBundle, result);
    }
 
    @Test
    public void testInstallBundleNotYetInstalled() throws Exception
    {
-      Bundle utilBundle = OSGiContainer.installBundle(context, "org.apache.aries.util");
+      Bundle utilBundle = container.installBundle("org.apache.aries.util");
       assertNotNull("Aries Util installed", utilBundle);
       
-      Bundle jmxBundle = OSGiContainer.installBundle(context, "org.apache.aries.jmx");
+      Bundle jmxBundle = container.installBundle("org.apache.aries.jmx");
       assertNotNull("Aries JMX installed", jmxBundle);
    }
 

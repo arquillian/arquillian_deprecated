@@ -16,8 +16,6 @@
  */
 package org.jboss.arquillian.osgi;
 
-import javax.management.ObjectName;
-
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
 
@@ -32,7 +30,5 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
  */
 public interface ArchiveProvider
 {
-   ObjectName getObjectName();
-   
    JavaArchive getTestArchive(String name);
 }

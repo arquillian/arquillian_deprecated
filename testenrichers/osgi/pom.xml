@@ -34,7 +34,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-jmx</artifactId>
+      <artifactId>arquillian-protocol-osgi</artifactId>
       <version>${project.version}</version>
     </dependency>
 

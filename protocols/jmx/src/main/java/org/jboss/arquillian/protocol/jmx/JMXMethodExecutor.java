@@ -37,17 +37,21 @@ import org.jboss.arquillian.spi.TestResult.Status;
  */
 public class JMXMethodExecutor implements ContainerMethodExecutor
 {
-   public static final String EMBEDDED_EXECUTION = "embeddedExecution";
-   
-   private MBeanServerConnection jmxConnection;
+   private MBeanServerConnection mbeanServer;
    private Properties properties;
+   
+   public enum ExecutionType
+   {
+      EMBEDDED,
+      REMOTE
+   }
    
    public JMXMethodExecutor(MBeanServerConnection connection, Properties props)
    {
       if (connection == null)
          throw new IllegalArgumentException("Null connection");
       
-      this.jmxConnection = connection;
+      this.mbeanServer = connection;
       this.properties = props;
    }
 
@@ -66,8 +70,8 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
          ObjectName objectName = new ObjectName(JMXTestRunnerMBean.OBJECT_NAME);
          JMXTestRunnerMBean testRunner = getMBeanProxy(objectName, JMXTestRunnerMBean.class);
 
-         Boolean embedded = (Boolean)properties.get(EMBEDDED_EXECUTION);
-         if (embedded == true)
+         ExecutionType type = (ExecutionType)properties.get(ExecutionType.class);
+         if (type == ExecutionType.EMBEDDED)
          {
             byte[] resultBytes = testRunner.runTestMethodSerialized(testClass, testMethod, properties);
             ByteArrayInputStream resultStream = new ByteArrayInputStream(resultBytes);
@@ -91,9 +95,8 @@ public class JMXMethodExecutor implements ContainerMethodExecutor
       return result;
    }
 
-
    private <T> T getMBeanProxy(ObjectName name, Class<T> interf)
    {
-      return (T)MBeanServerInvocationHandler.newProxyInstance(jmxConnection, name, interf, false);
+      return (T)MBeanServerInvocationHandler.newProxyInstance(mbeanServer, name, interf, false);
    }
 }

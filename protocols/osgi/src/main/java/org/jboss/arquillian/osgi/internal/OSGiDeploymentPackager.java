@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.packager.osgi;
+package org.jboss.arquillian.osgi.internal;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
