@@ -8,7 +8,9 @@ import org.jboss.arquillian.selenium.annotation.Selenium;
  * common frameworks.
  * 
  * Users which require special functionality can provide their own instantiator
- * and pass it to {@link Selenium} annotation configuration.
+ * and pass it to {@link Selenium} annotation configuration. The instantiator
+ * must accept contract defined by this interface and provide a zero-argument
+ * constructor.
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * 

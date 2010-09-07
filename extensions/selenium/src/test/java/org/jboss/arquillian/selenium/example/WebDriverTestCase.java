@@ -10,6 +10,7 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.selenium.annotation.Selenium;
+import org.jboss.arquillian.selenium.instantiator.WebDriverInstantiator;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.importer.ZipImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -23,10 +24,12 @@ import org.openqa.selenium.WebDriver;
 /**
  * Tests Arquillian Selenium extension against Weld Login example.
  * 
- * Uses standard settings of Selenium 2.0, that is HtmlUnitDriver.
- * 
+ * Uses standard settings of Selenium 2.0, that is HtmlUnitDriver by default, 
+ * but allows user to pass another driver specified as a System property or in the Arquillian configuration.
+ *  
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * 
+ * @see WebDriverInstantiator
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)

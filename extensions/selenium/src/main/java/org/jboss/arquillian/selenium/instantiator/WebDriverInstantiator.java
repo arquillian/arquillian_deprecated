@@ -12,7 +12,8 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
  * class which be used during testing either by Arquillian configuration or a
  * system property.
  * 
- * Default implementation is HtmlUnitDriver.
+ * Default implementation is HtmlUnitDriver. This instantiator is able to
+ * instantiate even legacy WebDriver drivers.
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * 

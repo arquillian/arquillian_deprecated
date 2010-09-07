@@ -2,12 +2,9 @@ package org.jboss.arquillian.selenium.event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.arquillian.impl.Validate;
 import org.jboss.arquillian.selenium.annotation.Selenium;
 import org.jboss.arquillian.selenium.instantiator.Instantiator;
 import org.jboss.arquillian.spi.Context;

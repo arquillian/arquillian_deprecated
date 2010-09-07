@@ -5,9 +5,11 @@ import org.jboss.arquillian.selenium.instantiator.Instantiator;
 import com.thoughtworks.selenium.DefaultSelenium;
 
 /**
- * Instantiator of the legacy Selenium driver
+ * Instantiator of the legacy Selenium driver with hard-coded parameters
+ * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  *
+ * @see DefaultSelenium
  */
 public class CustomInstantiator implements Instantiator<DefaultSelenium>
 {
