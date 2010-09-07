@@ -14,19 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.selenium.event;
+package org.jboss.arquillian.selenium.instantiator;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * SecurityActions
@@ -35,7 +29,6 @@ import java.util.List;
  * 
  * 
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
- * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
  * 
  * @version $Revision: $
  */
@@ -164,90 +157,7 @@ final class SecurityActions
          // Reconstruct so we get some useful information
          throw new ClassCastException("Incorrect expected type, " + expectedType.getName() + ", defined for " + obj.getClass().getName());
       }
-   }
-
-   static boolean isClassPresent(String name)
-   {
-      try
-      {
-         ClassLoader classLoader = getThreadContextClassLoader();
-         classLoader.loadClass(name);
-         return true;
-      }
-      catch (ClassNotFoundException e)
-      {
-         return false;
-      }
-   }
-
-   static List<Field> getFieldsWithAnnotation(final Class<?> source, final Class<? extends Annotation> annotationClass)
-   {
-      List<Field> declaredAccessableFields = AccessController.doPrivileged(new PrivilegedAction<List<Field>>()
-      {
-         public List<Field> run()
-         {
-            List<Field> foundFields = new ArrayList<Field>();
-            for (Field field : source.getDeclaredFields())
-            {
-               if (field.isAnnotationPresent(annotationClass))
-               {
-                  if (!field.isAccessible())
-                  {
-                     field.setAccessible(true);
-                  }
-                  foundFields.add(field);
-               }
-            }
-            return foundFields;
-         }
-      });
-      return declaredAccessableFields;
-   }
-
-   static List<Method> getMethodsWithSignature(final Class<?> source, final String name, final Class<?> returnType, final Class<?>...parameterTypes)
-   {
-      List<Method> declaredAccessableMethods = AccessController.doPrivileged(new PrivilegedAction<List<Method>>()
-      {
-         public List<Method> run()
-         {
-            List<Method> foundMethods = new ArrayList<Method>();
-            for (Method method : source.getDeclaredMethods())
-            {
-               if (method.getName().equals(name) && returnType.isAssignableFrom(method.getReturnType()) && isAssignableFrom(parameterTypes, method.getParameterTypes()))
-               {
-                  if (!method.isAccessible())
-                  {
-                     method.setAccessible(true);
-                  }
-                  foundMethods.add(method);
-               }
-            }
-            return foundMethods;
-         }
-      });
-      return declaredAccessableMethods;
-   }
-
-   static boolean isAssignableFrom(Class<?>[] first, Class<?>[] second)
-   {
-      if (first == second || Arrays.equals(first, second))
-      {
-         return true;
-      }
-
-      if (first.length != second.length)
-      {
-         return false;
-      }
-
-      boolean match = true;
-      for (int i = 0; i < first.length; i++)
-      {
-         match &= first[i].isAssignableFrom(second[i]);
-      }
-
-      return match;
-   }
+   }  
 
    // -------------------------------------------------------------------------------||
    // Inner Classes

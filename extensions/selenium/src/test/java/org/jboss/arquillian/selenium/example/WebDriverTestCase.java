@@ -30,7 +30,7 @@ import org.openqa.selenium.WebDriver;
  */
 @RunWith(Arquillian.class)
 @Run(AS_CLIENT)
-public class HtmlUnitTestCase
+public class WebDriverTestCase
 {
    /**
     * This creates the Selenium driver before invocation of test methods

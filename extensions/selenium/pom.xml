@@ -98,6 +98,7 @@
 
    <profiles>
       <profile>
+         <!--  Uses Selenium 2.0 default, that is WebDriver HtmlUnit driver -->
          <id>jbossas-remote-6</id>
          <dependencies>
             <dependency>
@@ -121,6 +122,7 @@
                <type>pom</type>
             </dependency>
          </dependencies>
+
          <build>
             <testResources>
                <testResource>
@@ -133,7 +135,7 @@
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
                      <includes>
-                        <include>org/jboss/arquillian/selenium/example/HtmlUnitTestCase.class</include>
+                        <include>org/jboss/arquillian/selenium/example/WebDriverTestCase.class</include>
                      </includes>
                   </configuration>
                </plugin>
@@ -141,6 +143,84 @@
          </build>
       </profile>
       <profile>
+         <!-- uses standalone WebDriver 0.9.7376 Firefox driver -->
+         <id>firefox-jbossas-remote-6</id>
+         <dependencies>
+            <dependency>
+               <groupId>org.jboss.arquillian.container</groupId>
+               <artifactId>arquillian-jbossas-remote-6</artifactId>
+               <version>${project.version}</version>
+            </dependency>
+            <dependency>
+               <!--
+                  Need on all profiles except Glassfish to compile, api
+                  is not 100% up to date with final spec
+               -->
+               <groupId>org.jboss.ejb3</groupId>
+               <artifactId>jboss-ejb3-api</artifactId>
+               <version>3.1.0</version>
+            </dependency>
+            <dependency>
+               <groupId>org.jboss.jbossas</groupId>
+               <artifactId>jboss-as-client</artifactId>
+               <version>${version.jboss_60}</version>
+               <type>pom</type>
+            </dependency>
+            <dependency>
+               <groupId>org.seleniumhq.webdriver</groupId>
+               <artifactId>webdriver-firefox</artifactId>
+               <version>0.9.7376</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.seleniumhq.webdriver</groupId>
+               <artifactId>webdriver-common</artifactId>
+               <version>0.9.7376</version>
+               <scope>test</scope>
+            </dependency>
+            <dependency>
+               <groupId>org.seleniumhq.webdriver</groupId>
+               <artifactId>webdriver-support</artifactId>
+               <version>0.9.7376</version>
+               <scope>test</scope>
+            </dependency>
+            <!-- WebDriver contains dependencies on the Selenium Server core -->
+            <dependency>
+               <groupId>org.seleniumhq.selenium.server</groupId>
+               <artifactId>selenium-server</artifactId>
+               <version>1.0.3</version>
+               <scope>test</scope>
+               <classifier>standalone</classifier>
+            </dependency>
+         </dependencies>
+
+         <build>
+            <testResources>
+               <testResource>
+                  <directory>src/test/jboss-resources</directory>
+               </testResource>
+            </testResources>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                     <systemPropertyVariables>
+                        <arquillian.selenium.webdriver.implementation>org.openqa.selenium.firefox.FirefoxDriver</arquillian.selenium.webdriver.implementation>
+                     </systemPropertyVariables>
+                     <includes>
+                        <include>org/jboss/arquillian/selenium/example/WebDriverTestCase.class</include>
+                     </includes>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+      <profile>
+         <!--
+            uses legacy Selenium 2.0 DefaultSelenium driver with
+            starting/stopping Selenium Server automatically
+         -->
          <id>selenium-server-jbossas-remote-6</id>
          <dependencies>
             <dependency>
@@ -168,12 +248,8 @@
                <artifactId>selenium-server</artifactId>
                <version>${version.selenium}</version>
             </dependency>
-            <!--
-               <dependency> <groupId>org.slf4j</groupId>
-               <artifactId>slf4j-simple</artifactId>
-               <version>${version.slf4j}</version> </dependency>
-            -->
          </dependencies>
+
          <build>
             <testResources>
                <testResource>
@@ -245,6 +321,7 @@
                         <configuration>
                            <includes>
                               <include>org/jboss/arquillian/selenium/example/CustomTestCase.class</include>
+                              <include>org/jboss/arquillian/selenium/example/DefaultSeleniumTestCase.class</include>
                            </includes>
                         </configuration>
                      </execution>

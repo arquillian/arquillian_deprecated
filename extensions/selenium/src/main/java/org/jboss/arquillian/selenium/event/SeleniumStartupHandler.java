@@ -2,6 +2,9 @@ package org.jboss.arquillian.selenium.event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.impl.Validate;
@@ -44,40 +47,41 @@ public class SeleniumStartupHandler implements EventHandler<ClassEvent>
    private void prepareContext(Context context, TestClass testClass)
    {
       SeleniumHolder holder = new SeleniumHolder();
-      List<Field> fields = SecurityActions.getFieldsWithAnnotation(testClass.getJavaClass(), Selenium.class);
-      for (Field f : fields)
+      for (Field f : SecurityActions.getFieldsWithAnnotation(testClass.getJavaClass(), Selenium.class))
       {
          Class<?> typeClass = f.getType();
          if (holder.contains(typeClass))
             break;
 
          Selenium annotation = f.getAnnotation(Selenium.class);
-         Class<?> instantiatorClass = annotation.instantiator();
-         createAndStoreSelenium(holder, instantiatorClass, typeClass);
+         Class<?>[] instantiatorClasses = annotation.instantiator();
+         createAndStoreSelenium(holder, instantiatorClasses, typeClass);
       }
 
       context.add(SeleniumHolder.class, holder);
    }
 
-   private void createAndStoreSelenium(SeleniumHolder holder, Class<?> instantiatorClass, Class<?> typeClass)
+   private void createAndStoreSelenium(SeleniumHolder holder, Class<?>[] instantiatorClasses, Class<?> typeClass)
    {
-      Method creator = null;
-      for (Method m : instantiatorClass.getMethods())
+      List<Method> creators = new ArrayList<Method>();
+      for (Class<?> instantiatorClass : instantiatorClasses)
       {
-         if ("create".equals(m.getName()) && typeClass.isAssignableFrom(m.getReturnType()))
-         {
-            if (creator == null)
-               creator = m;
-            else
-               throw new RuntimeException("Could not determine which instantiator method should be used to create object of type " + typeClass.getName() + " because there are multiple methods available.");
-         }
+         creators.addAll(SecurityActions.getMethodsWithSignature(instantiatorClass, "create", typeClass));
       }
-      Validate.notNull(creator, "No instantiator method was found for object of type " + typeClass.getName());
+
+      if (creators.size() == 0)
+      {
+         throw new RuntimeException("No instantiator method was found for object of type " + typeClass.getName());
+      }
+      if (creators.size() != 1)
+      {
+         throw new RuntimeException("Could not determine which instantiator method should be used to create object of type " + typeClass.getName() + " because there are multiple methods available.");
+      }
 
       try
       {
-         Instantiator<?> instantiator = SecurityActions.newInstance(instantiatorClass.getName(), new Class<?>[0], new Object[0], Instantiator.class);
-         holder.hold(typeClass, typeClass.cast(creator.invoke(instantiator, new Object[0])));
+         Instantiator<?> instantiator = SecurityActions.newInstance(creators.get(0).getDeclaringClass().getName(), new Class<?>[0], new Object[0], Instantiator.class);
+         holder.hold(typeClass, typeClass.cast(creators.get(0).invoke(instantiator, new Object[0])));
       }
       catch (Exception e)
       {

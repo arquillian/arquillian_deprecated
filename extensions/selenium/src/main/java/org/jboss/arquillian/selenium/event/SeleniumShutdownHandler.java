@@ -2,6 +2,7 @@ package org.jboss.arquillian.selenium.event;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.arquillian.impl.Validate;
@@ -14,8 +15,10 @@ import org.jboss.arquillian.spi.event.suite.EventHandler;
 
 /**
  * A handler which destroys a Selenium browser, Selenium WebDriver or Cheiron
- * instance from the current context. <br/><br/>
- * <b>Imports:</b><br/> {@link Selenium}<br/> 
+ * instance from the current context. <br/>
+ * <br/>
+ * <b>Imports:</b><br/> {@link Selenium}<br/>
+ * 
  * @{link {@link SeleniumHolder}<br/>
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
@@ -39,40 +42,41 @@ public class SeleniumShutdownHandler implements EventHandler<ClassEvent>
 
    private void clearContext(Context context, TestClass testClass)
    {
-      List<Field> fields = SecurityActions.getFieldsWithAnnotation(testClass.getJavaClass(), Selenium.class);
       SeleniumHolder holder = context.get(SeleniumHolder.class);
-      for (Field f : fields)
+
+      for (Field f : SecurityActions.getFieldsWithAnnotation(testClass.getJavaClass(), Selenium.class))
       {
          Class<?> typeClass = f.getType();
          if (!holder.contains(typeClass))
             break;
 
          Selenium annotation = f.getAnnotation(Selenium.class);
-         Class<?> instantiatorClass = annotation.instantiator();
-         destroySelenium(holder, instantiatorClass, typeClass);
+         Class<?>[] instantiatorClasses = annotation.instantiator();
+         destroySelenium(holder, instantiatorClasses, typeClass);
       }
    }
 
-   private void destroySelenium(SeleniumHolder holder, Class<?> instantiatorClass, Class<?> typeClass)
+   private void destroySelenium(SeleniumHolder holder, Class<?>[] instantiatorClasses, Class<?> typeClass)
    {
-      Method destroyer = null;
-      for (Method m : instantiatorClass.getMethods())
+      List<Method> destroyers = new ArrayList<Method>();
+      for (Class<?> instantiatorClass : instantiatorClasses)
       {
-         Class<?>[] types = m.getParameterTypes();
-         if ("destroy".equals(m.getName()) && types.length == 1 && typeClass.isAssignableFrom(types[0]))
-         {
-            if (destroyer == null)
-               destroyer = m;
-            else
-               throw new RuntimeException("Could not determine which destroyer method should be used to destroy object of type " + typeClass.getName() + " because there are multiple methods available.");
-         }
+         destroyers.addAll(SecurityActions.getMethodsWithSignature(instantiatorClass, "destroy", Void.TYPE, typeClass));
       }
-      Validate.notNull(destroyer, "No destroyer method was found for object of type " + typeClass.getName());
+
+      if (destroyers.size() == 0)
+      {
+         throw new RuntimeException("No destroyer method was found for object of type " + typeClass.getName());
+      }
+      if (destroyers.size() != 1)
+      {
+         throw new RuntimeException("Could not determine which destroyer method should be used to destroy object of type " + typeClass.getName() + " because there are multiple methods available.");
+      }
 
       try
       {
-         Instantiator<?> instantiator = SecurityActions.newInstance(instantiatorClass.getName(), new Class<?>[0], new Object[0], Instantiator.class);
-         destroyer.invoke(instantiator, holder.retrieve(typeClass));
+         Instantiator<?> destroyer = SecurityActions.newInstance(destroyers.get(0).getDeclaringClass().getName(), new Class<?>[0], new Object[0], Instantiator.class);
+         destroyers.get(0).invoke(destroyer, holder.retrieve(typeClass));
          holder.remove(typeClass);
       }
       catch (Exception e)
