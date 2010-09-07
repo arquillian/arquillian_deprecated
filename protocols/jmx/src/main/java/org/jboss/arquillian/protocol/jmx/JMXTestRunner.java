@@ -25,6 +25,7 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor.ExecutionType;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestResult.Status;
 import org.jboss.arquillian.spi.TestRunner;
@@ -42,6 +43,7 @@ public class JMXTestRunner implements JMXTestRunnerMBean
    // Provide logging
    private static Logger log = Logger.getLogger(JMXTestRunner.class);
 
+   private static ThreadLocal<ExecutionType> executionTypeAssociation = new ThreadLocal<ExecutionType>();
    private TestClassLoader testClassLoader;
    
    public interface TestClassLoader
@@ -65,6 +67,11 @@ public class JMXTestRunner implements JMXTestRunnerMBean
             }
          };
       }
+   }
+
+   public static ExecutionType getExecutionType()
+   {
+      return executionTypeAssociation.get();
    }
 
    public ObjectName registerMBean(MBeanServer mbeanServer) throws JMException
@@ -112,6 +119,14 @@ public class JMXTestRunner implements JMXTestRunnerMBean
 
    private TestResult runTestMethodInternal(String className, String methodName, Properties props)
    {
+      if (props != null)
+      {
+         // This hack associates the ExecutionType with the current thread
+         // such that the OSGitestEnricher can pick it up and know whether we run embedded or remote
+         ExecutionType executionType = (ExecutionType)props.get(ExecutionType.class);
+         executionTypeAssociation.set(executionType);
+      }
+      
       try
       {
          TestRunner runner = TestRunners.getTestRunner(JMXTestRunner.class.getClassLoader());

@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 
 import javax.management.JMException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
@@ -47,16 +46,7 @@ public class InternalArchiveProviderImpl implements InternalArchiveProvider
    public InternalArchiveProviderImpl(TestClass testCase, ArchiveProvider provider)
    {
       this.delegate = provider;
-
-      String name = ONAME_PREFIX + testCase.getSimpleName();
-      try
-      {
-         objectName = new ObjectName(name);
-      }
-      catch (MalformedObjectNameException e)
-      {
-         throw new IllegalArgumentException("Invalid object name: " + name);
-      }
+      this.objectName = AbstractOSGiContainer.getArchiveProviderName(testCase);
    }
 
    public void registerMBean() throws JMException

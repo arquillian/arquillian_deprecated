@@ -16,6 +16,11 @@
  */
 package org.jboss.arquillian.container.osgi.remote;
 
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_REGISTRY_PORT;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
@@ -30,8 +35,10 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 import org.jboss.arquillian.osgi.internal.AbstractDeployableContainer;
+import org.jboss.arquillian.protocol.jmx.JMXConnectorServerExt;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
 import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor.ExecutionType;
+import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.LifecycleException;
@@ -59,17 +66,22 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteDeployableContainer.class);
 
+   private JMXConnectorServerExt jmxConnectorServer;
    private JMXConnector jmxConnector;
    private ManagementSupport jmxSupport;
 
    @Override
    public void start(Context context) throws LifecycleException
    {
-      MBeanServerConnection mbeanServer = getMBeanServerConnection();
-      jmxSupport = new ManagementSupport(mbeanServer);
-      
+      // Create and start the JMXConnectorServer that the test case uses to connect back to the client
+      jmxConnectorServer = createJMXConnectorServer();
+
+      // Create the JMXConnector that the test client uses to connect to the remote MBeanServer
+      MBeanServerConnection connection = getMBeanServerConnection();
+      jmxSupport = new ManagementSupport(connection);
+
       super.start(context);
-      
+
       installSupportBundles();
    }
 
@@ -77,6 +89,10 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    public void stop(Context context) throws LifecycleException
    {
       super.stop(context);
+
+      // Stop the JMXConnectorServer
+      if (jmxConnectorServer != null)
+         jmxConnectorServer.stop();
 
       // Close the JMXConnector
       if (jmxConnector != null)
@@ -232,6 +248,25 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
       catch (IOException ex)
       {
          throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+      }
+   }
+
+   private JMXConnectorServerExt createJMXConnectorServer()
+   {
+      // Start the JSR160 connector
+      int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
+      int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", jmxPort + 1, rmiPort + 1);
+      try
+      {
+         JMXConnectorServerExt connectorServer = new JMXConnectorServerExt(serviceURL, rmiPort + 1);
+         connectorServer.start(JMXServerFactory.findOrCreateMBeanServer());
+         return connectorServer;
+      }
+      catch (IOException ex)
+      {
+         log.error("Cannot start JMXConnectorServer on: " + serviceURL, ex);
+         return null;
       }
    }
 }

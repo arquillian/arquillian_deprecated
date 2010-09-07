@@ -27,7 +27,10 @@ import javax.management.ObjectName;
 
 import org.jboss.arquillian.osgi.OSGiContainer;
 import org.jboss.arquillian.osgi.internal.EmbeddedOSGiContainer;
+import org.jboss.arquillian.osgi.internal.RemoteOSGiContainer;
+import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor.ExecutionType;
 import org.jboss.arquillian.protocol.jmx.JMXServerFactory;
+import org.jboss.arquillian.protocol.jmx.JMXTestRunner;
 import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestClass;
 import org.jboss.arquillian.spi.TestEnricher;
@@ -85,7 +88,8 @@ public class OSGiTestEnricher implements TestEnricher
    {
       try
       {
-         field.set(testCase, getContainer(context, testCase.getClass()));
+         TestClass testClass = new TestClass(testCase.getClass());
+         field.set(testCase, getContainer(context, testClass));
       }
       catch (IllegalAccessException ex)
       {
@@ -117,13 +121,16 @@ public class OSGiTestEnricher implements TestEnricher
       }
    }
 
-   private OSGiContainer getContainer(Context context, Class<?> testClass)
+   private OSGiContainer getContainer(Context context, TestClass testClass)
    {
       BundleContext bundleContext = getBundleContext(context);
-      EmbeddedOSGiContainer container = new EmbeddedOSGiContainer(bundleContext, new TestClass(testClass));
-      return container;
+
+      if (JMXTestRunner.getExecutionType() == ExecutionType.REMOTE)
+         return new RemoteOSGiContainer(bundleContext, testClass);
+      else
+         return new EmbeddedOSGiContainer(bundleContext, testClass);
    }
-   
+
    private BundleContext getBundleContext(Context context)
    {
       BundleContext bundleContext = context.get(BundleContext.class);

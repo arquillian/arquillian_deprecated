@@ -48,19 +48,23 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 07-Sep-2010
  */
-abstract class AbstractOSGiContainer implements OSGiContainer 
+public abstract class AbstractOSGiContainer implements OSGiContainer 
 {
    private BundleContext context;
-   private ObjectName archiveProviderName;
+   private TestClass testClass;
    
    protected AbstractOSGiContainer(BundleContext context, TestClass testClass)
    {
       this.context = context;
-      
+      this.testClass = testClass;
+   }
+
+   public static ObjectName getArchiveProviderName(TestClass testClass)
+   {
       String name = InternalArchiveProvider.ONAME_PREFIX + testClass.getSimpleName();
       try
       {
-         archiveProviderName = new ObjectName(name);
+         return new ObjectName(name);
       }
       catch (MalformedObjectNameException e)
       {
@@ -134,10 +138,11 @@ abstract class AbstractOSGiContainer implements OSGiContainer
       try
       {
          MBeanServerConnection mbeanServer = getMBeanServerConnection();
-         if (mbeanServer.isRegistered(archiveProviderName) == false)
-            throw new IllegalStateException("ArchiveProvider not registered: " + archiveProviderName);
+         ObjectName providerName = getArchiveProviderName(testClass);
+         if (mbeanServer.isRegistered(providerName) == false)
+            throw new IllegalStateException("ArchiveProvider not registered: " + providerName);
          
-         InternalArchiveProvider proxy = getMBeanProxy(mbeanServer, archiveProviderName, InternalArchiveProvider.class);
+         InternalArchiveProvider proxy = getMBeanProxy(mbeanServer, providerName, InternalArchiveProvider.class);
          byte[] bytes = proxy.getTestArchive(name);
          
          ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();

@@ -16,6 +16,11 @@
  */
 package org.jboss.arquillian.osgi.internal;
 
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_REGISTRY_PORT;
+
 import java.io.IOException;
 
 import javax.management.MBeanServerConnection;
@@ -34,7 +39,7 @@ import org.osgi.framework.BundleContext;
  * @author thomas.diesler@jboss.com
  * @since 07-Sep-2010
  */
-public class RemoteOSGiContainer extends AbstractOSGiContainer 
+public class RemoteOSGiContainer extends AbstractOSGiContainer
 {
    private JMXConnector jmxConnector;
 
@@ -50,7 +55,9 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
       {
          if (jmxConnector == null)
          {
-            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", null, null);
+            int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
+            int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
+            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", jmxPort + 1, rmiPort + 1);
             jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          }
          return jmxConnector.getMBeanServerConnection();

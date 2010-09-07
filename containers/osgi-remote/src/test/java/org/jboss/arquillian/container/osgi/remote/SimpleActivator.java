@@ -14,16 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.arquillian.container.osgi.remote.bundle;
+package org.jboss.arquillian.container.osgi.remote;
 
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 /**
- * A simple service.
+ * A BundleActivator that registers a {@ SimpleService}
  *
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public interface SimpleService 
+public class SimpleActivator implements BundleActivator
 {
-   Integer sum(Integer... values);
+   public void start(BundleContext context) throws Exception
+   {
+      SimpleService service = new SimpleService()
+      {
+         public Integer sum(Integer... values)
+         {
+            Integer result = 0;
+            if (values != null)
+            {
+               for (Integer i : values)
+               {
+                  result += i;
+               }
+            }
+            return result;
+         }
+      };
+      context.registerService(SimpleService.class.getName(), service, null);
+   }
+
+   public void stop(BundleContext context) throws Exception
+   {
+   }
 }
