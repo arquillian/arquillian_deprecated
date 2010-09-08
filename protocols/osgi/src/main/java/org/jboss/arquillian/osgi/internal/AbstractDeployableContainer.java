@@ -62,7 +62,6 @@ public abstract class AbstractDeployableContainer implements DeployableContainer
 
    public void stop(Context context) throws LifecycleException
    {
-      uninstallBundleList(supportBundles);
       log.debug("Stop OSGi Container");
    }
 
@@ -91,6 +90,11 @@ public abstract class AbstractDeployableContainer implements DeployableContainer
       {
          throw new IllegalStateException("Cannot install support bundles", ex);
       }
+   }
+
+   protected void uninstallSupportBundles()
+   {
+      uninstallBundleList(supportBundles);
    }
 
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException

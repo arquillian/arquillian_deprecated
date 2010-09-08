@@ -117,6 +117,7 @@ public class EmbeddedDeployableContainer extends AbstractDeployableContainer
       super.undeploy(context, archive);
 
       // Stop the Framework as part of @AfterClass
+      uninstallSupportBundles();
       stopFramework();
    }
 
