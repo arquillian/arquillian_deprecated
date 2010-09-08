@@ -50,7 +50,12 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 /**
- * JbossRemoteContainer
+ * A {@link DeployableContainer} implementation for a remote JBoss AS 5.1 instance.
+ *
+ * <p>As is true of all remote container types, this implementation assumes that
+ * the container is already running. The connection properties are defined by
+ * the type {@link JBossASConfiguration} in this same package and configured
+ * via XML.</p>
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
@@ -213,13 +218,21 @@ public class JBossASRemoteContainer implements DeployableContainer
 
    private void initDeploymentManager() throws Exception 
    {
-      String profileName = configuration.getProfileName();
-      InitialContext ctx = new InitialContext();
-      ProfileService ps = (ProfileService) ctx.lookup("ProfileService");
+      ProfileService ps = (ProfileService) buildInitialContext().lookup("ProfileService");
       deploymentManager = ps.getDeploymentManager();
-      ProfileKey defaultKey = new ProfileKey(profileName);
+      ProfileKey defaultKey = new ProfileKey(configuration.getProfileName());
       deploymentManager.loadProfile(defaultKey);
       VFS.init();
+   }
+
+   private InitialContext buildInitialContext() throws Exception
+   {
+      InitialContext ctx = new InitialContext();
+      ctx.addToEnvironment(InitialContext.INITIAL_CONTEXT_FACTORY, "org.jnp.interfaces.NamingContextFactory");
+      ctx.addToEnvironment(InitialContext.URL_PKG_PREFIXES, "org.jboss.naming:org.jnp.interfaces");
+      ctx.addToEnvironment(InitialContext.PROVIDER_URL, "jnp://" +
+            configuration.getRemoteServerAddress() + ":" + configuration.getRemoteServerNamingServicePort());
+      return ctx;
    }
    
    private URL createFileServerURL(String archiveName) 
@@ -229,7 +242,7 @@ public class JBossASRemoteContainer implements DeployableContainer
          InetSocketAddress address = httpFileServer.getAddress();
          return new URL(
                "http", 
-               address.getHostName(), 
+               address.getHostName(), // this causes problem with avahi; returns hostname.local; prefer configuration.getLocalDeploymentBindAddress()
                address.getPort(), 
                "/" + archiveName);
       }
