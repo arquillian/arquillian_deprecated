@@ -44,6 +44,13 @@ public class JBossASConfiguration implements ContainerConfiguration
     * Used by Servlet Protocol to connect to deployment.
     */
    private int remoteServerHttpPort = 8080;
+   
+   /**
+    * Port on which the JBoss Naming Service is running. Used to lookup objects
+    * in JNDI and invoke MBean operations. Combined with remoteServerAddress to
+    * create the JNDI provider URL (e.g., jnp://localhost:1099)
+    */
+   private int remoteServerNamingServicePort = 1099;
 
    /**
     * Bind Address for HTTP server for serving deployments to the remote server.
@@ -90,6 +97,16 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setRemoteServerHttpPort(int remoteServerHttpPort)
    {
       this.remoteServerHttpPort = remoteServerHttpPort;
+   }
+   
+   public int getRemoteServerNamingServicePort()
+   {
+      return remoteServerNamingServicePort;
+   }
+   
+   public void setRemoteServerNamingServicePort(int remoteServerNamingServicePort)
+   {
+      this.remoteServerNamingServicePort = remoteServerNamingServicePort;
    }
    
    public String getLocalDeploymentBindAddress()
