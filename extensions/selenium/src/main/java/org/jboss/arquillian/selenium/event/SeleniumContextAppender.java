@@ -15,6 +15,7 @@ import org.jboss.arquillian.spi.event.suite.BeforeClass;
  * 
  * 
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
+ * @see AfterClass
  * @see BeforeClass
  * @see Before
  * 

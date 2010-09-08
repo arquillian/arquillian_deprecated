@@ -1,5 +1,10 @@
 package org.jboss.arquillian.selenium.instantiator;
 
+import static org.jboss.arquillian.selenium.instantiator.SeleniumConstants.DEFAULT_SERVER_PORT;
+import static org.jboss.arquillian.selenium.instantiator.SeleniumConstants.DEFAULT_TIMEOUT;
+import static org.jboss.arquillian.selenium.instantiator.SeleniumConstants.SERVER_PORT_KEY;
+import static org.jboss.arquillian.selenium.instantiator.SeleniumConstants.TIMEOUT_KEY;
+
 import org.jboss.arquillian.selenium.meta.ArquillianConfiguration;
 import org.jboss.arquillian.selenium.meta.Configuration;
 import org.jboss.arquillian.selenium.meta.OverridableConfiguration;
@@ -26,11 +31,6 @@ public class DefaultSeleniumInstantiator implements Instantiator<DefaultSelenium
    public static final String SERVER_HOST_KEY = "arquillian.selenium.server.host";
 
    /**
-    * Port where Selenium server accepts requests
-    */
-   public static final String SERVER_PORT_KEY = "arquillian.selenium.server.port";
-
-   /**
     * Identification of the browser for needs of Selenium.
     * 
     * Use can use variants including path to binary, such as: <i>*firefoxproxy
@@ -48,17 +48,12 @@ public class DefaultSeleniumInstantiator implements Instantiator<DefaultSelenium
     */
    public static final String SPEED_KEY = "arquillian.selenium.speed";
 
-   /**
-    * Time limit in milliseconds which determines operation failed
-    */
-   public static final String TIMEOUT_KEY = "arquillian.selenium.timeout";
+
 
    private static final String DEFAULT_SERVER_HOST = "localhost";
-   private static final int DEFAULT_SERVER_PORT = 14444;
    private static final String DEFAULT_BROWSER = "*firefoxproxy";
    private static final String DEFAULT_URL = "http://localhost:8080";
    private static final String DEFAULT_SPEED = "0";
-   private static final String DEFAULT_TIMEOUT = "60000";
 
    private Configuration configuration;
 
@@ -82,9 +77,9 @@ public class DefaultSeleniumInstantiator implements Instantiator<DefaultSelenium
       String timeout = configuration.getString(TIMEOUT_KEY, DEFAULT_TIMEOUT);
 
       DefaultSelenium selenium = new DefaultSelenium(server, port, browser, url);
+      selenium.start();
       selenium.setSpeed(speed);
       selenium.setTimeout(timeout);
-      selenium.start();
 
       return selenium;
    }
