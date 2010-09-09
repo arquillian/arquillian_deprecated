@@ -48,11 +48,11 @@ import org.osgi.framework.Version;
  * @author thomas.diesler@jboss.com
  * @since 07-Sep-2010
  */
-public abstract class AbstractOSGiContainer implements OSGiContainer 
+public abstract class AbstractOSGiContainer implements OSGiContainer
 {
    private BundleContext context;
    private TestClass testClass;
-   
+
    protected AbstractOSGiContainer(BundleContext context, TestClass testClass)
    {
       this.context = context;
@@ -75,7 +75,7 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
    public Bundle installBundle(Archive<?> archive) throws BundleException
    {
       InputStream inputStream;
-      
+
       ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
       try
       {
@@ -91,27 +91,27 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
       {
          Thread.currentThread().setContextClassLoader(ctxLoader);
       }
-      
+
       return context.installBundle(archive.getName(), inputStream);
    }
-   
+
    public Bundle installBundle(String artifactId) throws BundleException
    {
       return installBundle(null, artifactId, null);
    }
-   
+
    public Bundle installBundle(String groupId, String artifactId, String version) throws BundleException
    {
       URL artifactURL = ArquillianHelper.getArtifactURL(groupId, artifactId, version);
       if (artifactURL == null)
          return null;
-      
+
       // Verify that the artifact is a bundle
       BundleInfo info = BundleInfo.createBundleInfo(artifactURL);
       Bundle bundle = getBundle(info.getSymbolicName(), info.getVersion());
       if (bundle != null)
          return bundle;
-      
+
       bundle = context.installBundle(artifactURL.toExternalForm());
       return bundle;
    }
@@ -122,7 +122,7 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
          throw new IllegalArgumentException("Null context");
       if (symbolicName == null)
          throw new IllegalArgumentException("Null symbolicName");
-      
+
       for (Bundle bundle : context.getBundles())
       {
          boolean artefactMatch = symbolicName.equals(bundle.getSymbolicName());
@@ -132,8 +132,28 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
       }
       return null;
    }
-   
+
    public Archive<?> getTestArchive(String name)
+   {
+      InputStream input = getTestArchiveStream(name);
+
+      ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
+      try
+      {
+         // Create the archive in the context of the arquillian-osgi-bundle 
+         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name);
+         ZipImporter zipImporter = archive.as(ZipImporter.class);
+         zipImporter.importZip(new ZipInputStream(input));
+         return archive;
+      }
+      finally
+      {
+         Thread.currentThread().setContextClassLoader(ctxLoader);
+      }
+   }
+
+   public InputStream getTestArchiveStream(String name)
    {
       try
       {
@@ -141,52 +161,13 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
          ObjectName providerName = getArchiveProviderName(testClass);
          if (mbeanServer.isRegistered(providerName) == false)
             throw new IllegalStateException("ArchiveProvider not registered: " + providerName);
-         
+
          InternalArchiveProvider proxy = getMBeanProxy(mbeanServer, providerName, InternalArchiveProvider.class);
-         byte[] bytes = proxy.getTestArchive(name);
-         
-         ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-         try
-         {
-            // Create the archive in the context of the arquillian-osgi-bundle 
-            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-            JavaArchive archive = ShrinkWrap.create(JavaArchive.class, name);
-            ZipImporter zipImporter = archive.as(ZipImporter.class);
-            zipImporter.importZip(new ZipInputStream(new ByteArrayInputStream(bytes)));
-            return archive;
-         }
-         finally
-         {
-            Thread.currentThread().setContextClassLoader(ctxLoader);
-         }
-      }
-      catch (RuntimeException rte)
-      {
-         throw rte;
+         return new ByteArrayInputStream(proxy.getTestArchive(name));
       }
       catch (IOException ex)
       {
          throw new IllegalStateException("Cannot obtain test archive: " + name, ex);
-      }
-   }
-
-   public InputStream getTestArchiveStream(String name)
-   {
-      Archive<?> archive = getTestArchive(name);
-      ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
-      try
-      {
-         // Read the archive in the context of the arquillian-osgi-bundle 
-         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-         ZipExporter exporter = archive.as(ZipExporter.class);
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         exporter.exportZip(baos);
-
-         return new ByteArrayInputStream(baos.toByteArray());
-      }
-      finally
-      {
-         Thread.currentThread().setContextClassLoader(ctxLoader);
       }
    }
 
