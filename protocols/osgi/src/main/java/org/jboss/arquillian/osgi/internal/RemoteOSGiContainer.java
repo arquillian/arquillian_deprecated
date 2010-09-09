@@ -57,22 +57,11 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
    @Override
    public MBeanServerConnection getMBeanServerConnection()
    {
-      BundleContext context = getBundleContext();
+      String jmxHost = getFrameworkProperty(REMOTE_JMX_HOST, DEFAULT_REMOTE_JMX_HOST);
+      Integer jmxPort = Integer.parseInt(getFrameworkProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
+      Integer rmiPort = Integer.parseInt(getFrameworkProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
       
-      // Obtain the connection properties from the framework
-      String jmxHost = context.getProperty(REMOTE_JMX_HOST);
-      if (jmxHost == null)
-         jmxHost = DEFAULT_REMOTE_JMX_HOST;
-      
-      String jmxPort = context.getProperty(REMOTE_JMX_RMI_PORT);
-      if (jmxPort == null)
-         jmxPort = DEFAULT_REMOTE_JMX_RMI_PORT;
-      
-      String rmiPort = context.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT);
-      if (rmiPort == null)
-         rmiPort = DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
-      
-      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, Integer.parseInt(jmxPort + 1), Integer.parseInt(rmiPort + 1));
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort + 1);
       try
       {
          if (jmxConnector == null)
@@ -87,5 +76,14 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
       {
          throw new IllegalStateException("Cannot obtain MBeanServerConnection to: " + serviceURL, ex);
       }
+   }
+   
+   private String getFrameworkProperty(String key, String defaultValue)
+   {
+      String value = getBundleContext().getProperty(key);
+      if (value == null)
+         value = defaultValue;
+      
+      return value;
    }
 }
