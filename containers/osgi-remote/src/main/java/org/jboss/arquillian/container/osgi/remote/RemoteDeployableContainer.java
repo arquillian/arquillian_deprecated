@@ -238,8 +238,10 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    // Get the MBeanServerConnection through the JMXConnector
    private MBeanServerConnection getMBeanServerConnection()
    {
-      String jmxHost = System.getProperty(REMOTE_JMX_HOST, DEFAULT_REMOTE_JMX_HOST);
-      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, null, null);
+      String jmxHost = System.getProperty(REMOTE_JMX_HOST, System.getProperty("jboss.bind.address", DEFAULT_REMOTE_JMX_HOST));
+      int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
+      int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort, rmiPort);
       try
       {
          if (jmxConnector == null)
@@ -259,9 +261,10 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    private JMXConnectorServerExt createJMXConnectorServer()
    {
       // Start the JSR160 connector
+      String jmxHost = System.getProperty(REMOTE_JMX_HOST, System.getProperty("jboss.bind.address", DEFAULT_REMOTE_JMX_HOST));
       int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
       int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
-      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", jmxPort + 1, rmiPort + 1);
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort + 1);
       try
       {
          log.debug("Starting JMXConnectorServer on: " + serviceURL);
