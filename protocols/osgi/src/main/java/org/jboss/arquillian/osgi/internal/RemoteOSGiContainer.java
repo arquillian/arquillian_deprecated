@@ -16,8 +16,10 @@
  */
 package org.jboss.arquillian.osgi.internal;
 
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_HOST;
 import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_PORT;
 import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_HOST;
 import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_PORT;
 import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_REGISTRY_PORT;
 
@@ -30,6 +32,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.jboss.arquillian.osgi.OSGiContainer;
 import org.jboss.arquillian.spi.TestClass;
+import org.jboss.logging.Logger;
 import org.jboss.osgi.jmx.JMXServiceURLFactory;
 import org.osgi.framework.BundleContext;
 
@@ -41,6 +44,9 @@ import org.osgi.framework.BundleContext;
  */
 public class RemoteOSGiContainer extends AbstractOSGiContainer
 {
+   // Provide logging
+   private static final Logger log = Logger.getLogger(RemoteOSGiContainer.class);
+   
    private JMXConnector jmxConnector;
 
    public RemoteOSGiContainer(BundleContext context, TestClass testClass)
@@ -51,20 +57,23 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
    @Override
    public MBeanServerConnection getMBeanServerConnection()
    {
+      String jmxHost = System.getProperty(REMOTE_JMX_HOST, DEFAULT_REMOTE_JMX_HOST);
+      int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
+      int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort + 1);
       try
       {
          if (jmxConnector == null)
          {
-            int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
-            int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
-            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", jmxPort + 1, rmiPort + 1);
+            log.debug("Connecting JMXConnector to: " + serviceURL);
             jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          }
+         
          return jmxConnector.getMBeanServerConnection();
       }
       catch (IOException ex)
       {
-         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection to: " + serviceURL, ex);
       }
    }
 }

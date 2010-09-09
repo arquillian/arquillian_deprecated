@@ -16,8 +16,10 @@
  */
 package org.jboss.arquillian.container.osgi.remote;
 
+import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_HOST;
 import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_PORT;
 import static org.jboss.osgi.jmx.JMXConstantsExt.DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
+import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_HOST;
 import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_PORT;
 import static org.jboss.osgi.jmx.JMXConstantsExt.REMOTE_JMX_RMI_REGISTRY_PORT;
 
@@ -236,18 +238,21 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    // Get the MBeanServerConnection through the JMXConnector
    private MBeanServerConnection getMBeanServerConnection()
    {
+      String jmxHost = System.getProperty(REMOTE_JMX_HOST, DEFAULT_REMOTE_JMX_HOST);
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, null, null);
       try
       {
          if (jmxConnector == null)
          {
-            JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", null, null);
+            log.debug("Connecting JMXConnector to: " + serviceURL);
             jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          }
+         
          return jmxConnector.getMBeanServerConnection();
       }
       catch (IOException ex)
       {
-         throw new IllegalStateException("Cannot obtain MBeanServerConnection");
+         throw new IllegalStateException("Cannot obtain MBeanServerConnection to: " + serviceURL, ex);
       }
    }
 
@@ -259,6 +264,7 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
       JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL("localhost", jmxPort + 1, rmiPort + 1);
       try
       {
+         log.debug("Starting JMXConnectorServer on: " + serviceURL);
          JMXConnectorServerExt connectorServer = new JMXConnectorServerExt(serviceURL, rmiPort + 1);
          connectorServer.start(JMXServerFactory.findOrCreateMBeanServer());
          return connectorServer;
