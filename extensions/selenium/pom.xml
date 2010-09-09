@@ -24,9 +24,11 @@
 
    <properties>
       <!-- Versioning -->
-      <version.selenium>2.0a5</version.selenium>
       <version.jboss_60>6.0.0.20100721-M4</version.jboss_60>
-      <version.slf4j>1.5.9.RC1</version.slf4j>
+      <version.selenium>2.0a5</version.selenium>
+      <version.webdriver>0.9.7376</version.webdriver>
+      <version.selenium.standalone>1.0.3</version.selenium.standalone>
+      <version.slf4j>1.5.10</version.slf4j>
    </properties>
 
    <!-- Dependencies -->
@@ -132,6 +134,7 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
+                     <skip>false</skip>
                      <includes>
                         <include>org/jboss/arquillian/selenium/example/WebDriverTestCase.class</include>
                      </includes>
@@ -158,26 +161,26 @@
             <dependency>
                <groupId>org.seleniumhq.webdriver</groupId>
                <artifactId>webdriver-firefox</artifactId>
-               <version>0.9.7376</version>
+               <version>${version.webdriver}</version>
                <scope>test</scope>
             </dependency>
             <dependency>
                <groupId>org.seleniumhq.webdriver</groupId>
                <artifactId>webdriver-common</artifactId>
-               <version>0.9.7376</version>
+               <version>${version.webdriver}</version>
                <scope>test</scope>
             </dependency>
             <dependency>
                <groupId>org.seleniumhq.webdriver</groupId>
                <artifactId>webdriver-support</artifactId>
-               <version>0.9.7376</version>
+               <version>${version.webdriver}</version>
                <scope>test</scope>
             </dependency>
             <!-- WebDriver contains dependencies on the Selenium Server core -->
             <dependency>
                <groupId>org.seleniumhq.selenium.server</groupId>
                <artifactId>selenium-server</artifactId>
-               <version>1.0.3</version>
+               <version>${version.selenium.standalone}</version>
                <scope>test</scope>
                <classifier>standalone</classifier>
             </dependency>
@@ -194,6 +197,7 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
+                     <skip>false</skip>
                      <systemPropertyVariables>
                         <arquillian.selenium.webdriver.implementation>org.openqa.selenium.firefox.FirefoxDriver</arquillian.selenium.webdriver.implementation>
                      </systemPropertyVariables>
@@ -239,6 +243,7 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
+                     <skip>false</skip>
                      <systemPropertyVariables>
                         <arquillian.selenium.webdriver.implementation>org.openqa.selenium.firefox.FirefoxDriver</arquillian.selenium.webdriver.implementation>
                      </systemPropertyVariables>
@@ -286,6 +291,7 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
+                     <skip>false</skip>
                      <systemPropertyVariables>
                         <arquillian.selenium.server.enable>true</arquillian.selenium.server.enable>
                      </systemPropertyVariables>
