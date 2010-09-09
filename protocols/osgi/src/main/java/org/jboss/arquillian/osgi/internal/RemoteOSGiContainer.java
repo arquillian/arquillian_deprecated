@@ -57,10 +57,22 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
    @Override
    public MBeanServerConnection getMBeanServerConnection()
    {
-      String jmxHost = System.getProperty(REMOTE_JMX_HOST, DEFAULT_REMOTE_JMX_HOST);
-      int jmxPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
-      int rmiPort = Integer.parseInt(System.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
-      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort + 1);
+      BundleContext context = getBundleContext();
+      
+      // Obtain the connection properties from the framework
+      String jmxHost = context.getProperty(REMOTE_JMX_HOST);
+      if (jmxHost == null)
+         jmxHost = DEFAULT_REMOTE_JMX_HOST;
+      
+      String jmxPort = context.getProperty(REMOTE_JMX_RMI_PORT);
+      if (jmxPort == null)
+         jmxPort = DEFAULT_REMOTE_JMX_RMI_PORT;
+      
+      String rmiPort = context.getProperty(REMOTE_JMX_RMI_REGISTRY_PORT);
+      if (rmiPort == null)
+         rmiPort = DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT;
+      
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, Integer.parseInt(jmxPort + 1), Integer.parseInt(rmiPort + 1));
       try
       {
          if (jmxConnector == null)

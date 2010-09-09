@@ -72,6 +72,11 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
       }
    }
 
+   protected BundleContext getBundleContext()
+   {
+      return context;
+   }
+
    public Bundle installBundle(Archive<?> archive) throws BundleException
    {
       InputStream inputStream;
