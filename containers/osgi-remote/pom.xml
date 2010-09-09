@@ -171,6 +171,22 @@
     </profile>
     
     <!--
+      Name: no-jboss-bind-address
+      Desc: Set the default jboss.bind.address
+    -->
+    <profile>
+      <id>no-jboss-bind-address</id>
+      <activation>
+        <property>
+          <name>!jboss.bind.address</name>
+        </property>
+      </activation>
+      <properties>
+        <jboss.bind.address>localhost</jboss.bind.address>
+      </properties>
+    </profile>
+    
+    <!--
       Name: remote 
       Descr: Setup for remote integration testing
     -->
@@ -190,6 +206,10 @@
                 <property>
                   <name>log4j.output.dir</name>
                   <value>${project.build.directory}</value>
+                </property>
+                <property>
+                  <name>jboss.bind.address</name>
+                  <value>${jboss.bind.address}</value>
                 </property>
                 <property>
                   <name>test.archive.directory</name>
