@@ -170,6 +170,26 @@ public abstract class AbstractOSGiContainer implements OSGiContainer
       }
    }
 
+   public InputStream getTestArchiveStream(String name)
+   {
+      Archive<?> archive = getTestArchive(name);
+      ClassLoader ctxLoader = Thread.currentThread().getContextClassLoader();
+      try
+      {
+         // Read the archive in the context of the arquillian-osgi-bundle 
+         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+         ZipExporter exporter = archive.as(ZipExporter.class);
+         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         exporter.exportZip(baos);
+
+         return new ByteArrayInputStream(baos.toByteArray());
+      }
+      finally
+      {
+         Thread.currentThread().setContextClassLoader(ctxLoader);
+      }
+   }
+
    public abstract MBeanServerConnection getMBeanServerConnection();
 
    private <T> T getMBeanProxy(MBeanServerConnection mbeanServer, ObjectName name, Class<T> interf)

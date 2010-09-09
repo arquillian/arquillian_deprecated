@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 /**
  * [ARQ-194] Support multiple bundle deployments
@@ -46,13 +47,35 @@ import org.osgi.framework.BundleActivator;
 public class ARQ194TestCase 
 {
    @Inject
+   public BundleContext context;
+   
+   @Inject
    public OSGiContainer container;
 
    @Test
-   public void testGeneratedBundle() throws Exception
+   public void testInstallBundleFromArchive() throws Exception
    {
       Archive<?> archive = container.getTestArchive("arq194-bundle");
       Bundle bundle = container.installBundle(archive);
+      
+      assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
+      assertEquals("arq194-bundle", bundle.getSymbolicName());
+
+      bundle.start();
+      assertEquals("Bundle ACTIVE", Bundle.ACTIVE, bundle.getState());
+
+      bundle.stop();
+      assertEquals("Bundle RESOLVED", Bundle.RESOLVED, bundle.getState());
+
+      bundle.uninstall();
+      assertEquals("Bundle UNINSTALLED", Bundle.UNINSTALLED, bundle.getState());
+   }
+
+   @Test
+   public void testInstallBundleFromStream() throws Exception
+   {
+      InputStream input = container.getTestArchiveStream("arq194-bundle");
+      Bundle bundle = context.installBundle("arq194-bundle", input);
       
       assertEquals("Bundle INSTALLED", Bundle.INSTALLED, bundle.getState());
       assertEquals("arq194-bundle", bundle.getSymbolicName());

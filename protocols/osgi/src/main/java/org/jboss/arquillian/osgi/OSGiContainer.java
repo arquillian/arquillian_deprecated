@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.osgi;
 
+import java.io.InputStream;
+
 import org.jboss.shrinkwrap.api.Archive;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
@@ -63,4 +65,10 @@ public interface OSGiContainer
     * This method makes a callback to the client side to generate the archive.
     */
    Archive<?> getTestArchive(String name);
+   
+   /**
+    * Gets an an input stream for an archive with the given name by invoking the {@link ArchiveProvider}.
+    * This method makes a callback to the client side to generate the archive.
+    */
+   InputStream getTestArchiveStream(String name);
 }
