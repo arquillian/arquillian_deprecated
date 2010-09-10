@@ -33,7 +33,6 @@ import javax.management.remote.JMXServiceURL;
 import org.jboss.arquillian.osgi.OSGiContainer;
 import org.jboss.arquillian.spi.TestClass;
 import org.jboss.logging.Logger;
-import org.jboss.osgi.jmx.JMXServiceURLFactory;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -61,7 +60,7 @@ public class RemoteOSGiContainer extends AbstractOSGiContainer
       Integer jmxPort = Integer.parseInt(getFrameworkProperty(REMOTE_JMX_RMI_PORT, DEFAULT_REMOTE_JMX_RMI_PORT));
       Integer rmiPort = Integer.parseInt(getFrameworkProperty(REMOTE_JMX_RMI_REGISTRY_PORT, DEFAULT_REMOTE_JMX_RMI_REGISTRY_PORT));
       
-      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort + 1);
+      JMXServiceURL serviceURL = JMXServiceURLFactory.getServiceURL(jmxHost, jmxPort + 1, rmiPort, "arquillian-osgi-callback");
       try
       {
          if (jmxConnector == null)
