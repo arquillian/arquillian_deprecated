@@ -35,6 +35,11 @@
   <name>Arquillian Container OSGi Embedded</name>
   <description>OSGi Embedded Container integration for the Arquillian Project</description>
 
+  <!-- Properties -->
+  <properties>
+    <surefire.system.args>${surefire.jpda.args}</surefire.system.args>
+  </properties>
+
   <!-- Build -->
   <build>
     <plugins>
@@ -61,6 +66,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <argLine>${surefire.system.args}</argLine>
           <systemProperties>
             <property>
               <name>log4j.output.dir</name>

@@ -68,7 +68,9 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    // Provide logging
    private static final Logger log = Logger.getLogger(RemoteDeployableContainer.class);
 
-   private JMXConnectorServerExt jmxConnectorServer;
+   // Workaround for [ARQ-282] DeployableContainer.stop(Context) never called
+   private static JMXConnectorServerExt jmxConnectorServer;
+   
    private JMXConnector jmxConnector;
    private ManagementSupport jmxSupport;
 
@@ -76,7 +78,19 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    public void start(Context context) throws LifecycleException
    {
       // Create and start the JMXConnectorServer that the test case uses to connect back to the client
-      jmxConnectorServer = createJMXConnectorServer();
+      if (jmxConnectorServer == null)
+         jmxConnectorServer = createJMXConnectorServer();
+
+      // Adding a shutdown hook to close JMXConnectors. This hack is a workaround for 
+      // [ARQ-282] DeployableContainer.stop(Context) never called
+      Runtime.getRuntime().addShutdownHook(new Thread()
+      {
+         @Override
+         public void run()
+         {
+            shutdownJMXConnectors();
+         }
+      });
 
       // Create the JMXConnector that the test client uses to connect to the remote MBeanServer
       MBeanServerConnection connection = getMBeanServerConnection();
@@ -91,10 +105,19 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
    public void stop(Context context) throws LifecycleException
    {
       super.stop(context);
+      
+      // [ARQ-282] DeployableContainer.stop(Context) never called
+      // shutdownJMXConnectors();
+   }
 
+   private void shutdownJMXConnectors()
+   {
       // Stop the JMXConnectorServer
       if (jmxConnectorServer != null)
+      {
          jmxConnectorServer.stop();
+         jmxConnectorServer = null;
+      }
 
       // Close the JMXConnector
       if (jmxConnector != null)
@@ -249,7 +272,7 @@ public class RemoteDeployableContainer extends AbstractDeployableContainer
             log.debug("Connecting JMXConnector to: " + serviceURL);
             jmxConnector = JMXConnectorFactory.connect(serviceURL, null);
          }
-         
+
          return jmxConnector.getMBeanServerConnection();
       }
       catch (IOException ex)

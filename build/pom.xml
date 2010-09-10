@@ -46,6 +46,7 @@
     <version.shrinkwrap_shrinkwrap>1.0.0-alpha-11</version.shrinkwrap_shrinkwrap>
     <version.testng_testng>5.12.1</version.testng_testng>
 
+    <surefire.jpda.args></surefire.jpda.args>
   </properties>
 
   <!-- Maven 2 Repositories -->
@@ -402,7 +403,27 @@
             ${project.build.outputDirectory}</additionalparam>
         </configuration>
       </plugin>
-
     </plugins>
   </reporting>
+  
+  <!-- Profiles -->
+  <profiles>
+  
+    <!--
+      Name: jpda
+      Descr: Enable JPDA remote debuging
+    -->
+    <profile>
+      <id>jpda</id>
+      <activation>
+        <property>
+          <name>jpda</name>
+        </property>
+      </activation>
+      <properties>
+        <surefire.jpda.args>-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</surefire.jpda.args>
+      </properties>
+    </profile>
+  </profiles>
+  
 </project>
