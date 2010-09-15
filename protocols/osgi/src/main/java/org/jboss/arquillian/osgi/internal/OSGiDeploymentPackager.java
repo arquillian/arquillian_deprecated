@@ -53,7 +53,7 @@ public class OSGiDeploymentPackager implements DeploymentPackager
 
       Archive<?> appArchive = testDeployment.getApplicationArchive();
 
-      enhanceApplicationArchive(context, (JavaArchive)appArchive);
+      enhanceApplicationArchive(context, JavaArchive.class.cast(appArchive));
       assertValidBundleArchive(appArchive);
 
       return appArchive;
