@@ -24,6 +24,7 @@
   <!-- Aggregate Modules -->
   <modules>
     <module>performance</module>
+    <module>selenium</module>
   </modules>
 
 </project>
