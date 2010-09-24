@@ -36,12 +36,15 @@ public class JBossASConfiguration implements ContainerConfiguration
 
    private String profileName = "default";
    
-   // 
    private String jbossHome = System.getenv("JBOSS_HOME");
    
    private String javaHome = System.getenv("JAVA_HOME");
    
    private String javaVmArguments = "-Xmx512m -XX:MaxPermSize=128m";
+
+   // default to ERROR to ensure a fast start, though let it be configurable
+   // might need to look into this more because both server.log and output.log are being written
+   private String logThreshold = "ERROR";
 
    public ContainerProfile getContainerProfile()
    {
@@ -122,5 +125,15 @@ public class JBossASConfiguration implements ContainerConfiguration
    public String getJavaVmArguments()
    {
       return javaVmArguments;
+   }
+
+   public String getLogThreshold()
+   {
+      return logThreshold;
+   }
+
+   public void setLogThreshold(String logThreshold)
+   {
+      this.logThreshold = logThreshold;
    }
 }

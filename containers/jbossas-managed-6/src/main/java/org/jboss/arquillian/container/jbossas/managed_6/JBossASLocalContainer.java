@@ -77,7 +77,7 @@ public class JBossASLocalContainer implements DeployableContainer
             throw new LifecycleException(
             		"The server is already running! " +
             		"Managed containers does not support connecting to running server instances due to the " +
-            		"possible harmfull effect of connecting to the wrong server. Please stop server before running or " +
+            		"possible harmful effect of connecting to the wrong server. Please stop server before running or " +
             		"change to another type of container.");
          }
          
@@ -237,7 +237,7 @@ public class JBossASLocalContainer implements DeployableContainer
       server.setName(configuration.getProfileName());
       server.setHttpPort(configuration.getHttpPort());
       server.setHost(configuration.getBindAddress());
-      
+      server.setLogThreshold(configuration.getLogThreshold());
       server.setUsername("admin");
       server.setPassword("admin");
       server.setPartition(Long.toHexString(System.currentTimeMillis()));
