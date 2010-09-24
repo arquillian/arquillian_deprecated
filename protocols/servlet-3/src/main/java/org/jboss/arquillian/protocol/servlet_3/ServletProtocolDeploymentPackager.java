@@ -21,6 +21,8 @@ import java.util.Collection;
 import org.jboss.arquillian.spi.DeploymentPackager;
 import org.jboss.arquillian.spi.TestDeployment;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -34,6 +36,14 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
  */
 public class ServletProtocolDeploymentPackager implements DeploymentPackager
 {
+   private static final ArchivePath EJB_JAR_XML_JAR_PATH = ArchivePaths.create("META-INF/ejb-jar.xml");
+
+   private static final ArchivePath EJB_JAR_XML_WAR_PATH = ArchivePaths.create("WEB-INF/ejb-jar.xml");
+
+   private static final ArchivePath BEANS_XML_JAR_PATH = ArchivePaths.create("META-INF/beans.xml");
+
+   private static final ArchivePath BEANS_XML_WAR_PATH = ArchivePaths.create("WEB-INF/beans.xml");
+
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.DeploymentPackager#generateDeployment(org.jboss.arquillian.spi.TestDeployment)
     */
@@ -73,9 +83,22 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
 
    private Archive<?> handleArchive(JavaArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, Archive<?> protocol) 
    {
-         return ShrinkWrap.create(WebArchive.class, "test.war")
-                  .addLibraries(applicationArchive, protocol)
-                  .addLibraries(auxiliaryArchives.toArray(new Archive[0]));
+      WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war");
+      if (applicationArchive.contains(EJB_JAR_XML_JAR_PATH))
+      {
+         archive.add(applicationArchive.get(EJB_JAR_XML_JAR_PATH).getAsset(), EJB_JAR_XML_WAR_PATH);
+         applicationArchive.delete(EJB_JAR_XML_JAR_PATH);
+      }
+      
+      if (applicationArchive.contains(BEANS_XML_JAR_PATH))
+      {
+         archive.add(applicationArchive.get(BEANS_XML_JAR_PATH).getAsset(), BEANS_XML_WAR_PATH);
+         applicationArchive.delete(BEANS_XML_JAR_PATH);
+      }
+
+      archive.addLibraries(applicationArchive, protocol);
+      archive.addLibraries(auxiliaryArchives.toArray(new Archive[0]));
+      return archive;
    }
 
    private Archive<?> handleArchive(EnterpriseArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, Archive<?> protocol) 
