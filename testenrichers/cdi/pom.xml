@@ -24,7 +24,7 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.weld-core>1.0.0-SP4</version.weld-core>
+		<version.weld-core>1.0.1-SP4</version.weld-core>
 		<version.javax-el>2.2</version.javax-el>
 		<version.slf4j>1.5.9.RC1</version.slf4j>
 		
