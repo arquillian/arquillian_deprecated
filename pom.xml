@@ -44,12 +44,27 @@
   <!--  Profiles -->
   <profiles>
   
-    <!-- Build all Arquillian modules -->
+    <!-- Build essential Arquillian modules, quickier startup for newcomers -->
     <profile>
-      <id>all</id>
+      <id>essential</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <modules>
+        <module>build</module>
+        <module>api</module>
+        <module>spi</module>
+        <module>impl-base</module>
+        <module>junit</module>
+        <module>testng</module>
+        <module>testenrichers</module> 
+        <module>protocols</module>
+      </modules>
+    </profile>
+
+    <!-- Build all Arquillian modules and containers -->
+    <profile>
+      <id>all</id>
       <modules>
       
         <!-- Core -->
@@ -72,7 +87,7 @@
         
         <module>containers</module>
     
-	<module>extensions</module>
+        <module>extensions</module>
         <module>frameworks</module>
         <module>examples</module>
     
