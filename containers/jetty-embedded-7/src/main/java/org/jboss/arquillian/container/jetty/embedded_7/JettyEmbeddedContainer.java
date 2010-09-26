@@ -115,6 +115,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
       {
          WebAppContext wctx = archive.as(ShrinkWrapWebAppContext.class);
          // Jetty plus is required to support in-container invocation and enrichment
+         // QUESTION is that true for Jetty 7, or is it just for @Resource injection?
          if (containerConfig.isJettyPlus())
          {
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
