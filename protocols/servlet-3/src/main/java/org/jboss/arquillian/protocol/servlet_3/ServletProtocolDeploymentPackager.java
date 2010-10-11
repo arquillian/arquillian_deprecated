@@ -83,22 +83,22 @@ public class ServletProtocolDeploymentPackager implements DeploymentPackager
 
    private Archive<?> handleArchive(JavaArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, Archive<?> protocol) 
    {
-      WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war");
+      WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war");
       if (applicationArchive.contains(EJB_JAR_XML_JAR_PATH))
       {
-         archive.add(applicationArchive.get(EJB_JAR_XML_JAR_PATH).getAsset(), EJB_JAR_XML_WAR_PATH);
+         war.add(applicationArchive.get(EJB_JAR_XML_JAR_PATH).getAsset(), EJB_JAR_XML_WAR_PATH);
          applicationArchive.delete(EJB_JAR_XML_JAR_PATH);
       }
       
       if (applicationArchive.contains(BEANS_XML_JAR_PATH))
       {
-         archive.add(applicationArchive.get(BEANS_XML_JAR_PATH).getAsset(), BEANS_XML_WAR_PATH);
+         war.add(applicationArchive.get(BEANS_XML_JAR_PATH).getAsset(), BEANS_XML_WAR_PATH);
          applicationArchive.delete(BEANS_XML_JAR_PATH);
       }
 
-      archive.addLibraries(applicationArchive, protocol);
-      archive.addLibraries(auxiliaryArchives.toArray(new Archive[0]));
-      return archive;
+      war.addLibraries(applicationArchive, protocol);
+      war.addLibraries(auxiliaryArchives.toArray(new Archive[0]));
+      return war;
    }
 
    private Archive<?> handleArchive(EnterpriseArchive applicationArchive, Collection<Archive<?>> auxiliaryArchives, Archive<?> protocol) 
