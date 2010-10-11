@@ -26,12 +26,7 @@
          <groupId>org.jboss.arquillian</groupId>
          <artifactId>arquillian-spi</artifactId>
          <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-extension-tomcat-6</artifactId>
-      </dependency>
+      </dependency>      
 
       <!-- Not yet working w/o a hack -->
       <dependency>
@@ -73,42 +68,7 @@
          <artifactId>jasper</artifactId>
          <version>${version.org.apache.tomcat}</version>
          <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-junit</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <scope>test</scope>
-      </dependency>
-
-      <!-- Weld servlet required for testing CDI injections -->
-      <dependency>
-         <groupId>org.jboss.weld.servlet</groupId>
-         <artifactId>weld-servlet</artifactId>
-         <version>1.0.1-Final</version>
-         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.glassfish.web</groupId>
-         <artifactId>el-impl</artifactId>
-         <version>2.2</version>
-         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>javax.servlet.jsp</groupId>
-         <artifactId>jsp-api</artifactId>
-         <version>2.2</version>
-         <scope>test</scope>
-      </dependency>
+      </dependency>      
 
    </dependencies>
 

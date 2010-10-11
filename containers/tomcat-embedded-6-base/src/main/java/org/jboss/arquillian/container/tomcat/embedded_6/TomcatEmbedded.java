@@ -556,33 +556,33 @@ public class TomcatEmbedded implements Lifecycle {
         if( log.isDebugEnabled() )
             log.debug("Removing context[" + context.getPath() + "]");
 
-        // Is this Context actually among those that are defined?
-        boolean found = false;
-        for (int i = 0; i < engines.length; i++) {
-            Container hosts[] = engines[i].findChildren();
-            for (int j = 0; j < hosts.length; j++) {
-                Container contexts[] = hosts[j].findChildren();
-                for (int k = 0; k < contexts.length; k++) {
-                    if (context == (Context) contexts[k]) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found)
-                    break;
-            }
-            if (found)
-                break;
-        }
-        if (!found)
-            return;
-
+        boolean isContextExists = isContextExists(context);
+        if(!isContextExists)
+        	return;
+        
         // Remove this Context from the associated Host
         if( log.isDebugEnabled() )
             log.debug(" Removing this Context");
         context.getParent().removeChild(context);
 
     }
+
+
+	private boolean isContextExists(Context context) {
+		// Is this Context actually among those that are defined?
+        for (int i = 0; i < engines.length; i++) {
+            Container hosts[] = engines[i].findChildren();
+            for (int j = 0; j < hosts.length; j++) {
+                Container contexts[] = hosts[j].findChildren();
+                for (int k = 0; k < contexts.length; k++) {
+                    if (context == (Context) contexts[k]) {
+                        return true;
+                    }
+                }                
+            }           
+        }
+        return false;
+	}
 
 
     /**

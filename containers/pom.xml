@@ -50,9 +50,9 @@
         <module>jetty-embedded-7</module>
         <module>tomcat-embedded-6-base</module>
         <module>tomcat-embedded-6</module>
-        <module>mobicents-sip-servlets-embedded-1.x</module>
+        <module>mobicents-sip-servlets-embedded-1</module>
         <module>weld-se-embedded-1</module>    
-	<module>weld-se-embedded-1.1</module>
+	      <module>weld-se-embedded-1.1</module>
         <module>weld-ee-embedded-1.1</module>
         <module>openejb-embedded-3.1</module>
         <module>openwebbeans-embedded-1</module>

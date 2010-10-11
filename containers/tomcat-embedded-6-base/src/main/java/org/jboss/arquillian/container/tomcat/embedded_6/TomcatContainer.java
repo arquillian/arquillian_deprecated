@@ -18,7 +18,6 @@ package org.jboss.arquillian.container.tomcat.embedded_6;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ExpandWar;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
@@ -40,7 +38,6 @@ import org.jboss.arquillian.spi.DeployableContainer;
 import org.jboss.arquillian.spi.DeploymentException;
 import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
 
 /**
  * <p>Arquillian {@link DeployableContainer} implementation for an
@@ -57,7 +54,7 @@ import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
  * @author Dan Allen
  * @version $Revision: $
  */
-public class TomcatContainer implements DeployableContainer
+public abstract class TomcatContainer implements DeployableContainer
 {
    private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
 
@@ -70,46 +67,42 @@ public class TomcatContainer implements DeployableContainer
    /**
     * Tomcat embedded
     */
-   protected TomcatEmbedded embedded;
+   private TomcatEmbedded embedded;
 
    /**
     * Engine contained within Tomcat embedded
     */
-   protected Engine engine;
+   private Engine engine;
 
    /**
     * Host contained in the tomcat engine
     */
-   protected Host standardHost;
+   private Host standardHost;   
 
-   /**
-    * Tomcat container configuration
-    */
-   protected TomcatConfiguration configuration;
+   private String serverName;
 
-   protected String serverName;
+   private String bindAddress;
 
-   protected String bindAddress;
+   private int bindPort;
 
-   protected int bindPort;
+   private boolean wasStarted;
 
-   protected boolean wasStarted;
-
-   protected final List<String> failedUndeployments = new ArrayList<String>();
+   private final List<String> failedUndeployments = new ArrayList<String>();
 
    public void setup(Context context, Configuration configuration)
-   {
-      this.configuration = configuration.getContainerConfig(TomcatConfiguration.class);
-      bindAddress = this.configuration.getBindAddress();
-      bindPort = this.configuration.getBindHttpPort();
-      serverName = this.configuration.getServerName();
+   {      
+      bindAddress = getConfiguration().getBindAddress();
+      bindPort = getConfiguration().getBindHttpPort();
+      serverName = getConfiguration().getServerName();
    }
 
+   public abstract StandardContext createStandardContext(Context context, Archive<?> archive) throws DeploymentException;
+   
    public void start(Context context) throws LifecycleException
    {
       try
       {
-         startTomcatEmbedded();
+         createTomcatEmbedded();
       }
       catch (Exception e)
       {
@@ -138,8 +131,8 @@ public class TomcatContainer implements DeployableContainer
             throw new LifecycleException("An unexpected error occurred", e);
          }
       }
-   }
-
+   }   
+   
    public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
    {
       if (archive == null)
@@ -151,23 +144,7 @@ public class TomcatContainer implements DeployableContainer
          throw new IllegalStateException("Embedded container is not running");
       }
 
-      try
-      {
-         StandardContext standardContext = archive.as(ShrinkWrapStandardContext.class);
-         standardContext.addLifecycleListener(new EmbeddedContextConfig());
-         standardContext.setUnpackWAR(configuration.isUnpackArchive());
-         if (standardContext.getUnpackWAR())
-         {
-            deleteUnpackedWAR(standardContext);
-         }
-
-         standardHost.addChild(standardContext);
-         context.add(StandardContext.class, standardContext);
-      }
-      catch (Exception e)
-      {
-         throw new DeploymentException("Failed to deploy " + archive.getName(), e);
-      }
+      createStandardContext(context, archive);
 
       try
       {
@@ -229,70 +206,7 @@ public class TomcatContainer implements DeployableContainer
       failedUndeployments.clear();
    }
 
-   protected void startTomcatEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException, LifecycleException
-   {
-      // creating the tomcat embedded == service tag in server.xml
-      embedded = new TomcatEmbedded();
-      embedded.getService().setName(serverName);
-      // TODO this needs to be a lot more robust
-      String tomcatHome = configuration.getTomcatHome();
-      File tomcatHomeFile = null;
-      if (tomcatHome != null)
-      {
-         if (tomcatHome.startsWith(ENV_VAR))
-         {
-            String sysVar = tomcatHome.substring(ENV_VAR.length(), tomcatHome.length() - 1);
-            tomcatHome = System.getProperty(sysVar);
-            if (tomcatHome != null && tomcatHome.length() > 0 && new File(tomcatHome).isAbsolute())
-            {
-               tomcatHomeFile = new File(tomcatHome);
-               log.info("Using tomcat home from environment variable: " + tomcatHome);
-            }
-         }
-         else
-         {
-            tomcatHomeFile = new File(tomcatHome);
-         }
-      }
-
-      if (tomcatHomeFile == null)
-      {
-         tomcatHomeFile = new File(System.getProperty(TMPDIR_SYS_PROP), "tomcat-embedded-6");
-      }
-
-      tomcatHomeFile.mkdirs();
-      embedded.setCatalinaBase(tomcatHomeFile.getAbsolutePath());
-      embedded.setCatalinaHome(tomcatHomeFile.getAbsolutePath());
-     
-      // creates the engine, i.e., <engine> element in server.xml
-      engine = embedded.createEngine();
-      engine.setName(serverName);
-      engine.setDefaultHost(bindAddress);
-      engine.setService(embedded.getService());
-      embedded.getService().setContainer(engine);
-      embedded.addEngine(engine);
-      
-      // creates the host, i.e., <host> element in server.xml
-      File appBaseFile = new File(tomcatHomeFile, configuration.getAppBase());
-      appBaseFile.mkdirs();
-      standardHost = embedded.createHost(bindAddress, appBaseFile.getAbsolutePath());
-      if (configuration.getTomcatWorkDir() != null)
-      {
-         ((StandardHost) standardHost).setWorkDir(configuration.getTomcatWorkDir());
-      }
-      ((StandardHost) standardHost).setUnpackWARs(configuration.isUnpackArchive());
-      engine.addChild(standardHost);
-      
-      // creates an http connector, i.e., <connector> element in server.xml
-      Connector connector = embedded.createConnector(InetAddress.getByName(bindAddress), bindPort, false);
-      embedded.addConnector(connector);
-      connector.setContainer(engine);
-      
-      // starts embedded tomcat
-      embedded.getService().init();
-      embedded.start();
-      wasStarted = true;
-   }
+   protected abstract TomcatEmbedded createTomcatEmbedded() throws UnknownHostException, org.apache.catalina.LifecycleException, LifecycleException;
 
    protected void stopTomcatEmbedded() throws LifecycleException, org.apache.catalina.LifecycleException
    {
@@ -334,5 +248,108 @@ public class TomcatContainer implements DeployableContainer
 	 */
 	public void addConnector(Connector connector) {		
 		embedded.getService().addConnector(connector);
+	}
+
+	/**
+	 * @param bindAddress the bindAddress to set
+	 */
+	public void setBindAddress(String bindAddress) {
+		this.bindAddress = bindAddress;
+	}
+
+	/**
+	 * @return the bindAddress
+	 */
+	public String getBindAddress() {
+		return bindAddress;
+	}
+
+	/**
+	 * @param bindPort the bindPort to set
+	 */
+	public void setBindPort(int bindPort) {
+		this.bindPort = bindPort;
+	}
+
+	/**
+	 * @return the bindPort
+	 */
+	public int getBindPort() {
+		return bindPort;
+	}
+
+	/**
+	 * @param wasStarted the wasStarted to set
+	 */
+	public void setWasStarted(boolean wasStarted) {
+		this.wasStarted = wasStarted;
+	}
+
+	/**
+	 * @return the wasStarted
+	 */
+	public boolean isWasStarted() {
+		return wasStarted;
+	}
+
+	/**
+	 * @param serverName the serverName to set
+	 */
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
+	}
+
+	/**
+	 * @return the serverName
+	 */
+	public String getServerName() {
+		return serverName;
+	}
+
+	/**
+	 * @return the configuration
+	 */
+	public abstract TomcatConfiguration getConfiguration();
+
+	/**
+	 * @param engine the engine to set
+	 */
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+	/**
+	 * @return the engine
+	 */
+	public Engine getEngine() {
+		return engine;
+	}
+
+	/**
+	 * @param standardHost the standardHost to set
+	 */
+	public void setStandardHost(Host standardHost) {
+		this.standardHost = standardHost;
+	}
+
+	/**
+	 * @return the standardHost
+	 */
+	public Host getStandardHost() {
+		return standardHost;
+	}
+
+	/**
+	 * @param embedded the embedded to set
+	 */
+	public void setEmbedded(TomcatEmbedded embedded) {
+		this.embedded = embedded;
+	}
+
+	/**
+	 * @return the embedded
+	 */
+	public TomcatEmbedded getEmbedded() {
+		return embedded;
 	}
 }
