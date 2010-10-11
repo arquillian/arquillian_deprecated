@@ -56,6 +56,12 @@ public class JBossASConfiguration implements ContainerConfiguration
     * Port must be reachable from remote server.
     */
    private int localDeploymentBindPort = 9999;
+
+   /**
+    * Flag indicating whether the archive should be exploded when^M
+    * it is deployed to the server.^M
+    */
+   private boolean deployExploded = false;
    
    public ContainerProfile getContainerProfile()
    {
@@ -110,5 +116,15 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setLocalDeploymentBindPort(int localDeploymentBindPort)
    {
       this.localDeploymentBindPort = localDeploymentBindPort;
+   }
+
+   public boolean isDeployExploded()
+   {
+      return deployExploded;
+   }
+
+   public void setDeployExploded(boolean deployExploded)
+   {
+      this.deployExploded = deployExploded;
    }
 }

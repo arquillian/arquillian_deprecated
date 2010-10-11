@@ -41,6 +41,7 @@ import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.deployers.spi.management.deploy.DeploymentManager;
 import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
 import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
+import org.jboss.profileservice.spi.DeploymentOption;
 import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
@@ -140,7 +141,15 @@ public class JBossASRemoteContainer implements DeployableContainer
          });
          URL fileServerUrl = createFileServerURL(deploymentName);
          
-         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
+         DeploymentProgress distribute = null;
+         if (configuration.isDeployExploded())
+         {
+            distribute = deploymentManager.distribute(deploymentName, fileServerUrl, DeploymentOption.Explode);
+         }
+         else
+         {
+            distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
+         }
          distribute.run();
          DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
          if(uploadStatus.isFailed()) 

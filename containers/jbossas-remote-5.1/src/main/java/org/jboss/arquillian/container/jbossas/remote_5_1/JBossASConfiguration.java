@@ -57,6 +57,12 @@ public class JBossASConfiguration implements ContainerConfiguration
     */
    private int localDeploymentBindPort = 9999;
    
+   /**
+    * Flag indicating whether the archive should be exploded when
+    * it is deployed to the server.
+    */
+   private boolean deployExploded = false;
+   
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
@@ -110,5 +116,15 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setLocalDeploymentBindPort(int localDeploymentBindPort)
    {
       this.localDeploymentBindPort = localDeploymentBindPort;
+   }
+
+   public boolean isDeployExploded()
+   {
+      return deployExploded;
+   }
+
+   public void setDeployExploded(boolean deployExploded)
+   {
+      this.deployExploded = deployExploded;
    }
 }
