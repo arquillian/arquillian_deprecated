@@ -58,8 +58,15 @@ public class JBossASConfiguration implements ContainerConfiguration
    private int localDeploymentBindPort = 9999;
    
    /**
-    * Flag indicating whether the archive should be exploded when
-    * it is deployed to the server.
+    * Flag indicating whether the archive should be exploded when it is deployed
+    * to the server.
+    * 
+    * <p>
+    * <strong>NOTE</strong> This flag will only work on JBoss EAP 5.1, not JBoss
+    * AS 5.1 Community Edition. The deployment option feature never got merged
+    * into the commmunity edition branch as described in this issue:
+    * <a href="https://jira.jboss.org/browse/JBAS-6693">JBAS-6693</a>
+    * </p>
     */
    private boolean deployExploded = false;
    
