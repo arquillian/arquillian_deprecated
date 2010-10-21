@@ -16,14 +16,13 @@
  */
 package org.jboss.arquillian.spi;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
- * Holds the global Arquillian configuration and a Map of {@link ContainerConfiguration} implementations objects. It is built by
- * {@link org.jboss.arquillian.impl.ConfigurationBuilder}s
+ * Holds the global Arquillian configuration and the containers, extensions and protocols configuration . 
+ * It is built by implementations of the {@link org.jboss.arquillian.impl.ConfigurationBuilder} interface.
  * 
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
  * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
@@ -32,78 +31,199 @@ import java.util.Map.Entry;
 public class Configuration
 {
    /**
-    * A Map of container configuration objects
+    * Holds the configuration of containers
     */
-   private Map<Class<? extends ContainerConfiguration>, ContainerConfiguration> containersConfig = new HashMap<Class<? extends ContainerConfiguration>, ContainerConfiguration>();
+   private Map<ContainerConfigKey, Map<String, String>> containersConfig = new HashMap<ContainerConfigKey, Map<String, String>>();
 
-   private Map<Class<? extends ExtensionConfiguration>, ExtensionConfiguration> extensionsConfig = new HashMap<Class<? extends ExtensionConfiguration>, ExtensionConfiguration>();
+   /**
+    * Holds the configuration of extensions
+    */
+   private Map<String, Map<String, String>> extensionsConfig = new HashMap<String, Map<String, String>>();
+   
+   /**
+    * The qualifier of the active container, null if no active container was specified
+    */
+   private String activeContainerQualifier = null;
 
    private String deploymentExportPath = null;
+   
    private int maxDeploymentsBeforeRestart = -1;
-
+   
    /**
-    * Puts a {@link ContainerConfiguration} implementation in the containersConfig
-    * field. If the {@link ContainerConfiguration} already exists, it just replaces
-    * it.
-    * @param containerConfig the {@link ContainerConfiguration} implementation to put.
-    */
-   public void addContainerConfig(ContainerConfiguration containerConfig)
-   {
-      containersConfig.put(containerConfig.getClass(), containerConfig);
-   }
-
-   /**
-    * Stores a {@link ExtensionConfiguration} implementation. If there exists the
-    * configuration for the same extension, it just replaces it.
+    * Stores a container configuration in the containersConfig map. If the package and qualifier 
+    * already exists, it just replaces it.
     * 
-    * @param extensionConfig the ${@link ExtensionConfiguration} implementation to store.
+    * @param packageName the name of the package that we will be used to match the container
+    * configuration.
+    * @param qualifier the qualifier of the container, null if the container has no qualifer.
+    * @param properties a Map of properties that will be used to populate the container 
+    * configuration.
     */
-   public void addExtensionConfig(ExtensionConfiguration extensionConfig)
+   public void addContainerConfig(String packageName, String qualifier, Map<String, String> properties)
    {
-      extensionsConfig.put(extensionConfig.getClass(), extensionConfig);
+	   containersConfig.put(new ContainerConfigKey(packageName, qualifier), properties);	   
    }
 
    /**
-    * Retrieves a {@link ContainerConfiguration} implementation that matches the clazz
-    * parameter.
-    * @param <T>
-    * @param clazz The actual class of the {@link ContainerConfiguration} we are looking
-    *        for.
-    * @return the {@link ContainerConfiguration} implementation that matches the clazz
-    *         parameter, null otherwise.
-    */
-   public <T extends ContainerConfiguration> T getContainerConfig(Class<T> clazz)
-   {
-      return clazz.cast(containersConfig.get(clazz));
-   }
-
-   /**
-    * Retrieves a {@link ExtensionConfiguration} implementation that matches
-    * the {@code clazz} parameter
-    * @param <T>
-    * @param clazz the actual class of the configuration we are looking for
-    * @return the {@link ExtensionConfiguration} implementation that matches the clazz
-    *         parameter, null otherwise.
-    */
-   public <T extends ExtensionConfiguration> T getExtensionConfig(Class<T> clazz)
-   {
-      return clazz.cast(extensionsConfig.get(clazz));
-   }
-
-   /**
+    * Stores an extension configuration in the extensionsConfig map. If the package already
+    * exists, it just replaces it. 
     * 
-    * @return
-    * @deprecated
+    * @param packageName the name of the package that will be used to match the container 
+    * configuration.
+    * @param properties a Map of properties that will be used to populate the container
+    * configuration.
     */
-   // TODO: figure out permanent solution
-   public ContainerConfiguration getActiveContainerConfiguration()
+   public void addExtensionConfig(String packageName, Map<String, String> properties)
    {
-      Iterator<Entry<Class<? extends ContainerConfiguration>, ContainerConfiguration>> itr = containersConfig.entrySet().iterator();
-      if (itr.hasNext())
+      extensionsConfig.put(packageName, properties);
+   }
+   
+   /**
+    * Populates a {@link ContainerConfiguration} object if there is a matching configuration for the 
+    * container/qualifier. If not, it will leave the object as it was received.
+    * 
+    * @param container the {@link ContainerConfiguration} object to be populated.
+    * @param qualifier used to match the container configuration.
+    * @throws ConfigurationException wraps any exception thrown.
+    */
+   public void populateContainerConfig(ContainerConfiguration container, String qualifier) throws ConfigurationException
+   {
+      try 
       {
-         return itr.next().getValue();
+         // retrieve container
+         String pkg = container.getClass().getPackage().getName();
+         Map<String, String> properties = containersConfig.get(new ContainerConfigKey(pkg, qualifier));
+         
+         // if no configuration found, just return
+         if (properties == null) {
+             return;
+         }
+         
+         // map the properties to the container
+         populateObject(container, properties);
       }
-      return null;
+      catch (Exception e) 
+      {
+         throw new ConfigurationException(e);
+      }
+   }
+
+   /**
+    * Populates a {@link ExtensionConfiguration} object if there is a matching configuration for the
+    * extension. If not, it will leave the object as it was received.
+    * 
+    * @param extension the {@link ExtensionConfiguration} object to be populated.
+    * @throws ConfigurationException wraps any exception thrown.
+    */
+   public void populateExtensionConfig(ExtensionConfiguration extension) throws ConfigurationException
+   {
+      try 
+      {
+         // retrieve the extension properties
+         String pkg = extension.getClass().getPackage().getName();
+         Map<String, String> properties = extensionsConfig.get(pkg);
+         
+         // if no configuration found, just return
+         if (properties == null) {
+             return;
+         }
+         
+         // map the properties to the container
+         populateObject(extension, properties);
+      }
+      catch (Exception e) 
+      {
+         throw new ConfigurationException(e);
+      }
+   }
+   
+   /**
+    * Helper method. Populates the object with the properties received in the map.
+    * 
+    * @param object the object to be populated.
+    * @param properties a Map of properties that will be used to populate the object
+    * @throws Exception if something fails.
+    */
+   public static void populateObject(Object object, Map<String, String> properties) throws Exception 
+   {
+      Map<String, Method> setters = new HashMap<String, Method>();
+      for (Method candidate : object.getClass().getMethods())
+      {
+         String methodName = candidate.getName();
+         if (methodName.matches("^set[A-Z].*") &&
+               candidate.getReturnType().equals(Void.TYPE) &&
+               candidate.getParameterTypes().length == 1)
+         {
+            candidate.setAccessible(true);
+            setters.put(methodName.substring(3, 4).toLowerCase() + methodName.substring(4), candidate);
+         }
+      }
+
+      // set the properties found in the container XML fragment to the Configuration Object
+      for (Map.Entry<String, String> property : properties.entrySet()) 
+      {
+         if (setters.containsKey(property.getKey()))
+         {
+            Method method = setters.get(property.getKey());
+            Object value = convert(method.getParameterTypes()[0], property.getValue());
+            method.invoke(object, value);
+         } 
+         else 
+         {
+            throw new IllegalArgumentException("property '" + property.getKey() + "' not found on class: " + object.getClass().getName()); 
+         }
+      }
+   }
+   
+   /**
+    * Converts a String value to the specified class.
+    * 
+    * @param clazz
+    * @param value
+    * @return
+    */
+   private static Object convert(Class<?> clazz, String value) 
+   {
+      /* TODO create a new Converter class and move this method there for reuse */
+      
+      if (Integer.class.equals(clazz) || int.class.equals(clazz)) 
+      {
+         return Integer.valueOf(value);
+      } 
+      else if (Double.class.equals(clazz) || double.class.equals(clazz)) 
+      {
+         return Double.valueOf(value);
+      } 
+      else if (Long.class.equals(clazz) || long.class.equals(clazz))
+      {
+         return Long.valueOf(value);
+      }
+      else if (Boolean.class.equals(clazz) || boolean.class.equals(clazz))
+      {
+         return Boolean.valueOf(value);
+      }
+      
+      return value;
+   }
+
+   /**
+    * Get the active container qualifier of null if no active container has been specified.
+    * 
+    * @return the qualifier of the active container
+    */
+   public String getActiveContainerQualifier()
+   {
+      return activeContainerQualifier;
+   }
+
+   /**
+    * Sets the active container qualifier.
+    * 
+    * @param activeContainerQualifier the qualifier of the active container.
+    */
+   public void setActiveContainerQualifier(String activeContainerQualifier)
+   {
+      this.activeContainerQualifier = activeContainerQualifier;
    }
 
    /**
@@ -143,5 +263,73 @@ public class Configuration
    public void setMaxDeploymentsBeforeRestart(int maxDeploymentsBeforeRestart)
    {
       this.maxDeploymentsBeforeRestart = maxDeploymentsBeforeRestart;
+   }
+   
+   /**
+    * This class is used as the key of the map of container configuration
+    * 
+    * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
+    */
+   class ContainerConfigKey {
+	   
+	   private String packageName;
+	   
+	   private String qualifier;
+	   
+	   public ContainerConfigKey(String packageName) {
+		   this(packageName, null);
+	   }
+	   
+	   public ContainerConfigKey(String packageName, String qualifier) {
+		   this.packageName = packageName;
+		   this.qualifier = qualifier;
+	   }
+
+		@Override
+		public int hashCode() 
+		{
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getOuterType().hashCode();
+			result = prime * result
+					+ ((packageName == null) ? 0 : packageName.hashCode());
+			result = prime * result
+					+ ((qualifier == null) ? 0 : qualifier.hashCode());
+			return result;
+		}
+	
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ContainerConfigKey other = (ContainerConfigKey) obj;
+			if (!getOuterType().equals(other.getOuterType()))
+				return false;
+			if (packageName == null) 
+			{
+				if (other.packageName != null)
+					return false;
+			} 
+			else if (!packageName.equals(other.packageName))
+				return false;
+			if (qualifier == null) 
+			{
+				if (other.qualifier != null)
+					return false;
+			} 
+			else if (!qualifier.equals(other.qualifier))
+				return false;
+			return true;
+		}
+	
+		private Configuration getOuterType() 
+		{
+			return Configuration.this;
+		}
+	   
    }
 }

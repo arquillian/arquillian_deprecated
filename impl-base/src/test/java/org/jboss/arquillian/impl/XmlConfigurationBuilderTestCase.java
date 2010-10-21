@@ -16,15 +16,11 @@
  */
 package org.jboss.arquillian.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.ExtensionConfiguration;
-import org.jboss.arquillian.spi.ServiceLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -49,7 +45,6 @@ public class XmlConfigurationBuilderTestCase
       Configuration configuration = builder.build();
 
       Assert.assertNotNull(configuration);
-      Assert.assertNull(configuration.getContainerConfig(MockContainerConfiguration.class));
    }
    
    /**
@@ -58,12 +53,9 @@ public class XmlConfigurationBuilderTestCase
     */
    @Test
    public void testValidConfigurationFile() throws Exception 
-   {
-      // create a mock ServiceLoader that returns our MockContainerConfiguration
-      ServiceLoader serviceLoader = new MockServiceLoader(new MockContainerConfiguration());
-      
+   {      
       // build the configuration
-      ConfigurationBuilder builder = new XmlConfigurationBuilder("arquillian.xml", serviceLoader);
+      ConfigurationBuilder builder = new XmlConfigurationBuilder("arquillian.xml");
       Configuration configuration = builder.build();
       Assert.assertNotNull(configuration);
 
@@ -73,7 +65,8 @@ public class XmlConfigurationBuilderTestCase
             configuration.getDeploymentExportPath());
       
       // retrieve the container configuration
-      MockContainerConfiguration containerConfig = configuration.getContainerConfig(MockContainerConfiguration.class);
+      MockContainerConfiguration containerConfig = new MockContainerConfiguration();
+      configuration.populateContainerConfig(containerConfig, null);
       Assert.assertNotNull(containerConfig);
       
       // check that the properties have the correct value
@@ -106,84 +99,29 @@ public class XmlConfigurationBuilderTestCase
    public void testLoadDefaultConfigurationOnMissingFile() throws Exception
    {
       Configuration configuration = new XmlConfigurationBuilder(
-            "missing_arquillian.xml", 
-            new MockServiceLoader(new MockContainerConfiguration())).build();
+            "missing_arquillian.xml").build();
       
-      ContainerConfiguration containerConfiguration = configuration.getActiveContainerConfiguration();
-      Assert.assertNotNull(containerConfiguration);
-      
-      MockContainerConfiguration mockContainerConfiguration = configuration.getContainerConfig(MockContainerConfiguration.class);
+      MockContainerConfiguration mockContainerConfiguration = new MockContainerConfiguration();
+      configuration.populateContainerConfig(mockContainerConfiguration, null);
       Assert.assertNotNull(mockContainerConfiguration);
    }
    
    @Test
    public void testMockExtensionConfiguration() throws Exception
-   {
-      // create a mock ServiceLoader that returns our MockContainerConfiguration
-      ServiceLoader serviceLoader = new MockServiceLoader(new MockExtensionConfiguration());
-      
+   {      
       // build the configuration
-      ConfigurationBuilder builder = new XmlConfigurationBuilder("arquillian-extension.xml", serviceLoader);
+      ConfigurationBuilder builder = new XmlConfigurationBuilder("arquillian-extension.xml");
       Configuration configuration = builder.build();
       Assert.assertNotNull(configuration);
       
-      MockExtensionConfiguration extensionConfig = configuration.getExtensionConfig(MockExtensionConfiguration.class);
+      MockExtensionConfiguration extensionConfig = new MockExtensionConfiguration();
+      configuration.populateExtensionConfig(extensionConfig);
       Assert.assertNotNull(extensionConfig);
       
       // check that the properties have the correct value
       Assert.assertEquals("*superbrowser /usr/local/bin/superbrowser", extensionConfig.getBrowser());
       Assert.assertEquals(8888, extensionConfig.getServerPort());
       Assert.assertEquals("localhost", extensionConfig.getServerHost());
-   }
-   
-   /**
-    * Mocks the ServiceLoader to return configuration we want to test
-    * 
-    * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
-    * @author <a href="mailto:kpiwko@redhat.com">Karel Piwko</a>
-    */
-   class MockServiceLoader implements ServiceLoader 
-   {
-      private Object instance;
-      
-      /**
-       * 
-       * @param instance
-       */
-      public MockServiceLoader(Object instance) {
-         this.instance = instance;
-      }
-      
-      
-      @SuppressWarnings("unchecked")      
-      public <T> Collection<T> all(Class<T> serviceClass)
-      {
-         if(serviceClass.isAssignableFrom(instance.getClass())) 
-         {         
-            return (Collection<T>) Collections.singleton(instance);
-         }
-         
-         return Collections.emptyList();
-      }
-
-      @SuppressWarnings("unchecked")      
-      public <T> T onlyOne(Class<T> serviceClass)
-      {
-         if(serviceClass.isAssignableFrom(instance.getClass()))
-         {
-            return (T) instance;
-         }
-         
-         return null;
-      }
-      
-      /* (non-Javadoc)
-       * @see org.jboss.arquillian.spi.ServiceLoader#onlyOne(java.lang.Class, java.lang.Class)
-       */
-      public <T> T onlyOne(Class<T> serviceClass, Class<? extends T> defaultServiceClass)
-      {
-         return onlyOne(serviceClass);
-      }
    }
 
    class AbstractMockContainerConfiguration
