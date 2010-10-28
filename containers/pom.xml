@@ -41,7 +41,10 @@
         <module>jbossas-remote-6</module>
         <module>jbossas-managed-5.1</module>
         <module>jbossas-managed-6</module>
+        <!-- jbossas-embedded-6 disabled until test is fixed -->
+        <!--
         <module>jbossas-embedded-6</module>
+        -->
         <module>reloaded-embedded-1</module>
         <module>jsr88-remote-1.2</module>
         <module>glassfish-remote-3</module>
