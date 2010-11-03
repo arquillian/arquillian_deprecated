@@ -32,7 +32,7 @@ public class WorkHardCdiTestCase
    @Inject HardWorker worker;
    
    @Test
-   @Performance(time=20)
+   @Performance(time=30)
    public void doHardWork() throws Exception 
    {
       Assert.assertEquals(21, worker.workingHard(), 0d);
@@ -44,7 +44,7 @@ public class WorkHardCdiTestCase
     * @throws Exception
     */
    @Test(expected = PerformanceException.class)
-   @Performance(time=9)
+   @Performance(time=5)
    public void doHardWorkThatFails() throws Exception
    {
       Assert.assertEquals(21, worker.workingHard(), 0d);
