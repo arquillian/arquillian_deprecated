@@ -26,23 +26,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.InitialContext;
 
-import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.deployers.spi.management.deploy.DeploymentManager;
 import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
 import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.managed.api.ManagedDeployment.DeploymentPhase;
 import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.virtual.VFS;
 
@@ -56,7 +56,7 @@ import com.sun.net.httpserver.HttpServer;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossASRemoteContainer implements DeployableContainer
+public class JBossASRemoteContainer implements DeployableContainer<JBossASConfiguration>
 {
    private final List<String> failedUndeployments = new ArrayList<String>();
    private DeploymentManager deploymentManager;
@@ -64,13 +64,25 @@ public class JBossASRemoteContainer implements DeployableContainer
    private HttpServer httpFileServer;
    
    private JBossASConfiguration configuration;
-   
-   public void setup(Context context, Configuration configuration)
+
+   private InitialContext context;
+
+   public ProtocolDescription getDefaultProtocol()
    {
-      this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
+      return new ProtocolDescription("Servlet 2.5");
    }
    
-   public void start(Context context) throws LifecycleException
+   public Class<JBossASConfiguration> getConfigurationClass()
+   {
+      return JBossASConfiguration.class;
+   }
+   
+   public void setup(JBossASConfiguration configuration)
+   {
+      this.configuration = configuration;
+   }
+   
+   public void start() throws LifecycleException
    {
       try 
       {
@@ -90,7 +102,7 @@ public class JBossASRemoteContainer implements DeployableContainer
       }
    }
    
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try 
       {
@@ -103,9 +115,9 @@ public class JBossASRemoteContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
    {
-      if(archive == null) 
+      if(deployments == null) 
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
@@ -113,82 +125,90 @@ public class JBossASRemoteContainer implements DeployableContainer
       {
          throw new IllegalStateException("start has not been called!");
       }
-      String deploymentName = archive.getName();
-      
-      Exception failure = null;
-      try
+      for(final Deployment deployment : deployments)
       {
-         httpFileServer.createContext("/" + deploymentName, new HttpHandler()
+         String deploymentName = deployment.getName();
+
+         Exception failure = null;
+         try
          {
-            public void handle(HttpExchange exchange) throws IOException
+            httpFileServer.createContext("/" + deploymentName, new HttpHandler()
             {
-               InputStream zip = archive.as(ZipExporter.class).exportZip();
-               ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-               JBossASRemoteContainer.copy(zip, zipStream);
-               zip.close();
+               public void handle(HttpExchange exchange) throws IOException
+               {
+                  if(deployment.isArchiveDeployment())
+                  {
+                     InputStream zip = deployment.getArchive().as(ZipExporter.class).exportAsInputStream();
+                     ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+                     JBossASRemoteContainer.copy(zip, zipStream);
+                     zip.close();
 
-               byte[] zipArray = zipStream.toByteArray();
-               exchange.sendResponseHeaders(200, zipArray.length);
+                     byte[] zipArray = zipStream.toByteArray();
+                     exchange.sendResponseHeaders(200, zipArray.length);
 
-               OutputStream out = exchange.getResponseBody();
-               out.write(zipArray);
-               out.close();
+                     OutputStream out = exchange.getResponseBody();
+                     out.write(zipArray);
+                     out.close();                     
 
-            }
-         });
-         URL fileServerUrl = createFileServerURL(deploymentName);
-         
-         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, DeploymentPhase.APPLICATION, fileServerUrl, true);
-         distribute.run();
-         DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
-         if(uploadStatus.isFailed()) 
-         {
-            failure = uploadStatus.getFailure();
-            undeploy(deploymentName);
-         } 
-         else 
-         {
-            DeploymentProgress progress = deploymentManager.start(DeploymentPhase.APPLICATION, deploymentName);
-            progress.run();
-            DeploymentStatus status = progress.getDeploymentStatus();
-            if (status.isFailed())
+                  }
+                  else
+                  {
+                     exchange.sendResponseHeaders(200, -1);
+
+                     OutputStream out = exchange.getResponseBody();
+                     out.write(deployment.getDescriptor().exportAsString().getBytes());
+                     out.close();
+                  }
+               }
+            });
+            URL fileServerUrl = createFileServerURL(deploymentName);
+            
+            DeploymentProgress distribute = deploymentManager.distribute(deploymentName, DeploymentPhase.APPLICATION, fileServerUrl, true);
+            distribute.run();
+            DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
+            if(uploadStatus.isFailed()) 
             {
-               failure = status.getFailure();
+               failure = uploadStatus.getFailure();
                undeploy(deploymentName);
+            } 
+            else 
+            {
+               DeploymentProgress progress = deploymentManager.start(DeploymentPhase.APPLICATION, deploymentName);
+               progress.run();
+               DeploymentStatus status = progress.getDeploymentStatus();
+               if (status.isFailed())
+               {
+                  failure = status.getFailure();
+                  undeploy(deploymentName);
+               }
             }
          }
+         catch (Exception e)
+         {
+            throw new DeploymentException("Could not deploy " + deploymentName, e);
+         }
+         if (failure != null)
+         {
+            throw new DeploymentException("Failed to deploy " + deploymentName, failure);
+         }
       }
-      catch (Exception e)
-      {
-         throw new DeploymentException("Could not deploy " + deploymentName, e);
-      }
-      if (failure != null)
-      {
-         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
-      }
-      try 
-      {
-         return new ServletMethodExecutor(
-               new URL(
-                     "http",
-                     configuration.getRemoteServerAddress(),
+      return new ProtocolMetaData()
+               .addContext(new HTTPContext(
+                     configuration.getRemoteServerAddress(), 
                      configuration.getRemoteServerHttpPort(), 
-                     "/")
-               );
-      } 
-      catch (Exception e) 
-      {
-         throw new RuntimeException("Could not create ContianerMethodExecutor", e);
-      }
+                     "test"));
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Deployment... deployments) throws DeploymentException
    {
-      if(archive == null) 
+      if(deployments == null) 
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
-      undeploy(archive.getName());
+      for(Deployment deployment : deployments)
+      {
+         undeploy(deployment.getName());
+      }
    }
 
    private void undeploy(String name) throws DeploymentException
@@ -215,7 +235,7 @@ public class JBossASRemoteContainer implements DeployableContainer
    private void initDeploymentManager() throws Exception 
    {
       String profileName = configuration.getProfileName();
-      InitialContext ctx = new InitialContext();
+      InitialContext ctx = createContext();
       ProfileService ps = (ProfileService) ctx.lookup("ProfileService");
       deploymentManager = ps.getDeploymentManager();
       ProfileKey defaultKey = new ProfileKey(profileName);
@@ -223,6 +243,19 @@ public class JBossASRemoteContainer implements DeployableContainer
       VFS.init();
    }
    
+   private InitialContext createContext() throws Exception
+   {
+      if(context == null)
+      {
+         Properties props = new Properties();
+         props.put(InitialContext.INITIAL_CONTEXT_FACTORY, configuration.getContextFactory());
+         props.put(InitialContext.URL_PKG_PREFIXES, configuration.getUrlPkgPrefix());
+         props.put(InitialContext.PROVIDER_URL, configuration.getProviderUrl());
+         context = new InitialContext(props);
+      }
+      return context;
+   }
+
    private URL createFileServerURL(String archiveName) 
    {
       try 
