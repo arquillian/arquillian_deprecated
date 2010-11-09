@@ -18,11 +18,11 @@ package org.jboss.arquillian.container.glassfish.embedded_3;
 
 import java.util.UUID;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the GlassFish Embedded container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>

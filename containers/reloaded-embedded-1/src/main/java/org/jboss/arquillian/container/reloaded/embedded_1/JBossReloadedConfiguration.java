@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.reloaded.embedded_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * JBossReloadedConfiguration

@@ -16,8 +16,7 @@
  */
 package org.jboss.arquillian.container.openwebbeans.embedded_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * OpenWebBeansConfiguration
@@ -27,11 +26,4 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class OpenWebBeansConfiguration implements ContainerConfiguration
 {
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
-    */
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.STANDALONE;
-   }
 }

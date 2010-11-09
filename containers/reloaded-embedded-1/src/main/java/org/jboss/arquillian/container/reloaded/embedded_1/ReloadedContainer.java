@@ -26,9 +26,9 @@ import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
 import org.jboss.bootstrap.api.lifecycle.LifecycleState;
 import org.jboss.bootstrap.api.mc.server.MCServer;
@@ -94,7 +94,7 @@ public class ReloadedContainer implements DeployableContainer
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
     */
    @Override
    public void setup(final Context context, final Configuration configuration)
@@ -104,7 +104,7 @@ public class ReloadedContainer implements DeployableContainer
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
     */
    @Override
    public ContainerMethodExecutor deploy(final Context context, final Archive<?> archive) throws DeploymentException
@@ -126,7 +126,7 @@ public class ReloadedContainer implements DeployableContainer
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#start(org.jboss.arquillian.spi.Context)
     */
    @Override
    public void start(Context context) throws LifecycleException
@@ -201,7 +201,7 @@ public class ReloadedContainer implements DeployableContainer
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
     */
    @Override
    public void stop(final Context context) throws LifecycleException
@@ -224,7 +224,7 @@ public class ReloadedContainer implements DeployableContainer
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
     */
    @Override
    public void undeploy(Context context, final Archive<?> archive) throws DeploymentException

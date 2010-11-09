@@ -16,11 +16,11 @@
  */
 package org.jboss.arquillian.container.jsr88.remote_1_2;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * a JSR 88-compliant container. The required configuration settings are the
  * deployment URI and the deployment factory class.
  *
@@ -45,11 +45,6 @@ public class JSR88Configuration implements ContainerConfiguration
 
    protected void setDefaults()
    {
-   }
-
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
    }
 
    public int getRemoteServerHttpPort()

@@ -38,14 +38,12 @@ import org.glassfish.api.embedded.EmbeddedContainer;
 import org.glassfish.api.embedded.EmbeddedFileSystem;
 import org.glassfish.api.embedded.Port;
 import org.glassfish.api.embedded.Server;
-import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.glassfish.api.ShrinkwrapReadableArchive;
 import org.jvnet.hk2.annotations.Service;
 
@@ -57,7 +55,7 @@ import org.jvnet.hk2.annotations.Service;
  * @version $Revision: $
  * @see org.glassfish.admin.cli.resources.AddResources
  */
-public class GlassFishEmbeddedContainer implements DeployableContainer
+public class GlassFishEmbeddedContainer implements DeployableContainer<GlassFishConfiguration>
 {
    public static final String HTTP_PROTOCOL = "http";
    public static final String DEFAULT_ASADMIN_PARAM = "DEFAULT";
@@ -67,23 +65,24 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
    private String target = "server";
    private Server server;
 
-   private GlassFishConfiguration containerConfig;
+   private GlassFishConfiguration configuration;
    
-   public GlassFishEmbeddedContainer()
+   public Class<GlassFishConfiguration> getConfigurationClass()
    {
+      return GlassFishConfiguration.class;
    }
    
-   public void setup(Context context, Configuration arquillianConfig)
+   public void setup(GlassFishConfiguration configuration)
    {
-      containerConfig = arquillianConfig.getContainerConfig(GlassFishConfiguration.class);
+      this.configuration = configuration;
       final Server.Builder serverBuilder = new Server.Builder("arquillian-" + System.currentTimeMillis());
 
       final EmbeddedFileSystem.Builder embeddedFsBuilder = new EmbeddedFileSystem.Builder()
-            .instanceRoot(new File(containerConfig.getInstanceRoot()))
-            .autoDelete(containerConfig.isAutoDelete());
-      if (containerConfig.getDomainXml() != null)
+            .instanceRoot(new File(configuration.getInstanceRoot()))
+            .autoDelete(configuration.isAutoDelete());
+      if (configuration.getDomainXml() != null)
       {
-         File domainXmlFile = new File(containerConfig.getDomainXml());
+         File domainXmlFile = new File(configuration.getDomainXml());
          if (!domainXmlFile.exists() || !domainXmlFile.isFile())
          {
             throw new RuntimeException("File specified in domainXml configuration property does not exist: " +
@@ -95,9 +94,9 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       server = serverBuilder.embeddedFileSystem(embeddedFsBuilder.build()).build();
       server.addContainer(ContainerBuilder.Type.all);
 
-      if (containerConfig.getSunResourcesXml() != null)
+      if (configuration.getSunResourcesXml() != null)
       {
-         File resourcesXmlFile = new File(containerConfig.getSunResourcesXml());
+         File resourcesXmlFile = new File(configuration.getSunResourcesXml());
          if (!resourcesXmlFile.exists() || !resourcesXmlFile.isFile())
          {
             throw new RuntimeException("File specified in sunResourcesXml configuration property does not exist: " +
@@ -110,7 +109,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
             copyResourceDTDsToFileSystem(server.getFileSystem().instanceRoot, "dtds/" , "glassfish-resources_1_5.dtd");
             
             ParameterMap params = new ParameterMap();
-            params.add(DEFAULT_ASADMIN_PARAM, containerConfig.getSunResourcesXml());
+            params.add(DEFAULT_ASADMIN_PARAM, configuration.getSunResourcesXml());
             {
                executeCommand(AddResources.class.getAnnotation(Service.class).name(), server, params);
             }
@@ -122,11 +121,11 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try 
       {
-         Port httpPort = server.createPort(containerConfig.getBindHttpPort());
+         Port httpPort = server.createPort(configuration.getBindHttpPort());
          for(EmbeddedContainer container : server.getContainers())
          {
             container.getSniffers();
@@ -140,7 +139,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try 
       {
@@ -152,34 +151,35 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
    {
-      try 
+      for(Deployment deployment : deployments)
       {
-         DeployCommandParameters params = new DeployCommandParameters();
-         params.enabled = true;
-         params.target = target;
-         params.name = createDeploymentName(archive.getName());
-         
-         server.getDeployer().deploy(
-               archive.as(ShrinkwrapReadableArchive.class),
-               params);
-
-      } 
-      catch (Exception e) 
-      {
-         throw new DeploymentException("Could not deploy " + archive.getName(), e);
+         try 
+         {
+            if(deployment.isArchiveDeployment())
+            {
+               DeployCommandParameters params = new DeployCommandParameters();
+               params.enabled = true;
+               params.target = target;
+               params.name = createDeploymentName(deployment.getName());
+               
+               server.getDeployer().deploy(
+                     deployment.getArchive().as(ShrinkwrapReadableArchive.class),
+                     params);
+            }
+         } 
+         catch (Exception e) 
+         {
+            throw new DeploymentException("Could not deploy " + deployment.getName(), e);
+         }
       }
-
       try 
       {
-         return new ServletMethodExecutor(
-               new URL(
-                     HTTP_PROTOCOL,
-                     "localhost",
-                     containerConfig.getBindHttpPort(),
-                     "/")
-               );
+         // TODO: Dynamically lookup contexts
+         return new ProtocolMetaData()
+            .addContext(
+                  new HTTPContext("localhost", configuration.getBindHttpPort(), "/test"));
       } 
       catch (Exception e) 
       {
@@ -187,19 +187,25 @@ public class GlassFishEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Deployment... deployments) throws DeploymentException
    {
-      UndeployCommandParameters params = new UndeployCommandParameters();
-      params.target = target;
-      params.name = createDeploymentName(archive.getName());
-      
-      try 
+      for(Deployment deployment : deployments)
       {
-         server.getDeployer().undeploy(params.name, params);
-      }
-      catch (Exception e) 
-      {
-         throw new DeploymentException("Could not undeploy " + archive.getName(), e);
+         if(deployment.isArchiveDeployment())
+         {
+            UndeployCommandParameters params = new UndeployCommandParameters();
+            params.target = target;
+            params.name = createDeploymentName(deployment.getName());
+            
+            try 
+            {
+               server.getDeployer().undeploy(params.name, params);
+            }
+            catch (Exception e) 
+            {
+               throw new DeploymentException("Could not undeploy " + deployment.getName(), e);
+            }
+         }
       }
    }
    

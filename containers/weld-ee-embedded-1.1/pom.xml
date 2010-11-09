@@ -63,11 +63,6 @@
 
       <dependency>
          <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-extension-classloader</artifactId>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
          <artifactId>shrinkwrap-impl-base</artifactId>
          <scope>provided</scope>
       </dependency>

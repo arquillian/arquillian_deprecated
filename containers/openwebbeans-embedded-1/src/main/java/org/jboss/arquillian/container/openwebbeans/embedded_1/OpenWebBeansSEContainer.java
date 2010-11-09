@@ -35,11 +35,13 @@ import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
 import org.jboss.arquillian.spi.Configuration;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.api.Archive;
 
 /**
@@ -65,41 +67,51 @@ import org.jboss.shrinkwrap.api.Archive;
  * @version $Revision: $
  * @see org.jboss.arquillian.weld.WeldSEContainer
  */
-public class OpenWebBeansSEContainer implements DeployableContainer
+public class OpenWebBeansSEContainer implements DeployableContainer<OpenWebBeansConfiguration>
 {
    private static final Logger log = Logger.getLogger(OpenWebBeansSEContainer.class.getName());
 
    public final static ThreadLocal<ContainerInstanceHolder> CONTAINER_INSTANCE_HOLDER = new ThreadLocal<ContainerInstanceHolder>();
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Configuration)
-    */
-   public void setup(Context context, Configuration configuration)
+   public Class<OpenWebBeansConfiguration> getConfigurationClass()
+   {
+      return OpenWebBeansConfiguration.class;
+   }
+   public void setup(Configuration configuration)
    {
    }
    
    /**
-    * @see org.jboss.arquillian.spi.DeployableContainer#start()
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#start()
     */
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
    }
 
    /**
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop()
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#stop()
     */
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
    }
 
    /**
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
     */
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
+   public ProtocolMetaData deploy(Deployment... deployments)
          throws DeploymentException
    {
+      if(deployments.length > 1)
+      {
+         throw new IllegalArgumentException("Container only support single deployments");
+      }
+      if(!deployments[0].isArchiveDeployment())
+      {
+         throw new IllegalArgumentException("Container only support archive deployments");
+      }
+      Archive<?> archive = deployments[0].getArchive();
+      
       ClassLoader cl = new ShrinkWrapClassLoader(archive);
-
       Thread.currentThread().setContextClassLoader(cl);
 
       final ShrinkWrapMetaDataDiscovery discovery = new ShrinkWrapMetaDataDiscovery(archive);
@@ -157,7 +169,7 @@ public class OpenWebBeansSEContainer implements DeployableContainer
    }
 
    /**
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
     */
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {

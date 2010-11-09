@@ -17,26 +17,26 @@
 package org.jboss.arquillian.container.jsr88.remote_1_2;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.enterprise.deploy.shared.CommandType;
+import javax.enterprise.deploy.shared.ModuleType;
 import javax.enterprise.deploy.shared.factories.DeploymentFactoryManager;
 import javax.enterprise.deploy.spi.DeploymentManager;
+import javax.enterprise.deploy.spi.Target;
 import javax.enterprise.deploy.spi.TargetModuleID;
 import javax.enterprise.deploy.spi.factories.DeploymentFactory;
 import javax.enterprise.deploy.spi.status.ProgressObject;
 
-import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -57,7 +57,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  * object using the Arquillian configuration file (arquillian.xml). Alternatively,
  * you can choose to extend the {@link JSR88Configuration} to assign defaults for
  * these values. You should also specify the configuration class by overriding the
- * {@link JSR88CompliantRemoteContainer#getContainerConfigurationClass()}
+ * {@link JSR88CompliantRemoteContainer#getConfigurationClass()}
  * method.</p>
  *
  * <p>JSR 88 deploys the archive using an {@link InputStream}. The deployed
@@ -69,7 +69,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  * @author Iskandar Salim
  * @see org.glassfish.admin.cli.resources.AddResources
  */
-public class JSR88RemoteContainer implements DeployableContainer
+public class JSR88RemoteContainer<T extends JSR88Configuration> implements DeployableContainer<T>
 {
    public static final String HTTP_PROTOCOL = "http";
    public static final ArchivePath MODULE_ID_STORE_PATH = ArchivePaths.create(".jsr88-module-id");
@@ -82,19 +82,19 @@ public class JSR88RemoteContainer implements DeployableContainer
    private DeploymentManager deploymentManager;
    private boolean moduleStarted = false;
 
-   private JSR88Configuration containerConfig;
+   private T containerConfig;
    
    public JSR88RemoteContainer()
    {
       moduleTypeMapper = new JSR88ModuleTypeMapper();
    }
    
-   public void setup(Context context, Configuration arquillianConfig)
+   public void setup(T containerConfig)
    {
-      containerConfig = arquillianConfig.getContainerConfig(getContainerConfigurationClass());
+      this.containerConfig = containerConfig;
    }
    
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try 
       {
@@ -109,7 +109,7 @@ public class JSR88RemoteContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try
       {
@@ -121,7 +121,7 @@ public class JSR88RemoteContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(Deployment... deployments) throws DeploymentException
    {
       if (deploymentManager == null)
       {
@@ -129,17 +129,26 @@ public class JSR88RemoteContainer implements DeployableContainer
       }
 
       TargetModuleID moduleInfo = null;
-      try {
-         PROGRESS_BARRIER.reset();
-         resetModuleStatus();
-         ProgressObject progress = deploymentManager.distribute(
-               deploymentManager.getTargets(), moduleTypeMapper.getModuleType(archive),
-               archive.as(ZipExporter.class).exportZip(), null);
-         progress.addProgressListener(new JSR88DeploymentListener(this, progress.getResultTargetModuleIDs(), CommandType.DISTRIBUTE));
-         waitForModuleToStart();
-         // QUESTION when is getResultTargetModuleIDs() > 0?
-         moduleInfo =  progress.getResultTargetModuleIDs()[0];
-         context.add(TargetModuleID.class, moduleInfo);
+      try 
+      {
+         for(Deployment deployment : deployments)
+         {
+            if(deployment.isArchiveDeployment())
+            {
+               PROGRESS_BARRIER.reset();
+               resetModuleStatus();
+               ProgressObject progress = deploymentManager.distribute(
+                     deploymentManager.getTargets(), moduleTypeMapper.getModuleType(deployment.getArchive()),
+                     deployment.getArchive().as(ZipExporter.class).exportAsInputStream(), null);
+               progress.addProgressListener(new JSR88DeploymentListener(this, progress.getResultTargetModuleIDs(), CommandType.DISTRIBUTE));
+               waitForModuleToStart();
+               // QUESTION when is getResultTargetModuleIDs() > 0?
+               moduleInfo =  progress.getResultTargetModuleIDs()[0];
+               
+               context.add(TargetModuleID.class, moduleInfo);
+            }
+         }
+         
       }
       catch (Exception e)
       {
@@ -154,13 +163,8 @@ public class JSR88RemoteContainer implements DeployableContainer
       try 
       {
          // FIXME pass moduleId to ServletMethodExecutor since we can't guarantee anymore it's /test
-         return new ServletMethodExecutor(
-               new URL(
-                     HTTP_PROTOCOL,
-                     containerConfig.getRemoteServerAddress(),
-                     containerConfig.getRemoteServerHttpPort(),
-                     "/")
-               );
+         return new ProtocolMetaData().addContext(
+               new HTTPContext(containerConfig.getRemoteServerAddress(), containerConfig.getRemoteServerHttpPort(), "/test"));
       } 
       catch (Exception e) 
       {
@@ -168,7 +172,7 @@ public class JSR88RemoteContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(Deployment... deployments) throws DeploymentException
    {
       if (!moduleStarted)
       {
@@ -181,48 +185,54 @@ public class JSR88RemoteContainer implements DeployableContainer
          throw new DeploymentException("Could not undeploy since deployment manager was not loaded");
       }
       
-      try
+      for(Deployment deployment : deployments)
       {
-         PROGRESS_BARRIER.reset();
-         TargetModuleID moduleInfo = context.get(TargetModuleID.class);
-         if (moduleInfo == null || moduleInfo.getModuleID() == null)
+         if(deployment.isArchiveDeployment())
          {
-            log.log(Level.INFO, "Skipping undeploy since module ID could not be determined");
-            return;
-         }
-         
-         TargetModuleID[] availableModuleIDs = deploymentManager.getAvailableModules(
-               moduleTypeMapper.getModuleType(archive), getDeploymentManager().getTargets());
-         TargetModuleID moduleInfoMatch = null;
-         for (TargetModuleID candidate : availableModuleIDs)
-         {
-            if (candidate.getModuleID().equals(moduleInfo.getModuleID()))
+            try
             {
-               moduleInfoMatch = candidate;
-               break;
+               PROGRESS_BARRIER.reset();
+               TargetModuleID moduleInfo = context.get(TargetModuleID.class);
+               if (moduleInfo == null || moduleInfo.getModuleID() == null)
+               {
+                  log.log(Level.INFO, "Skipping undeploy since module ID could not be determined");
+                  return;
+               }
+               
+               TargetModuleID[] availableModuleIDs = deploymentManager.getAvailableModules(
+                     moduleTypeMapper.getModuleType(deployment.getArchive()), getDeploymentManager().getTargets());
+               TargetModuleID moduleInfoMatch = null;
+               for (TargetModuleID candidate : availableModuleIDs)
+               {
+                  if (candidate.getModuleID().equals(moduleInfo.getModuleID()))
+                  {
+                     moduleInfoMatch = candidate;
+                     break;
+                  }
+               }
+   
+               if (moduleInfoMatch != null)
+               {
+                  TargetModuleID[] targetModuleIDs = { moduleInfoMatch };
+                  ProgressObject progress = deploymentManager.undeploy(targetModuleIDs);
+                  progress.addProgressListener(new JSR88DeploymentListener(this, targetModuleIDs, CommandType.UNDEPLOY));
+                  waitForModuleToUndeploy();
+               }
+               else
+               {
+                  resetModuleStatus();
+                  log.info("Undeploy skipped since could not locate module in list of deployed modules");
+               }
+            }
+            catch (Exception e)
+            {
+               throw new DeploymentException("Could not undeploy module", e);
             }
          }
-
-         if (moduleInfoMatch != null)
-         {
-            TargetModuleID[] targetModuleIDs = { moduleInfoMatch };
-            ProgressObject progress = deploymentManager.undeploy(targetModuleIDs);
-            progress.addProgressListener(new JSR88DeploymentListener(this, targetModuleIDs, CommandType.UNDEPLOY));
-            waitForModuleToUndeploy();
-         }
-         else
-         {
-            resetModuleStatus();
-            log.info("Undeploy skipped since could not locate module in list of deployed modules");
-         }
-      }
-      catch (Exception e)
-      {
-         throw new DeploymentException("Could not undeploy module", e);
       }
    }
 
-   public Class<? extends JSR88Configuration> getContainerConfigurationClass()
+   public Class<T> getConfigurationClass()
    {
       return JSR88Configuration.class;
    }

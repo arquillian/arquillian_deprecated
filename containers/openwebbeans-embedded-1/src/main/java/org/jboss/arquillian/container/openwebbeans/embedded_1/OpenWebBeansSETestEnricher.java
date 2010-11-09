@@ -19,8 +19,6 @@ package org.jboss.arquillian.container.openwebbeans.embedded_1;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.jboss.arquillian.container.openwebbeans.embedded_1.OpenWebBeansSEContainer.ContainerInstanceHolder;
-
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 
 /**
@@ -34,7 +32,7 @@ import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 public class OpenWebBeansSETestEnricher extends CDIInjectionEnricher
 {
    @Override
-   protected BeanManager lookupBeanManager(Context context)
+   protected BeanManager lookupBeanManager()
    {
       ContainerInstanceHolder holder = OpenWebBeansSEContainer.CONTAINER_INSTANCE_HOLDER.get();
       if (holder != null)

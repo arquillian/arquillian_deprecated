@@ -16,11 +16,11 @@
  */
 package org.jboss.arquillian.container.jetty.embedded_6_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the Jetty Embedded 6.1.x container.
  *
  * @author Dan Allen

@@ -16,11 +16,11 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_5_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the JBoss AS container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>

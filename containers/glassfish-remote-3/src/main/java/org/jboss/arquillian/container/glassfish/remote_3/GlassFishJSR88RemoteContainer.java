@@ -20,7 +20,7 @@ import org.jboss.arquillian.container.jsr88.remote_1_2.JSR88Configuration;
 import org.jboss.arquillian.container.jsr88.remote_1_2.JSR88RemoteContainer;
 import org.jboss.arquillian.spi.ContainerMethodExecutor;
 import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeploymentException;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -38,7 +38,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class GlassFishJSR88RemoteContainer extends JSR88RemoteContainer
 {
    @Override
-   public Class<? extends JSR88Configuration> getContainerConfigurationClass()
+   public Class<? extends JSR88Configuration> getConfigurationClass()
    {
       return GlassFishJSR88Configuration.class;
    }

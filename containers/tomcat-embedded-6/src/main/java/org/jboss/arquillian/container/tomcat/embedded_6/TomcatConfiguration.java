@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.tomcat.embedded_6;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * Arquillian Tomcat Container Configuration
