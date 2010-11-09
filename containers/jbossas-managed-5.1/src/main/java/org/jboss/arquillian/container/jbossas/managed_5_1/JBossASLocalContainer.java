@@ -17,25 +17,24 @@
 package org.jboss.arquillian.container.jbossas.managed_5_1;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.jbossas.servermanager.Argument;
 import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
 /**
@@ -44,7 +43,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  * @author <a href="mailto:aamonten@gmail.com">Alejandro Montenegro</a>
  * @version $Revision: $
  */
-public class JBossASLocalContainer implements DeployableContainer
+public class JBossASLocalContainer implements DeployableContainer<JBossASConfiguration>
 {
    private static Logger log = Logger.getLogger(JBossASLocalContainer.class.getName());
 
@@ -54,20 +53,24 @@ public class JBossASLocalContainer implements DeployableContainer
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
-   */
-   public void setup(Context context, Configuration configuration)
+   public ProtocolDescription getDefaultProtocol()
    {
-      this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
+      return new ProtocolDescription("Servlet 2.5");
+   }
+   
+   public Class<JBossASConfiguration> getConfigurationClass()
+   {
+      return JBossASConfiguration.class;
+   }
+   
+   public void setup(JBossASConfiguration configuration)
+   {
+      this.configuration = configuration;
       
       manager = createAndConfigureServerManager();
    }
    
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
-   */
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try
       {
@@ -89,10 +92,7 @@ public class JBossASLocalContainer implements DeployableContainer
       }
    }
 
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
-   */
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       Server server = manager.getServer(configuration.getProfileName());
       if(!server.isRunning())
@@ -118,12 +118,9 @@ public class JBossASLocalContainer implements DeployableContainer
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
    {
-      if (archive == null)
+      if (deployments == null)
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
@@ -131,42 +128,46 @@ public class JBossASLocalContainer implements DeployableContainer
       {
          throw new IllegalStateException("Container has not been setup");
       }
-      final String deploymentName = archive.getName();
-
-      File file = new File(deploymentName);
-      archive.as(ZipExporter.class).exportZip(file, true);
-
       Server server = manager.getServer(configuration.getProfileName());
-      try
+      for(Deployment deployment : deployments)
       {
-         server.deploy(file);
+         final String deploymentName = deployment.getName();
+
+         File file = new File(deploymentName);
+         try
+         {
+            if(deployment.isArchiveDeployment())
+            {
+               deployment.getArchive().as(ZipExporter.class).exportTo(file, true);
+            }
+            else
+            {
+               deployment.getDescriptor().exportTo(new FileOutputStream(file));
+            }
+
+            server.deploy(file);
+         }
+         catch (Exception e)
+         {
+            throw new DeploymentException("Could not deploy " + deploymentName, e);
+         }
       }
-      catch (Exception e)
-      {
-         throw new DeploymentException("Could not deploy " + deploymentName, e);
-      }
-      try
-      {
-         return new ServletMethodExecutor(new URL(server.getHttpUrl().toExternalForm() + "/"));
-      }
-      catch (Exception e)
-      {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
-      }
+      return new ProtocolMetaData()
+               .addContext(new HTTPContext(server.getHost(), server.getHttpPort(), "/test"));
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Deployment... deployments) throws DeploymentException
    {
-      if (archive == null)
+      if (deployments == null)
       {
          throw new IllegalArgumentException("Archive must be specified");
       }
-      // we only need the File, not the content to undeploy.
-      File file = new File(archive.getName());
-      undeploy(file);
+      for(Deployment deployment : deployments)
+      {
+         // we only need the File, not the content to undeploy.
+         File file = new File(deployment.getName());
+         undeploy(file);
+      }
    }
 
    private void undeploy(File file) throws DeploymentException

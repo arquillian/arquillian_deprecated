@@ -53,25 +53,16 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getDefaultProtocol()
-    */
    public ProtocolDescription getDefaultProtocol()
    {
       return new ProtocolDescription("Servlet 3.0");
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getConfigurationClass()
-    */
    public Class<JBossASConfiguration> getConfigurationClass()
    {
       return JBossASConfiguration.class;
    }
    
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
-   */
    public void setup(JBossASConfiguration configuration)
    {
       this.configuration = configuration;
@@ -79,9 +70,6 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       manager = createAndConfigureServerManager();
    }
    
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
-   */
    public void start() throws LifecycleException
    {
       try
@@ -104,9 +92,6 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       }
    }
 
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
-   */
    public void stop() throws LifecycleException
    {
       Server server = manager.getServer(configuration.getProfileName());
@@ -133,9 +118,6 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       }
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
    public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
    {
       if (deployments == null)
@@ -174,9 +156,6 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
                .addContext(new HTTPContext(server.getHost(), server.getHttpPort(), "/test"));
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
    public void undeploy(final Deployment... deployments) throws DeploymentException
    {
       if (deployments == null)
