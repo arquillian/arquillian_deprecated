@@ -42,6 +42,7 @@ import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.glassfish.api.ShrinkwrapReadableArchive;
@@ -66,6 +67,11 @@ public class GlassFishEmbeddedContainer implements DeployableContainer<GlassFish
    private Server server;
 
    private GlassFishConfiguration configuration;
+   
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Servlet 3.0");
+   }
    
    public Class<GlassFishConfiguration> getConfigurationClass()
    {
@@ -94,6 +100,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer<GlassFish
       server = serverBuilder.embeddedFileSystem(embeddedFsBuilder.build()).build();
       server.addContainer(ContainerBuilder.Type.all);
 
+      // TODO: Move this down as a Descriptor deployment?
       if (configuration.getSunResourcesXml() != null)
       {
          File resourcesXmlFile = new File(configuration.getSunResourcesXml());
@@ -157,6 +164,7 @@ public class GlassFishEmbeddedContainer implements DeployableContainer<GlassFish
       {
          try 
          {
+            // TODO: add support fro deploying Descriptors
             if(deployment.isArchiveDeployment())
             {
                DeployCommandParameters params = new DeployCommandParameters();
