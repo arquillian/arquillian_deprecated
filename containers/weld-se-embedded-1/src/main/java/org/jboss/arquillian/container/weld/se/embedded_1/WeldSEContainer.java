@@ -20,19 +20,20 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkwrapBeanDeploymentArchive;
-import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ClassScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.bootstrap.api.Environments;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
-import org.jboss.weld.bootstrap.spi.Deployment;
 import org.jboss.weld.context.api.helpers.ConcurrentHashMapBeanStore;
 import org.jboss.weld.manager.api.WeldManager;
 
@@ -42,38 +43,56 @@ import org.jboss.weld.manager.api.WeldManager;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldSEContainer implements DeployableContainer
+public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
 {
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
-    */
-   public void setup(Context context, Configuration configuration)
+   @Inject @ClassScoped
+   private InstanceProducer<ContextClassLoaderManager> classLoaderManagerInst;
+   
+   @Inject @ClassScoped
+   private InstanceProducer<WeldManager> weldManagerInst;
+
+   @Inject @ClassScoped
+   private InstanceProducer<WeldBootstrap> weldBootstrapInst;
+
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Local");
+   }
+   
+   public Class<WeldSEConfiguration> getConfigurationClass()
+   {
+      return WeldSEConfiguration.class;
+   }
+   
+   public void setup(WeldSEConfiguration configuration)
    {
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
-    */
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
-    */
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive)
+   public ProtocolMetaData deploy(final Deployment... deployments)
          throws DeploymentException
    {
+      if(deployments.length > 1)
+      {
+         throw new IllegalArgumentException("Weld SE container can only handle one deployment pr container");
+      }
+      if(!deployments[0].isArchiveDeployment())
+      {
+         throw new IllegalArgumentException("Weld SE container can only handle Archive deployments");
+      }
+      
+      Archive<?> archive = deployments[0].getArchive();
+      
       final ShrinkwrapBeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
 
-      final Deployment deployment = new Deployment() 
+      final org.jboss.weld.bootstrap.spi.Deployment deployment = new org.jboss.weld.bootstrap.spi.Deployment() 
       {
          public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()
          {
@@ -91,11 +110,11 @@ public class WeldSEContainer implements DeployableContainer
             return beanArchive;
          }
       };
-      
+
       ContextClassLoaderManager classLoaderManager = new ContextClassLoaderManager(beanArchive.getClassLoader());
       classLoaderManager.enable();
 
-      context.add(ContextClassLoaderManager.class, classLoaderManager);
+      classLoaderManagerInst.set(classLoaderManager);
       
       WeldBootstrap bootstrap = new WeldBootstrap();
       bootstrap.startContainer(Environments.SE, deployment, new ConcurrentHashMapBeanStore())
@@ -106,23 +125,20 @@ public class WeldSEContainer implements DeployableContainer
 
       WeldManager manager = bootstrap.getManager(beanArchive);
       
-      context.add(WeldBootstrap.class, bootstrap);
-      context.add(WeldManager.class, manager);
+      weldBootstrapInst.set(bootstrap);
+      weldManagerInst.set(manager);
       
-      return new LocalMethodExecutor();
+      return new ProtocolMetaData(); // local execution only, not specific protocol metadata needed
    }
 
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Deployment... deployments) throws DeploymentException
    {
-      WeldBootstrap bootstrap = context.get(WeldBootstrap.class);
+      WeldBootstrap bootstrap = weldBootstrapInst.get();
       if(bootstrap != null)
       {
          bootstrap.shutdown();
       }
-      ContextClassLoaderManager classLoaderManager = context.get(ContextClassLoaderManager.class);
+      ContextClassLoaderManager classLoaderManager = classLoaderManagerInst.get();
       classLoaderManager.disable();
    }
 }

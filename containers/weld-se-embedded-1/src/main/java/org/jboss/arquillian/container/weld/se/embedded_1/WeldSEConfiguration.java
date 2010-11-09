@@ -16,8 +16,7 @@
  */
 package org.jboss.arquillian.container.weld.se.embedded_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * WeldSEConfiguration
@@ -27,10 +26,4 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class WeldSEConfiguration implements ContainerConfiguration
 {
-
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.STANDALONE;
-   }
-
 }

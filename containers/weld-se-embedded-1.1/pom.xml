@@ -50,11 +50,6 @@
 			<artifactId>arquillian-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.jboss.arquillian.protocol</groupId>
-			<artifactId>arquillian-protocol-local</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.arquillian.testenricher</groupId>
@@ -66,11 +61,6 @@
 			<groupId>org.jboss.shrinkwrap</groupId>
 			<artifactId>shrinkwrap-impl-base</artifactId>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.shrinkwrap</groupId>
-			<artifactId>shrinkwrap-extension-classloader</artifactId>
 		</dependency>
 
 		<!-- org.jboss.weld -->

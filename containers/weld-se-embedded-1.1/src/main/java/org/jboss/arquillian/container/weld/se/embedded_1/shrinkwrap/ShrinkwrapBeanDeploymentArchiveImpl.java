@@ -31,7 +31,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
+import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.impl.base.AssignableBase;
 import org.jboss.shrinkwrap.impl.base.Validate;
 import org.jboss.weld.bootstrap.api.Bootstrap;
@@ -49,20 +49,19 @@ import org.jboss.weld.resources.spi.ResourceLoadingException;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implements ShrinkwrapBeanDeploymentArchive 
+public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase<Archive<?>> implements ShrinkwrapBeanDeploymentArchive 
 {
-   private Archive<?> archive;
-   
    private ServiceRegistry serviceRegistry = new SimpleServiceRegistry();
    
    private ShrinkWrapClassLoader classLoader;
    
    private Bootstrap bootstrap;
    
+   
    public ShrinkwrapBeanDeploymentArchiveImpl(Archive<?> archive)
    {
+      super(archive);
       Validate.notNull(archive, "Archive must be specified");
-      this.archive = archive;
       
       this.classLoader = new ShrinkWrapClassLoader(archive.getClass().getClassLoader(), archive);
       
@@ -101,12 +100,6 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       });
    }
 
-   @Override
-   protected Archive<?> getArchive()
-   {
-      return archive;
-   }
-
    public ShrinkWrapClassLoader getClassLoader()
    {
       return classLoader;
@@ -119,7 +112,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
          throw new RuntimeException("setBootstrap must be set. Needed to parse Beans XML");
       }
       List<URL> beansXmls = new ArrayList<URL>();
-      Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*/beans.xml"));
+      Map<ArchivePath, Node> classes = getArchive().getContent(Filters.include(".*/beans.xml"));
       for(final Map.Entry<ArchivePath, Node> entry : classes.entrySet()) 
       {
          try 
@@ -155,7 +148,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
    public Collection<String> getBeanClasses()
    {
       List<String> beanClasses = new ArrayList<String>();
-      Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
+      Map<ArchivePath, Node> classes = getArchive().getContent(Filters.include(".*\\.class"));
 
       for(Map.Entry<ArchivePath, Node> classEntry : classes.entrySet()) 
       {
@@ -176,7 +169,7 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
 
    public String getId()
    {
-      return archive.getName();
+      return getArchive().getName();
    }
 
    public ServiceRegistry getServices()

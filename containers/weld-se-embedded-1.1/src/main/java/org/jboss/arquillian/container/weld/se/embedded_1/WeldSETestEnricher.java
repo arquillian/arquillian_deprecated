@@ -18,7 +18,8 @@ package org.jboss.arquillian.container.weld.se.embedded_1;
 
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.core.Instance;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.weld.manager.api.WeldManager;
 
@@ -30,9 +31,12 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSETestEnricher extends CDIInjectionEnricher
 {
+   @Inject
+   private Instance<WeldManager> weldManaer;
+   
    @Override
-   protected BeanManager lookupBeanManager(Context context)
+   protected BeanManager lookupBeanManager()
    {
-      return context.get(WeldManager.class);
+      return weldManaer.get();
    }
 }

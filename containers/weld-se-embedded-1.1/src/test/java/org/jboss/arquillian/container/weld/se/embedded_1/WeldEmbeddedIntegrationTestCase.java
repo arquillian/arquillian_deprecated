@@ -21,6 +21,8 @@ import javax.inject.Inject;
 import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
+import org.jboss.arquillian.api.DeploymentTarget;
+import org.jboss.arquillian.api.Protocol;
 import org.jboss.arquillian.container.weld.se.embedded_1.beans.MyBean;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
@@ -39,7 +41,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class WeldEmbeddedIntegrationTestCase
 {
-   @Deployment
+   @Deployment(name = "test") @Protocol("local")
    public static JavaArchive createdeployment() 
    {
       return ShrinkWrap.create(JavaArchive.class, "test.jar")
@@ -53,7 +55,7 @@ public class WeldEmbeddedIntegrationTestCase
    @Inject
    private MyBean instanceVariable;
    
-   @Test
+   @Test @DeploymentTarget("test")
    public void shouldBeAbleToInjectBeanAsInstanceVariable() throws Exception 
    {
       Assert.assertNotNull(
@@ -63,7 +65,7 @@ public class WeldEmbeddedIntegrationTestCase
       Assert.assertEquals("aslak", instanceVariable.getName());
    }
 
-   @Test
+   @Test @DeploymentTarget("test")
    public void shouldBeAbleToInjectBeanAsArgumentVariable(MyBean argumentVariable) throws Exception 
    {
       Assert.assertNotNull(
