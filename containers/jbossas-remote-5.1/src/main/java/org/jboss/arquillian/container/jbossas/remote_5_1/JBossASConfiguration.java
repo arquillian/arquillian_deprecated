@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_5_1;
 
-import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -56,12 +55,13 @@ public class JBossASConfiguration implements ContainerConfiguration
     * Port must be reachable from remote server.
     */
    private int localDeploymentBindPort = 9999;
+
+   private String contextFactory = "org.jnp.interfaces.NamingContextFactory";
    
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
-   }
+   private String urlPkgPrefix = "org.jboss.naming:org.jnp.interfaces";
    
+   private String providerUrl = "jnp://localhost:1099";
+
    public String getProfileName()
    {
       return profileName;
@@ -110,5 +110,53 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setLocalDeploymentBindPort(int localDeploymentBindPort)
    {
       this.localDeploymentBindPort = localDeploymentBindPort;
+   }
+
+   /**
+    * @param contextFactory the contextFactory to set
+    */
+   public void setContextFactory(String contextFactory)
+   {
+      this.contextFactory = contextFactory;
+   }
+   
+   /**
+    * @return the contextFactory
+    */
+   public String getContextFactory()
+   {
+      return contextFactory;
+   }
+   
+   /**
+    * @param provierUrl the provierUrl to set
+    */
+   public void setProviderUrl(String provierUrl)
+   {
+      this.providerUrl = provierUrl;
+   }
+   
+   /**
+    * @return the provierUrl
+    */
+   public String getProviderUrl()
+   {
+      return providerUrl;
+   }
+   
+   /**
+    * @param urlPkgPrefix the urlPkgPrefix to set
+    */
+   public void setUrlPkgPrefix(String urlPkgPrefix)
+   {
+      this.urlPkgPrefix = urlPkgPrefix;
+   }
+   
+   /**
+    * @return the urlPkgPrefix
+    */
+   public String getUrlPkgPrefix()
+   {
+      return urlPkgPrefix;
    }
 }
