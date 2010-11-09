@@ -16,18 +16,18 @@
  */
 package org.jboss.arquillian.container.jbossas.embedded_6;
 
-import java.net.URL;
-
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
 import org.jboss.embedded.api.server.JBossASEmbeddedServerFactory;
-import org.jboss.shrinkwrap.api.Archive;
 
 /**
  * JbossEmbeddedContainer
@@ -35,31 +35,52 @@ import org.jboss.shrinkwrap.api.Archive;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossASEmbeddedContainer implements DeployableContainer
+public class JBossASEmbeddedContainer implements DeployableContainer<JBossASContainerConfiguration>
 {
+   @Inject @ContainerScoped
+   private InstanceProducer<JBossASEmbeddedServer> serverInst;
+   
+   private JBossASContainerConfiguration configuration;
+   
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getDefaultProtocol()
     */
-   public void setup(Context context, Configuration configuration)
+   public ProtocolDescription getDefaultProtocol()
    {
-      JBossASContainerConfiguration containerConfiguration = configuration.getContainerConfig(JBossASContainerConfiguration.class);
+      return new ProtocolDescription("Servlet 3.0");
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getConfigurationClass()
+    */
+   public Class<JBossASContainerConfiguration> getConfigurationClass()
+   {
+      return JBossASContainerConfiguration.class;
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#setup(org.jboss.arquillian.spi.client.container.ContainerConfiguration)
+    */
+   public void setup(JBossASContainerConfiguration configuration)
+   {
+      this.configuration = configuration;
 
       JBossASEmbeddedServer server = JBossASEmbeddedServerFactory.createServer();
       server.getConfiguration()
-               .bindAddress(containerConfiguration.getBindAddress())
-               .serverName(containerConfiguration.getProfileName());
+               .bindAddress(configuration.getBindAddress())
+               .serverName(configuration.getProfileName());
 
-      context.add(JBossASEmbeddedServer.class, server);
+      this.serverInst.set(server);
    }
 
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#start()
     */
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try 
       {
-         context.get(JBossASEmbeddedServer.class).start();
+         serverInst.get().start();
       }
       catch (Exception e) 
       {
@@ -68,13 +89,13 @@ public class JBossASEmbeddedContainer implements DeployableContainer
    }
    
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#stop()
     */
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try 
       {
-         context.get(JBossASEmbeddedServer.class).stop();
+         serverInst.get().stop();
       }
       catch (Exception e) 
       {
@@ -83,23 +104,27 @@ public class JBossASEmbeddedContainer implements DeployableContainer
    }
    
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(Deployment... deployments) throws DeploymentException
    {
-      JBossASContainerConfiguration containerConfiguration = context.get(Configuration.class)
-                                                         .getContainerConfig(JBossASContainerConfiguration.class);
       try 
       {
-         context.get(JBossASEmbeddedServer.class).deploy(archive);
+         for(Deployment deployment : deployments)
+         {
+            if(deployment.isArchiveDeployment())
+            {
+               serverInst.get().deploy(deployment.getArchive());
+            }
+            else
+            {
+               // TODO: create a Deploayble File ?
+               // serverInst.get().deploy(deployables);
+            }
+         }
          
-         return new ServletMethodExecutor(
-               new URL(
-                     "http",
-                     containerConfiguration.getBindAddress(),
-                     containerConfiguration.getHttpPort(),
-                     "/")
-               );
+         return new ProtocolMetaData()
+               .addContext(new HTTPContext(configuration.getBindAddress(), configuration.getHttpPort(), "/test"));
       }
       catch (Exception e) 
       {
@@ -108,13 +133,24 @@ public class JBossASEmbeddedContainer implements DeployableContainer
    }
    
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(Deployment... deployments) throws DeploymentException
    {
       try 
       {
-         context.get(JBossASEmbeddedServer.class).undeploy(archive);
+         for(Deployment deployment : deployments)
+         {
+            if(deployment.isArchiveDeployment())
+            {
+               serverInst.get().undeploy(deployment.getArchive());
+            }
+            else
+            {
+               // TODO: create a Deploayble File ?
+               // serverInst.get().deploy(deployables);
+            }
+         }
       }
       catch (Exception e) 
       {

@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.container.jbossas.embedded_6;
 
-import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -42,14 +41,6 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
     */
    private int httpPort = 8080;
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
-    */
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.STANDALONE;
-   }
-
    public String getProfileName()
    {
       return profileName;
