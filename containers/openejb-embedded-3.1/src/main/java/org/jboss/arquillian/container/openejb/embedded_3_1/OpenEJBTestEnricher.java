@@ -33,8 +33,8 @@ import org.jboss.arquillian.prototyping.context.api.Properties;
 import org.jboss.arquillian.prototyping.context.api.Property;
 import org.jboss.arquillian.prototyping.context.impl.PropertiesImpl;
 import org.jboss.arquillian.prototyping.context.impl.openejb.OpenEJBArquillianContextImpl;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.core.Instance;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 
 /**
@@ -47,18 +47,19 @@ import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
  */
 public class OpenEJBTestEnricher extends EJBInjectionEnricher
 {
-
+   @Inject
+   private Instance<AppInfo> appInfo;
+   
    private ArquillianContext arquillianContext = null;
-
+   
    /**
     * {@inheritDoc}
     * @see org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
    @Override
-   public void enrich(Context context, Object testCase)
-   {
+   public void enrich(Object testCase)   {
       // Call the super implementation to handle @EJB
-      super.enrich(context, testCase);
+      super.enrich(testCase);
 
       // Handle Typesafe @Inject (ie. ask Arquillian for a an instance of the field type with no additional context properties)
       final Class<? extends Annotation> inject = (Class<? extends Annotation>) Inject.class;
@@ -86,7 +87,7 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
              *  Resolve (based on contextual properties if specified)
              */
             final Object resolvedVaue;
-            final ArquillianContext arquillianContext = this.getArquillianContext(context);
+            final ArquillianContext arquillianContext = this.getArquillianContext();
             final Class<?> type = field.getType();
 
             // If Properties are defined
@@ -120,27 +121,27 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 
    }
 
-   protected ArquillianContext getArquillianContext(final Context context)
+   protected ArquillianContext getArquillianContext()
    {
       if (arquillianContext == null)
       {
          // Make a context
-         final AppInfo deployment = context.get(AppInfo.class);
+         final AppInfo deployment = appInfo.get();
          arquillianContext = new OpenEJBArquillianContextImpl(deployment);
       }
       return arquillianContext;
    }
 
    @Override
-   protected InitialContext createContext(final Context context) throws Exception
+   protected InitialContext createContext() throws Exception
    {
-      return this.getArquillianContext(context).get(InitialContext.class);
+      return this.getArquillianContext().get(InitialContext.class);
    }
 
    @Override
-   protected Object lookupEJB(Context context, Class<?> fieldType) throws Exception
+   protected Object lookupEJB(Class<?> fieldType) throws Exception
    {
-      InitialContext initcontext = createContext(context);
+      InitialContext initcontext = createContext();
       return lookupRecursive(fieldType, initcontext, initcontext.listBindings("/"));
    }
 

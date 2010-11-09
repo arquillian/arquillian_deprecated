@@ -16,8 +16,6 @@
  */
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
-import java.util.logging.Logger;
-
 import org.apache.openejb.NoSuchApplicationException;
 import org.apache.openejb.OpenEJBException;
 import org.apache.openejb.UndeployException;
@@ -25,14 +23,15 @@ import org.apache.openejb.assembler.classic.AppInfo;
 import org.apache.openejb.assembler.classic.Assembler;
 import org.apache.openejb.assembler.classic.SecurityServiceInfo;
 import org.apache.openejb.assembler.classic.TransactionServiceInfo;
-import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.openejb.config.ShrinkWrapConfigurationFactory;
 
 /**
@@ -43,17 +42,13 @@ import org.jboss.shrinkwrap.openejb.config.ShrinkWrapConfigurationFactory;
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-public class OpenEJBContainer implements DeployableContainer
+public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguration>
 {
 
    //-------------------------------------------------------------------------------------||
    // Class Members ----------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   /**
-    * Logger
-    */
-   private static final Logger log = Logger.getLogger(OpenEJBContainer.class.getName());
 
    //-------------------------------------------------------------------------------------||
    // Instance Members -------------------------------------------------------------------||
@@ -72,28 +67,42 @@ public class OpenEJBContainer implements DeployableContainer
    /**
     * The deployment
     */
-   private AppInfo deployment;
+   @Inject @DeploymentScoped
+   private InstanceProducer<AppInfo> deployment;
 
-   private OpenEJBConfiguration configuration;
-   
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   public void setup(Context context, Configuration configuration)
+   public ProtocolDescription getDefaultProtocol() 
    {
-      this.configuration = configuration.getContainerConfig(OpenEJBConfiguration.class);
+      return new ProtocolDescription("Local");
    }
    
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   @Override
+   public Class<OpenEJBConfiguration> getConfigurationClass()
    {
+      return OpenEJBConfiguration.class;
+   }
+   
+   @Override
+   public void setup(OpenEJBConfiguration configuration)
+   {
+   }
+   
+   public ProtocolMetaData deploy(Deployment... deployments) throws DeploymentException
+   {
+      if(deployments == null || deployments.length > 1 || !deployments[0].isArchiveDeployment())
+      {
+         throw new IllegalArgumentException("Container only supports single Archive Deployments");
+      }
+      
       // Deploy as an archive
       final AppInfo appInfo;
       try
       {
-         appInfo = config.configureApplication(archive);
-         context.add(AppInfo.class, appInfo);
-         this.deployment = appInfo;
+         appInfo = config.configureApplication(deployments[0].getArchive());
+         this.deployment.set(appInfo);
       }
       catch (final OpenEJBException e)
       {
@@ -109,10 +118,10 @@ public class OpenEJBContainer implements DeployableContainer
       }
 
       // Invoke locally
-      return new LocalMethodExecutor();
+      return new ProtocolMetaData();
    }
 
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       final ShrinkWrapConfigurationFactory config = new ShrinkWrapConfigurationFactory();
       final Assembler assembler = new Assembler();
@@ -132,25 +141,30 @@ public class OpenEJBContainer implements DeployableContainer
       this.config = new ShrinkWrapConfigurationFactory();
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       assembler.destroy();
    }
 
-   public void undeploy(Context context, final Archive<?> archive) throws DeploymentException
+   public void undeploy(Deployment... deployments) throws DeploymentException
    {
+      if(deployments == null || deployments.length > 1 || !deployments[0].isArchiveDeployment())
+      {
+         throw new IllegalArgumentException("Container only supports single Archive Deployments");
+      }
+      String deploymentName = deployments[0].getName();
       // Undeploy the archive
       try
       {
-         assembler.destroyApplication(deployment.jarPath);
+         assembler.destroyApplication(deployment.get().jarPath);
       }
       catch (final UndeployException e)
       {
-         throw new DeploymentException("Error in undeployment of " + archive.getName(), e);
+         throw new DeploymentException("Error in undeployment of " + deploymentName, e);
       }
       catch (final NoSuchApplicationException e)
       {
-         throw new DeploymentException("Application was not deployed; cannot undeploy: " + archive.getName(), e);
+         throw new DeploymentException("Application was not deployed; cannot undeploy: " + deploymentName, e);
       }
    }
 }
