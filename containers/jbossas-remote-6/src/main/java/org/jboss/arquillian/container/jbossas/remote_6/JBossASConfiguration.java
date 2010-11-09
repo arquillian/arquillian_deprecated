@@ -16,11 +16,10 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_6;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the JBoss AS container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
@@ -57,10 +56,11 @@ public class JBossASConfiguration implements ContainerConfiguration
     */
    private int localDeploymentBindPort = 9999;
    
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
-   }
+   private String contextFactory = "org.jnp.interfaces.NamingContextFactory";
+   
+   private String urlPkgPrefix = "org.jboss.naming:org.jnp.interfaces";
+   
+   private String providerUrl = "jnp://localhost:1099";
    
    public String getProfileName()
    {
@@ -110,5 +110,53 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setLocalDeploymentBindPort(int localDeploymentBindPort)
    {
       this.localDeploymentBindPort = localDeploymentBindPort;
+   }
+   
+   /**
+    * @param contextFactory the contextFactory to set
+    */
+   public void setContextFactory(String contextFactory)
+   {
+      this.contextFactory = contextFactory;
+   }
+   
+   /**
+    * @return the contextFactory
+    */
+   public String getContextFactory()
+   {
+      return contextFactory;
+   }
+   
+   /**
+    * @param provierUrl the provierUrl to set
+    */
+   public void setProviderUrl(String provierUrl)
+   {
+      this.providerUrl = provierUrl;
+   }
+   
+   /**
+    * @return the provierUrl
+    */
+   public String getProviderUrl()
+   {
+      return providerUrl;
+   }
+   
+   /**
+    * @param urlPkgPrefix the urlPkgPrefix to set
+    */
+   public void setUrlPkgPrefix(String urlPkgPrefix)
+   {
+      this.urlPkgPrefix = urlPkgPrefix;
+   }
+   
+   /**
+    * @return the urlPkgPrefix
+    */
+   public String getUrlPkgPrefix()
+   {
+      return urlPkgPrefix;
    }
 }
