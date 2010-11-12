@@ -26,13 +26,14 @@ import org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap.ShrinkwrapBe
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
 import org.jboss.arquillian.spi.core.annotation.ClassScoped;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.weld.bootstrap.WeldBootstrap;
 import org.jboss.weld.bootstrap.api.Environments;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
@@ -49,13 +50,13 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
 {
-   @Inject @ClassScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<ContextClassLoaderManager> classLoaderManagerInst;
    
-   @Inject @ClassScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<WeldManager> weldManagerInst;
 
-   @Inject @ClassScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<WeldBootstrap> weldBootstrapInst;
 
    public ProtocolDescription getDefaultProtocol()
@@ -79,19 +80,19 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
    public void stop() throws LifecycleException
    {
    }
-
-   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
+   
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if(deployments.length > 1)
-      {
-         throw new IllegalArgumentException("Weld SE container can only handle one deployment pr container");
-      }
-      if(!deployments[0].isArchiveDeployment())
-      {
-         throw new IllegalArgumentException("Weld SE container can only handle Archive deployments");
-      }
-      
-      Archive<?> archive = deployments[0].getArchive();
+      throw new UnsupportedOperationException("Descriptors not supported by Weld");
+   }
+   
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("Descriptors not supported by Weld");      
+   }
+
+   public ProtocolMetaData deploy(Archive<?> archive) throws DeploymentException
+   {
       final ShrinkwrapBeanDeploymentArchive beanArchive = archive.as(ShrinkwrapBeanDeploymentArchive.class);
 
       final org.jboss.weld.bootstrap.spi.Deployment deployment = new org.jboss.weld.bootstrap.spi.Deployment() 
@@ -143,7 +144,7 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
       return new ProtocolMetaData();
    }
 
-   public void undeploy(final Deployment... deployments) throws DeploymentException
+   public void undeploy(Archive<?> archive) throws DeploymentException
    {
       WeldBootstrap bootstrap = weldBootstrapInst.get();
       if(bootstrap != null)
