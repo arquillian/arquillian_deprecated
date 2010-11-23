@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../../build/pom.xml</relativePath>
+   </parent>
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>org.jboss.arquillian.container</groupId>
+   <artifactId>arquillian-resin4-embedded</artifactId>
+   <name>Arquillian Container Resin 4 Embedded</name>
+   <description>Resin4 Embedded container integration for the Arquillian project</description>
+
+   <properties>
+
+   </properties>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.protocol</groupId>
+         <artifactId>arquillian-protocol-servlet-3</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!-- TODO We likely need a servlet packager to restrict use of EAR -->
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-resource</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!--<dependency>-->
+         <!--<groupId>org.jboss.shrinkwrap</groupId>-->
+         <!--<artifactId>shrinkwrap-extension-resin-4</artifactId>-->
+      <!--</dependency>-->
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-impl-base</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-junit</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>com.h2database</groupId>
+         <artifactId>h2</artifactId>
+         <version>1.2.138</version>
+         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+          <groupId>com.caucho</groupId>
+          <artifactId>resin</artifactId>
+          <version>4.0-SNAPSHOT</version>
+      </dependency>
+
+         <dependency>
+          <groupId>com.caucho</groupId>
+          <artifactId>resin-kernel</artifactId>
+          <version>4.0-SNAPSHOT</version>
+      </dependency>
+
+       <dependency>
+           <groupId>com.caucho</groupId>
+           <artifactId>candi</artifactId>
+           <version>4.0-SNAPSHOT</version>
+       </dependency>
+
+   </dependencies>
+</project>
