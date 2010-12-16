@@ -18,8 +18,6 @@ package org.jboss.arquillian.container.jetty.embedded_7;
 
 import java.sql.Connection;
 
-import java.util.logging.Logger;
-
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -27,8 +25,9 @@ import javax.sql.DataSource;
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.dependencies.Dependencies;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,23 +41,20 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JettyEmbeddedInContainerTestCase
 {
-   private static final Logger log = Logger.getLogger(JettyEmbeddedInContainerTestCase.class.getName());
-   
    /**
     * Deployment for the test
     */
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
+      final WebArchive war = ShrinkWrap.create(WebArchive.class)
          .addClass(TestBean.class)
          // adding the configuration class silences the logged exception when building the configuration on the server-side, but shouldn't be necessary
          //.addClass(JettyEmbeddedConfiguration.class)
-         .addLibrary(MavenArtifactResolver.resolve("org.jboss.weld.servlet:weld-servlet:1.0.1-Final"))
+         .addLibraries(Dependencies.artifacts("org.jboss.weld.servlet:weld-servlet:1.1.0.Beta2").resolve())
          .addWebResource("jetty-env.xml")
-         .addWebResource(new ByteArrayAsset(new byte[0]), "beans.xml")
+         .addWebResource(EmptyAsset.INSTANCE, "beans.xml")
          .setWebXML("in-container-web.xml");
-      log.info(war.toString(true));
       return war;
    }
 

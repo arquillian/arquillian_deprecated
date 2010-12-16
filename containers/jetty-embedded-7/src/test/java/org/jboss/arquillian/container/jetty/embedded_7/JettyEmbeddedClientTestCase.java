@@ -21,13 +21,15 @@ import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.WebAppDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,19 +45,20 @@ import org.junit.runner.RunWith;
 @Run(AS_CLIENT)
 public class JettyEmbeddedClientTestCase
 {
-   private static final Logger log = Logger.getLogger(JettyEmbeddedClientTestCase.class.getName());
-   
    /**
     * Deployment for the test
     */
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "client-test.war")
+      return ShrinkWrap.create(WebArchive.class, "client-test.war")
          .addClass(TestServlet.class)
-         .setWebXML("client-web.xml");
-      log.info(war.toString(true));
-      return war;
+         .setWebXML(new StringAsset(
+               Descriptors.create(WebAppDescriptor.class)
+                  .version("2.5")
+                  .servlet(TestServlet.class, "/Test")
+                  .exportAsString()
+         ));
    }
 
    @Test

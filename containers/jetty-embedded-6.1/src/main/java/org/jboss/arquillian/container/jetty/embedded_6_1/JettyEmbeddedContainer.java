@@ -16,17 +16,19 @@
  */
 package org.jboss.arquillian.container.jetty.embedded_6_1;
 
-import java.net.URL;
 import java.util.logging.Logger;
 
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.jetty_6.api.ShrinkWrapWebAppContext;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -55,7 +57,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
  * @author Dan Allen
  * @version $Revision: $
  */
-public class JettyEmbeddedContainer implements DeployableContainer
+public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbeddedConfiguration>
 {
    public static final String HTTP_PROTOCOL = "http";
 
@@ -74,16 +76,29 @@ public class JettyEmbeddedContainer implements DeployableContainer
 
    private JettyEmbeddedConfiguration containerConfig;
    
+   @Inject @DeploymentScoped
+   private InstanceProducer<WebAppContext> webAppContextProducer;
+   
    public JettyEmbeddedContainer()
    {
    }
    
-   public void setup(Context context, Configuration arquillianConfig)
+   public ProtocolDescription getDefaultProtocol()
    {
-      containerConfig = arquillianConfig.getContainerConfig(JettyEmbeddedConfiguration.class);
+      return new ProtocolDescription("Servlet 2.5");
+   }
+
+   public Class<JettyEmbeddedConfiguration> getConfigurationClass()
+   {
+      return JettyEmbeddedConfiguration.class;
    }
    
-   public void start(Context context) throws LifecycleException
+   public void setup(JettyEmbeddedConfiguration containerConfig)
+   {
+      this.containerConfig = containerConfig;
+   }
+   
+   public void start() throws LifecycleException
    {
       try 
       {
@@ -100,7 +115,7 @@ public class JettyEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try 
       {
@@ -111,8 +126,26 @@ public class JettyEmbeddedContainer implements DeployableContainer
          throw new LifecycleException("Could not stop container", e);
       }
    }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       try 
       {
@@ -122,13 +155,6 @@ public class JettyEmbeddedContainer implements DeployableContainer
          {
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
          }
-         // HACK this needs to be rethought, perhaps another auxiliary archive appender to guarantee uniqueness and a static check for run mode?
-//         if (archive.contains(ArchivePaths.create("/WEB-INF/lib/arquillian-protocol.jar")))
-//         {
-//            // wctx.setOverrideDescriptor("jar:file:" + wctx.getTempDirectory() + "/webapp/WEB-INF/lib/arquillian-protocol.jar!/META-INF/web-fragment.xml");
-//            // NOTE go on faith there is only one META-INF/web-fragment.xml
-//            wctx.setOverrideDescriptor("META-INF/web-fragment.xml");
-//         }
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);
@@ -142,32 +168,23 @@ public class JettyEmbeddedContainer implements DeployableContainer
          
          server.addHandler(wctx);
          wctx.start();
-         context.add(WebAppContext.class, wctx);
+         webAppContextProducer.set(wctx);
+
+         return new ProtocolMetaData()
+            .addContext(new HTTPContext(
+                  containerConfig.getBindAddress(), 
+                  containerConfig.getBindHttpPort(), 
+                  wctx.getContextPath()));
       } 
       catch (Exception e) 
       {
          throw new DeploymentException("Could not deploy " + archive.getName(), e);
       }
-
-      try 
-      {
-         return new ServletMethodExecutor(
-               new URL(
-                     HTTP_PROTOCOL,
-                     containerConfig.getBindAddress(),
-                     containerConfig.getBindHttpPort(),
-                     "/")
-               );
-      } 
-      catch (Exception e) 
-      {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
-      }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      WebAppContext wctx = context.get(WebAppContext.class);
+      WebAppContext wctx = webAppContextProducer.get();
       if (wctx != null)
       {
          try
