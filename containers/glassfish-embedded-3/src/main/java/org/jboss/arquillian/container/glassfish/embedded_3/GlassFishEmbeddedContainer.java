@@ -41,10 +41,11 @@ import org.glassfish.api.embedded.Server;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.glassfish.api.ShrinkwrapReadableArchive;
 import org.jvnet.hk2.annotations.Service;
 
@@ -158,62 +159,59 @@ public class GlassFishEmbeddedContainer implements DeployableContainer<GlassFish
       }
    }
 
-   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      for(Deployment deployment : deployments)
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+   
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
+      DeployCommandParameters params = new DeployCommandParameters();
+      params.enabled = true;
+      params.target = target;
+      params.name = createDeploymentName(archive.getName());
+      try
       {
-         try 
-         {
-            // TODO: add support fro deploying Descriptors
-            if(deployment.isArchiveDeployment())
-            {
-               DeployCommandParameters params = new DeployCommandParameters();
-               params.enabled = true;
-               params.target = target;
-               params.name = createDeploymentName(deployment.getName());
-               
-               server.getDeployer().deploy(
-                     deployment.getArchive().as(ShrinkwrapReadableArchive.class),
-                     params);
-            }
-         } 
-         catch (Exception e) 
-         {
-            throw new DeploymentException("Could not deploy " + deployment.getName(), e);
-         }
-      }
-      try 
-      {
-         // TODO: Dynamically lookup contexts
-         return new ProtocolMetaData()
-            .addContext(
-                  new HTTPContext("localhost", configuration.getBindHttpPort(), "/test"));
+         server.getDeployer().deploy(
+               archive.as(ShrinkwrapReadableArchive.class),
+               params);
       } 
       catch (Exception e) 
       {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
+         throw new DeploymentException("Could not deploy " + archive.getName(), e);
       }
+      // TODO: Dynamically lookup contexts
+      return new ProtocolMetaData()
+         .addContext(
+               new HTTPContext("localhost", configuration.getBindHttpPort(), "/test"));
    }
 
-   public void undeploy(final Deployment... deployments) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      for(Deployment deployment : deployments)
-      {
-         if(deployment.isArchiveDeployment())
-         {
-            UndeployCommandParameters params = new UndeployCommandParameters();
-            params.target = target;
-            params.name = createDeploymentName(deployment.getName());
+      UndeployCommandParameters params = new UndeployCommandParameters();
+      params.target = target;
+      params.name = createDeploymentName(archive.getName());
             
-            try 
-            {
-               server.getDeployer().undeploy(params.name, params);
-            }
-            catch (Exception e) 
-            {
-               throw new DeploymentException("Could not undeploy " + deployment.getName(), e);
-            }
-         }
+      try 
+      {
+         server.getDeployer().undeploy(params.name, params);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not undeploy " + archive.getName(), e);
       }
    }
    
