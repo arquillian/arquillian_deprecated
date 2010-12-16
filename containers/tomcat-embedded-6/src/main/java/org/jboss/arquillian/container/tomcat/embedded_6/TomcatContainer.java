@@ -19,10 +19,10 @@ package org.jboss.arquillian.container.tomcat.embedded_6;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.catalina.Container;
@@ -31,16 +31,20 @@ import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.startup.Embedded;
 import org.apache.catalina.startup.ExpandWar;
-import org.jboss.arquillian.protocol.servlet.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ClassScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
 
 /**
@@ -58,13 +62,11 @@ import org.jboss.shrinkwrap.tomcat_6.api.ShrinkWrapStandardContext;
  * @author Dan Allen
  * @version $Revision: $
  */
-public class TomcatContainer implements DeployableContainer
+public class TomcatContainer implements DeployableContainer<TomcatConfiguration>
 {
    private static final Logger log = Logger.getLogger(TomcatContainer.class.getName());
 
    private static final String ENV_VAR = "${env.";
-
-   private static final String HTTP_PROTOCOL = "http";
 
    private static final String TMPDIR_SYS_PROP = "java.io.tmpdir";
 
@@ -98,15 +100,28 @@ public class TomcatContainer implements DeployableContainer
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
-   public void setup(Context context, Configuration configuration)
+   @Inject @ClassScoped // @DeploymentScoped
+   private InstanceProducer<StandardContext> standardContextProducer;
+   
+   public Class<TomcatConfiguration> getConfigurationClass()
    {
-      this.configuration = configuration.getContainerConfig(TomcatConfiguration.class);
+      return TomcatConfiguration.class;
+   }
+
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Servlet 2.5");
+   }
+   
+   public void setup(TomcatConfiguration configuration)
+   {
+      this.configuration = configuration;
       bindAddress = this.configuration.getBindAddress();
       bindPort = this.configuration.getBindHttpPort();
       serverName = this.configuration.getServerName();
    }
 
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try
       {
@@ -118,7 +133,7 @@ public class TomcatContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try
       {
@@ -141,53 +156,63 @@ public class TomcatContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if (archive == null)
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      if (embedded == null)
-      {
-         throw new IllegalStateException("Embedded container is not running");
-      }
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
 
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
       try
       {
          StandardContext standardContext = archive.as(ShrinkWrapStandardContext.class);
          standardContext.addLifecycleListener(new EmbeddedContextConfig());
          standardContext.setUnpackWAR(configuration.isUnpackArchive());
+         standardContext.setJ2EEServer("Arquillian-" + UUID.randomUUID().toString());
+         
+         // Need to tell TomCat to use TCCL as parent, else the WebContextClassloader will be looking in AppCL 
+         standardContext.setParentClassLoader(Thread.currentThread().getContextClassLoader());
+
          if (standardContext.getUnpackWAR())
          {
             deleteUnpackedWAR(standardContext);
          }
 
+         // Override the default Tomcat WebappClassLoader, it delegates to System first. Half our testable app is on System classpath.
+         WebappLoader webappLoader = new WebappLoader(standardContext.getParentClassLoader());
+         webappLoader.setDelegate(standardContext.getDelegate());
+         webappLoader.setLoaderClass(EmbeddedWebappClassLoader.class.getName());
+         standardContext.setLoader(webappLoader);
+
          standardHost.addChild(standardContext);
-         context.add(StandardContext.class, standardContext);
+         
+         standardContextProducer.set(standardContext);
+
+         return new ProtocolMetaData()
+            .addContext(new HTTPContext(bindAddress, bindPort, standardContext.getPath()));
       }
       catch (Exception e)
       {
          throw new DeploymentException("Failed to deploy " + archive.getName(), e);
       }
-
-      try
-      {
-         return new ServletMethodExecutor(
-            new URL(
-               HTTP_PROTOCOL,
-               bindAddress,
-               bindPort,
-               "/"));
-      }
-      catch (Exception e)
-      {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
-      }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      StandardContext standardContext = context.get(StandardContext.class);
+      StandardContext standardContext = standardContextProducer.get();
       if (standardContext != null)
       {
          standardHost.removeChild(standardContext);

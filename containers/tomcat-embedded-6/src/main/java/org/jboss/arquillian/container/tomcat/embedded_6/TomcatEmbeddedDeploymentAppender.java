@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.tomcat.embedded_6;
 
-import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
 import org.jboss.shrinkwrap.api.Archive;

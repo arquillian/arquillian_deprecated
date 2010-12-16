@@ -26,16 +26,6 @@
       <url-pattern>/Test</url-pattern>
    </servlet-mapping>
 
-   <servlet>
-      <servlet-name>ServletTestRunner</servlet-name>
-      <servlet-class>org.jboss.arquillian.protocol.servlet_3.ServletTestRunner</servlet-class>
-   </servlet>
-
-   <servlet-mapping>
-      <servlet-name>ServletTestRunner</servlet-name>
-      <url-pattern>/ArquillianServletRunner</url-pattern>
-   </servlet-mapping>
-
    <resource-env-ref>
       <description>Object factory for the CDI Bean Manager</description>
       <resource-env-ref-name>BeanManager</resource-env-ref-name>

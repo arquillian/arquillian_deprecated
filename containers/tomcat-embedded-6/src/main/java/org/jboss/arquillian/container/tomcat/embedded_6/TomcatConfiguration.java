@@ -16,7 +16,6 @@
  */
 package org.jboss.arquillian.container.tomcat.embedded_6;
 
-import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -41,11 +40,6 @@ public class TomcatConfiguration implements ContainerConfiguration
    private String serverName = "arquillian-tomcat-embedded-6";
    
    private boolean unpackArchive = false;
-
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
-   }
 
    public String getBindAddress()
    {

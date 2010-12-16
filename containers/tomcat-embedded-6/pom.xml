@@ -18,6 +18,7 @@
 
    <properties>
       <version.org.apache.tomcat>6.0.29</version.org.apache.tomcat>
+      <version.cdi-api>1.0</version.cdi-api>
    </properties>
 
    <dependencies>
@@ -33,10 +34,9 @@
          <artifactId>shrinkwrap-extension-tomcat-6</artifactId>
       </dependency>
 
-      <!-- Not yet working w/o a hack -->
       <dependency>
         <groupId>org.jboss.arquillian.protocol</groupId>
-        <artifactId>arquillian-protocol-servlet-3</artifactId>
+        <artifactId>arquillian-protocol-servlet</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -83,30 +83,15 @@
       </dependency>
 
       <dependency>
+      	<groupId>javax.enterprise</groupId>
+      	<artifactId>cdi-api</artifactId>
+      	<version>${version.cdi-api}</version>
+      	<scope>test</scope>
+      </dependency>
+      
+      <dependency>
          <groupId>junit</groupId>
          <artifactId>junit</artifactId>
-         <scope>test</scope>
-      </dependency>
-
-      <!-- Weld servlet required for testing CDI injections -->
-      <dependency>
-         <groupId>org.jboss.weld.servlet</groupId>
-         <artifactId>weld-servlet</artifactId>
-         <version>1.0.1-Final</version>
-         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>org.glassfish.web</groupId>
-         <artifactId>el-impl</artifactId>
-         <version>2.2</version>
-         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-         <groupId>javax.servlet.jsp</groupId>
-         <artifactId>jsp-api</artifactId>
-         <version>2.2</version>
          <scope>test</scope>
       </dependency>
 
