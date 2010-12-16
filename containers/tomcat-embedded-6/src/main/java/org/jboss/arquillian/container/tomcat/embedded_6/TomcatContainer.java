@@ -41,7 +41,7 @@ import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
-import org.jboss.arquillian.spi.core.annotation.ClassScoped;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
@@ -100,7 +100,7 @@ public class TomcatContainer implements DeployableContainer<TomcatConfiguration>
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
-   @Inject @ClassScoped // @DeploymentScoped
+   @Inject @DeploymentScoped 
    private InstanceProducer<StandardContext> standardContextProducer;
    
    public Class<TomcatConfiguration> getConfigurationClass()
