@@ -17,7 +17,6 @@
 package org.jboss.arquillian.container.jbossas.managed_5_1;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
@@ -35,7 +33,9 @@ import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
  * JbossLocalContainer
@@ -118,56 +118,48 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       }
    }
 
-   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if (deployments == null)
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      if (manager == null)
-      {
-         throw new IllegalStateException("Container has not been setup");
-      }
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
+      final String deploymentName = archive.getName();
+
+      File file = new File(deploymentName);
       Server server = manager.getServer(configuration.getProfileName());
-      for(Deployment deployment : deployments)
+      try
       {
-         final String deploymentName = deployment.getName();
-
-         File file = new File(deploymentName);
-         try
-         {
-            if(deployment.isArchiveDeployment())
-            {
-               deployment.getArchive().as(ZipExporter.class).exportTo(file, true);
-            }
-            else
-            {
-               deployment.getDescriptor().exportTo(new FileOutputStream(file));
-            }
-
-            server.deploy(file);
-         }
-         catch (Exception e)
-         {
-            throw new DeploymentException("Could not deploy " + deploymentName, e);
-         }
+         archive.as(ZipExporter.class).exportTo(file, true);
+         server.deploy(file);
+      }
+      catch (Exception e)
+      {
+         throw new DeploymentException("Could not deploy " + deploymentName, e);
       }
       return new ProtocolMetaData()
                .addContext(new HTTPContext(server.getHost(), server.getHttpPort(), "/test"));
    }
 
-   public void undeploy(final Deployment... deployments) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      if (deployments == null)
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      for(Deployment deployment : deployments)
-      {
-         // we only need the File, not the content to undeploy.
-         File file = new File(deployment.getName());
-         undeploy(file);
-      }
+      // we only need the File, not the content to undeploy.
+      File file = new File(archive.getName());
+      undeploy(file);
    }
 
    private void undeploy(File file) throws DeploymentException

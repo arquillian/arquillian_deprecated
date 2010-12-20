@@ -33,7 +33,6 @@ import javax.naming.InitialContext;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
@@ -42,7 +41,9 @@ import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
 import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.virtual.VFS;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -114,82 +115,77 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       }
    }
 
-   public ProtocolMetaData deploy(final Deployment... deployments) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if(deployments == null) 
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      if (deploymentManager == null)
-      {
-         throw new IllegalStateException("start has not been called!");
-      }
-      for(final Deployment deployment : deployments)
-      {
-         String deploymentName = deployment.getName();
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
 
-         Exception failure = null;
-         try
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
+      String deploymentName = archive.getName();
+
+      Exception failure = null;
+      try
+      {
+         httpFileServer.createContext("/" + deploymentName, new HttpHandler()
          {
-            httpFileServer.createContext("/" + deploymentName, new HttpHandler()
+            public void handle(HttpExchange exchange) throws IOException
             {
-               public void handle(HttpExchange exchange) throws IOException
-               {
-                  if(deployment.isArchiveDeployment())
-                  {
-                     InputStream zip = deployment.getArchive().as(ZipExporter.class).exportAsInputStream();
-                     ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-                     JBossASRemoteContainer.copy(zip, zipStream);
-                     zip.close();
+               InputStream zip = archive.as(ZipExporter.class).exportAsInputStream();
+               ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+               JBossASRemoteContainer.copy(zip, zipStream);
+               zip.close();
 
-                     byte[] zipArray = zipStream.toByteArray();
-                     exchange.sendResponseHeaders(200, zipArray.length);
+               byte[] zipArray = zipStream.toByteArray();
+               exchange.sendResponseHeaders(200, zipArray.length);
 
-                     OutputStream out = exchange.getResponseBody();
-                     out.write(zipArray);
-                     out.close();                     
-
-                  }
-                  else
-                  {
-                     exchange.sendResponseHeaders(200, -1);
-
-                     OutputStream out = exchange.getResponseBody();
-                     out.write(deployment.getDescriptor().exportAsString().getBytes());
-                     out.close();
-                  }
-               }
-            });
-            URL fileServerUrl = createFileServerURL(deploymentName);
-            
-            DeploymentProgress distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
-            distribute.run();
-            DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
-            if(uploadStatus.isFailed()) 
+               OutputStream out = exchange.getResponseBody();
+               out.write(zipArray);
+               out.close();                     
+            }
+         });
+         URL fileServerUrl = createFileServerURL(deploymentName);
+         
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
+         distribute.run();
+         DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
+         if(uploadStatus.isFailed()) 
+         {
+            failure = uploadStatus.getFailure();
+            undeploy(deploymentName);
+         } 
+         else 
+         {
+            DeploymentProgress progress = deploymentManager.start(deploymentName);
+            progress.run();
+            DeploymentStatus status = progress.getDeploymentStatus();
+            if (status.isFailed())
             {
-               failure = uploadStatus.getFailure();
+               failure = status.getFailure();
                undeploy(deploymentName);
-            } 
-            else 
-            {
-               DeploymentProgress progress = deploymentManager.start(deploymentName);
-               progress.run();
-               DeploymentStatus status = progress.getDeploymentStatus();
-               if (status.isFailed())
-               {
-                  failure = status.getFailure();
-                  undeploy(deploymentName);
-               }
             }
          }
-         catch (Exception e)
-         {
-            throw new DeploymentException("Could not deploy " + deploymentName, e);
-         }
-         if (failure != null)
-         {
-            throw new DeploymentException("Failed to deploy " + deploymentName, failure);
-         }
+      }
+      catch (Exception e)
+      {
+         throw new DeploymentException("Could not deploy " + deploymentName, e);
+      }
+      if (failure != null)
+      {
+         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
       return new ProtocolMetaData()
                .addContext(new HTTPContext(
@@ -198,16 +194,9 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
                      "test"));
    }
 
-   public void undeploy(final Deployment... deployments) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      if(deployments == null) 
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      for(Deployment deployment : deployments)
-      {
-         undeploy(deployment.getName());
-      }
+      undeploy(archive.getName());
    }
 
    private void undeploy(String name) throws DeploymentException

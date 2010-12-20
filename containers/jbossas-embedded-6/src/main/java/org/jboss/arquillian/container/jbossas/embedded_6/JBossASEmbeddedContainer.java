@@ -19,7 +19,6 @@ package org.jboss.arquillian.container.jbossas.embedded_6;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
@@ -28,6 +27,8 @@ import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
 import org.jboss.embedded.api.server.JBossASEmbeddedServerFactory;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
  * JbossEmbeddedContainer
@@ -104,53 +105,48 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    }
    
    /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
-   public ProtocolMetaData deploy(Deployment... deployments) throws DeploymentException
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       try 
       {
-         for(Deployment deployment : deployments)
-         {
-            if(deployment.isArchiveDeployment())
-            {
-               serverInst.get().deploy(deployment.getArchive());
-            }
-            else
-            {
-               // TODO: create a Deploayble File ?
-               // serverInst.get().deploy(deployables);
-            }
-         }
-         
-         return new ProtocolMetaData()
-               .addContext(new HTTPContext(configuration.getBindAddress(), configuration.getHttpPort(), "/test"));
+         serverInst.get().deploy(archive);
       }
       catch (Exception e) 
       {
          throw new DeploymentException("Could not deploy to container", e);
       }
+      return new ProtocolMetaData()
+         .addContext(new HTTPContext(configuration.getBindAddress(), configuration.getHttpPort(), "/test"));
    }
    
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
-   public void undeploy(Deployment... deployments) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       try 
       {
-         for(Deployment deployment : deployments)
-         {
-            if(deployment.isArchiveDeployment())
-            {
-               serverInst.get().undeploy(deployment.getArchive());
-            }
-            else
-            {
-               // TODO: create a Deploayble File ?
-               // serverInst.get().deploy(deployables);
-            }
-         }
+         serverInst.get().undeploy(archive);
       }
       catch (Exception e) 
       {
