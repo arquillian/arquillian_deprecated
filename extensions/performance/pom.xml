@@ -30,7 +30,7 @@
     <!--
 		<version.weld_core>1.0.2-SNAPSHOT</version.weld_core>
     -->
-		<version.weld_core>1.0.1-SP4</version.weld_core>
+		<version.weld_core>1.1.0.CR1</version.weld_core>
 		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
 		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
 		<version.jboss_60>6.0.0.20100721-M4</version.jboss_60>
@@ -72,7 +72,7 @@
          <dependencies>
             <dependency>
                <groupId>org.jboss.arquillian.container</groupId>
-               <artifactId>arquillian-weld-se-embedded-1</artifactId>
+               <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
                <version>${project.version}</version>
             </dependency>
             <dependency> 
