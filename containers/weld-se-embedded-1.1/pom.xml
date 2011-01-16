@@ -24,7 +24,8 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.weld_core>1.1.0.Beta1</version.weld_core>
+		<version.weld_core>1.1.0.CR1</version.weld_core>
+		<version.javax_el>2.2</version.javax_el>
 
 	</properties>
 
@@ -78,7 +79,7 @@
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
-			<version>2.2</version>
+			<version>${version.javax_el}</version>
 			<scope>provided</scope>
 		</dependency>
 

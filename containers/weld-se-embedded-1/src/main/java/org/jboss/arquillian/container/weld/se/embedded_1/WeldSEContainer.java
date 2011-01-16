@@ -26,7 +26,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
-import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.ClassScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
@@ -45,14 +45,15 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
 {
-   @Inject @DeploymentScoped
-   private InstanceProducer<ContextClassLoaderManager> classLoaderManagerInst;
+   // TODO: these should be DeploymentScoped, but TestEnrich is currently happening outside a DeploymentScope.
+   @Inject @ClassScoped // @DeploymentScoped
+   private InstanceProducer<ContextClassLoaderManager> classLoaderManagerProducer;
    
-   @Inject @DeploymentScoped
-   private InstanceProducer<WeldManager> weldManagerInst;
+   @Inject @ClassScoped // @DeploymentScoped
+   private InstanceProducer<WeldManager> weldManagerProducer;
 
-   @Inject @DeploymentScoped
-   private InstanceProducer<WeldBootstrap> weldBootstrapInst;
+   @Inject @ClassScoped // @DeploymentScoped
+   private InstanceProducer<WeldBootstrap> weldBootstrapProducer;
 
    public ProtocolDescription getDefaultProtocol()
    {
@@ -112,7 +113,7 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
       ContextClassLoaderManager classLoaderManager = new ContextClassLoaderManager(beanArchive.getClassLoader());
       classLoaderManager.enable();
 
-      classLoaderManagerInst.set(classLoaderManager);
+      classLoaderManagerProducer.set(classLoaderManager);
       
       WeldBootstrap bootstrap = new WeldBootstrap();
       bootstrap.startContainer(Environments.SE, deployment, new ConcurrentHashMapBeanStore())
@@ -123,20 +124,20 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
 
       WeldManager manager = bootstrap.getManager(beanArchive);
       
-      weldBootstrapInst.set(bootstrap);
-      weldManagerInst.set(manager);
+      weldBootstrapProducer.set(bootstrap);
+      weldManagerProducer.set(manager);
       
       return new ProtocolMetaData(); // local execution only, not specific protocol metadata needed
    }
 
    public void undeploy(Archive<?> archive) throws DeploymentException
    {
-      WeldBootstrap bootstrap = weldBootstrapInst.get();
+      WeldBootstrap bootstrap = weldBootstrapProducer.get();
       if(bootstrap != null)
       {
          bootstrap.shutdown();
       }
-      ContextClassLoaderManager classLoaderManager = classLoaderManagerInst.get();
+      ContextClassLoaderManager classLoaderManager = classLoaderManagerProducer.get();
       classLoaderManager.disable();
    }
 }

@@ -32,11 +32,11 @@ import org.jboss.weld.manager.api.WeldManager;
 public class WeldSETestEnricher extends CDIInjectionEnricher
 {
    @Inject
-   private Instance<WeldManager> weldManaer;
+   private Instance<WeldManager> weldManager;
    
    @Override
    protected BeanManager lookupBeanManager()
    {
-      return weldManaer.get();
+      return weldManager.get();
    }
 }

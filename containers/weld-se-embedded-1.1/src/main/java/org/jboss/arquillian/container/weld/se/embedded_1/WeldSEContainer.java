@@ -29,7 +29,6 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
-import org.jboss.arquillian.spi.core.annotation.ClassScoped;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
@@ -39,7 +38,6 @@ import org.jboss.weld.bootstrap.api.Environments;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 import org.jboss.weld.bootstrap.spi.Metadata;
-import org.jboss.weld.context.api.helpers.ConcurrentHashMapBeanStore;
 import org.jboss.weld.manager.api.WeldManager;
 
 /**
@@ -130,7 +128,7 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
       WeldBootstrap bootstrap = new WeldBootstrap();
       beanArchive.setBootstrap(bootstrap);
       
-      bootstrap.startContainer(Environments.SE, deployment, new ConcurrentHashMapBeanStore())
+      bootstrap.startContainer(Environments.SE, deployment)
                   .startInitialization()
                   .deployBeans()
                   .validateBeans()
