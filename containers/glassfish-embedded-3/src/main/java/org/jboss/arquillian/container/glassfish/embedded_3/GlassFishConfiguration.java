@@ -18,7 +18,6 @@ package org.jboss.arquillian.container.glassfish.embedded_3;
 
 import java.util.UUID;
 
-import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -36,11 +35,6 @@ public class GlassFishConfiguration implements ContainerConfiguration
    private boolean autoDelete = true;
    private String domainXml;
    private String sunResourcesXml;
-   
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
-   }
    
    public int getBindHttpPort()
    {
