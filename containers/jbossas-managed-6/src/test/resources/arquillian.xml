@@ -1,14 +1,14 @@
-<?xml version="1.0"?>
-
-<arquillian xmlns="http://jboss.com/arquillian"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:jboss="urn:arq:org.jboss.arquillian.container.jbossas.managed_6">
-
-	<jboss:container>
-		<jbossHome>target/jboss-6.0.0.20100721-M4</jbossHome>
-		<!-- <javaHome>/usr/lib/jvm/java-6-openjdk</javaHome> Will default o JAVA_HOME--> 
-		<bindAddress>127.0.0.1</bindAddress>
-		<httpPort>8080</httpPort> <!-- WARN: this is not the bind port, but connect port. Bind port must be set in jboss xml config -->
-	</jboss:container>	
-
+<?xml version="1.0" encoding="UTF-8"?>
+<arquillian 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian-1.0.xsd">
+	
+       <container qualifier="jboss" default="true">
+           <configuration>
+               <property name="jbossHome">target/jboss-6.0.0.20100721-M4</property>
+               <!-- <property name="javaHome">/usr/lib/jvm/java-6-openjdk/</property> -->
+               <property name="bindAddress">127.0.0.1</property>
+               <property name="httpPort">8080</property>
+           </configuration>
+       </container>
 </arquillian>
