@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
  * @author <a href="http://community.jboss.org/people/dan.j.allen">Dan Allen</a>
  */
 @RunWith(Arquillian.class)
-@Run(RunModeType.AS_CLIENT)
+@Run(RunModeType.IN_CONTAINER)
 public class GlassFishRestDeployWarTest
 {
    private static final Logger log = Logger.getLogger(GlassFishRestDeployWarTest.class.getName());
@@ -59,7 +59,7 @@ public class GlassFishRestDeployWarTest
    public static Archive<?> getTestArchive()
    {
       final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
-         .addClasses(GreeterServlet.class, Greeter.class);
+         .addClasses(GreeterServlet.class, Greeter.class, GlassFishRestDeployWarTest.class);
       log.info(war.toString(true));
       return war;
    }

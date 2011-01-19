@@ -71,7 +71,7 @@ public class GlassFishRestDeployEarTest
       final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
          .addClasses(GreeterServlet.class);
       final JavaArchive ejb = ShrinkWrap.create(JavaArchive.class, "test.jar")
-         .addClass(Greeter.class);
+         .addClasses(Greeter.class);
       final EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "test.ear")
          .setApplicationXML("application.xml")
          .addModule(war)

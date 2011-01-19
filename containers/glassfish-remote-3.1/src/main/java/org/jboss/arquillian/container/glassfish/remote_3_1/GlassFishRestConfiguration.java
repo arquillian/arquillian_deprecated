@@ -28,17 +28,38 @@ public class GlassFishRestConfiguration implements ContainerConfiguration
 {
    /**
     * Glassfish Admin Console port.
-    * Used to build the URL for the rest request.
+    * Used to build the URL for the REST request.
     */
    private int remoteServerAdminPort = 4848;
 
    /**
     * Glassfish address.
-    * Used to build the URL for the rest request.
+    * Used to build the URL for the REST request.
     */
    private String remoteServerAddress = "localhost";
 
-   @Override
+   /**
+    * Flag indicating the administration url uses a secure connection.
+    * Used to build the URL for the REST request.
+    */
+   private boolean remoteServerAdminHttps = false;
+
+   /**
+    * Flag indicating application urls use secure connections.
+    * Used to build the URL for the REST request.
+    */
+   private boolean remoteServerHttps = false;
+
+   /**
+    * Http port for application urls.
+    * Used to build the URL for the REST request.
+    */
+   private int remoteServerHttpPort = 8080;
+
+   /**
+    * Type of container this is.
+    * @return CLIENT
+    */
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
@@ -62,5 +83,35 @@ public class GlassFishRestConfiguration implements ContainerConfiguration
    public void setRemoteServerAdminPort(int remoteServerAdminPort)
    {
       this.remoteServerAdminPort = remoteServerAdminPort;
+   }
+
+   public boolean isRemoteServerAdminHttps()
+   {
+      return remoteServerAdminHttps;
+   }
+
+   public void setRemoteServerAdminHttps(boolean remoteServerAdminHttps)
+   {
+      this.remoteServerAdminHttps = remoteServerAdminHttps;
+   }
+
+   public int getRemoteServerHttpPort()
+   {
+      return remoteServerHttpPort;
+   }
+
+   public void setRemoteServerHttpPort(int remoteServerHttpPort)
+   {
+      this.remoteServerHttpPort = remoteServerHttpPort;
+   }
+
+   public boolean isRemoteServerHttps()
+   {
+      return remoteServerHttps;
+   }
+
+   public void setRemoteServerHttps(boolean remoteServerHttps)
+   {
+      this.remoteServerHttps = remoteServerHttps;
    }
 }

@@ -40,10 +40,13 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 public class GlassFishRestDeploymentAppender implements AuxiliaryArchiveAppender
 {
 
-   @Override
+   /**
+    * Creates the enricher archive for the test.
+    * @return Archive containing all the valid enrichers for the server.
+    */
    public Archive<?> createAuxiliaryArchive()
    {
-      return ShrinkWrap.create(JavaArchive.class, "arquillian-jboss-testenrichers.jar")
+      return ShrinkWrap.create(JavaArchive.class, "arquillian-glassfish-testenrichers.jar")
          .addPackages(
             true,
             EJBInjectionEnricher.class.getPackage(),
