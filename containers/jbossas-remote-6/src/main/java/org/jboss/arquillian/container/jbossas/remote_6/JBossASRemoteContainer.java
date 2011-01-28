@@ -36,7 +36,6 @@ import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
-import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.deployers.spi.management.deploy.DeploymentManager;
 import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
@@ -60,6 +59,7 @@ import com.sun.net.httpserver.HttpServer;
 public class JBossASRemoteContainer implements DeployableContainer<JBossASConfiguration>
 {
    private final List<String> failedUndeployments = new ArrayList<String>();
+   private ProfileService profileService;
    private DeploymentManager deploymentManager;
 
    private HttpServer httpFileServer;
@@ -190,11 +190,15 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       {
          throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
-      return new ProtocolMetaData()
-               .addContext(new HTTPContext(
-                     configuration.getRemoteServerAddress(), 
-                     configuration.getRemoteServerHttpPort(), 
-                     "test"));
+      
+      try
+      {
+         return ManagementViewParser.parse(deploymentName, profileService);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
    }
 
    public void undeploy(final Archive<?> archive) throws DeploymentException
@@ -227,9 +231,10 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
    {
       String profileName = configuration.getProfileName();
       InitialContext ctx = createContext();
-      ProfileService ps = (ProfileService) ctx.lookup("ProfileService");
+      profileService = (ProfileService) ctx.lookup("ProfileService");
+      
+      deploymentManager = profileService.getDeploymentManager();
 
-      deploymentManager = ps.getDeploymentManager();
       ProfileKey defaultKey = new ProfileKey(profileName);
       deploymentManager.loadProfile(defaultKey);
    }

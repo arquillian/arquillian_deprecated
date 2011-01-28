@@ -55,6 +55,7 @@
 		<dependency>
 			<groupId>org.jboss.embedded</groupId>
 			<artifactId>jboss-embedded-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

@@ -40,6 +40,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.client.protocol.metadata.Servlet;
 import org.jboss.arquillian.spi.core.InstanceProducer;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
@@ -201,8 +202,17 @@ public class TomcatContainer implements DeployableContainer<TomcatConfiguration>
          
          standardContextProducer.set(standardContext);
 
+         String contextPath = standardContext.getPath();
+         HTTPContext httpContext = new HTTPContext(bindAddress, bindPort);
+         
+         for(String mapping : standardContext.findServletMappings())
+         {
+            httpContext.add(new Servlet(
+                  standardContext.findServletMapping(mapping), contextPath));
+         }
+         
          return new ProtocolMetaData()
-            .addContext(new HTTPContext(bindAddress, bindPort, standardContext.getPath()));
+            .addContext(httpContext);
       }
       catch (Exception e)
       {

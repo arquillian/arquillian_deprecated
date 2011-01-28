@@ -26,13 +26,13 @@ import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
-import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.jbossas.servermanager.Argument;
 import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
+import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
@@ -151,8 +151,15 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       {
          throw new DeploymentException("Could not deploy " + deploymentName, e);
       }
-      return new ProtocolMetaData()
-               .addContext(new HTTPContext(server.getHost(), server.getHttpPort(), "/test"));
+
+      try
+      {
+         return ManagementViewParser.parse(deploymentName, (ProfileService)server.getNamingContext().lookup("ProfileService"));
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
    }
 
    public void undeploy(final Archive<?> archive) throws DeploymentException

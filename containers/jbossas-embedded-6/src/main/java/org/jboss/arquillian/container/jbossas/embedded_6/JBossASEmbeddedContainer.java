@@ -16,17 +16,19 @@
  */
 package org.jboss.arquillian.container.jbossas.embedded_6;
 
+import javax.naming.InitialContext;
+
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
-import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
 import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
 import org.jboss.embedded.api.server.JBossASEmbeddedServerFactory;
+import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
@@ -135,8 +137,15 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
       {
          throw new DeploymentException("Could not deploy to container", e);
       }
-      return new ProtocolMetaData()
-         .addContext(new HTTPContext(configuration.getBindAddress(), configuration.getHttpPort(), "/test"));
+
+      try
+      {
+         return ManagementViewParser.parse(archive.getName(), (ProfileService)new InitialContext().lookup("ProfileService"));
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
    }
    
    /* (non-Javadoc)

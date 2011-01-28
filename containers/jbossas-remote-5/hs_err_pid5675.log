@@ -1,0 +1,596 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007fc3b5761ab8, pid=5675, tid=140477250627328
+#
+# JRE version: 6.0_20-b20
+# Java VM: OpenJDK 64-Bit Server VM (19.0-b09 mixed mode linux-amd64 )
+# Derivative: IcedTea6 1.9.2
+# Distribution: Ubuntu 10.10, package 6b20-1.9.2-0ubuntu2
+# Problematic frame:
+# V  [libjvm.so+0x49bab8]
+#
+# If you would like to submit a bug report, please include
+# instructions how to reproduce the bug and visit:
+#   https://bugs.launchpad.net/ubuntu/+source/openjdk-6/
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000000000160d800):  JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_in_vm, id=5690, stack(0x00007fc3688f6000,0x00007fc3689f7000)]
+
+siginfo:si_signo=SIGSEGV: si_errno=0, si_code=1 (SEGV_MAPERR), si_addr=0x0000000000000031
+
+Registers:
+RAX=0x0000000000000021, RBX=0x0000000001581d20, RCX=0x00007fc3b67a72a0, RDX=0x0000000000000001
+RSP=0x00007fc3689f5790, RBP=0x00007fc3689f57a0, RSI=0x000000000160d800, RDI=0x0000000000000031
+R8 =0x00000000015829e0, R9 =0x2f67726f4c3b7478, R10=0x0000000000000000, R11=0x00007fc3b5f526e0
+R12=0x0000000001568a60, R13=0x00007fc3b6181eb8, R14=0x00007fc3b5dd7ce0, R15=0x00007fc3689f57c0
+RIP=0x00007fc3b5761ab8, EFL=0x0000000000010246, CSGSFS=0x0000000000000033, ERR=0x0000000000000004
+  TRAPNO=0x000000000000000e
+
+Register to memory mapping:
+
+RAX=0x0000000000000021
+0x0000000000000021 is pointing to unknown location
+
+RBX=0x0000000001581d20
+0x0000000001581d20 is pointing to unknown location
+
+RCX=0x00007fc3b67a72a0
+0x00007fc3b67a72a0: <offset 0x2182a0> in /lib/libpthread.so.0 at 0x00007fc3b658f000
+
+RDX=0x0000000000000001
+0x0000000000000001 is pointing to unknown location
+
+RSP=0x00007fc3689f5790
+0x00007fc3689f5790 is pointing into the stack for thread: 0x000000000160d800
+"JDWP Transport Listener: dt_socket" daemon prio=10 tid=0x000000000160d800 nid=0x163a runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+RBP=0x00007fc3689f57a0
+0x00007fc3689f57a0 is pointing into the stack for thread: 0x000000000160d800
+"JDWP Transport Listener: dt_socket" daemon prio=10 tid=0x000000000160d800 nid=0x163a runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+RSI=0x000000000160d800
+"JDWP Transport Listener: dt_socket" daemon prio=10 tid=0x000000000160d800 nid=0x163a runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+RDI=0x0000000000000031
+0x0000000000000031 is pointing to unknown location
+
+R8 =0x00000000015829e0
+0x00000000015829e0 is pointing to unknown location
+
+R9 =0x2f67726f4c3b7478
+0x2f67726f4c3b7478 is pointing to unknown location
+
+R10=0x0000000000000000
+0x0000000000000000 is pointing to unknown location
+
+R11=0x00007fc3b5f526e0
+0x00007fc3b5f526e0: <offset 0x14f6e0> in /lib/libc.so.6 at 0x00007fc3b5e03000
+
+R12=0x0000000001568a60
+0x0000000001568a60 is pointing to unknown location
+
+R13=0x00007fc3b6181eb8
+0x00007fc3b6181eb8: <offset 0x37eeb8> in /lib/libc.so.6 at 0x00007fc3b5e03000
+
+R14=0x00007fc3b5dd7ce0
+0x00007fc3b5dd7ce0: <offset 0xb11ce0> in /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so at 0x00007fc3b52c6000
+
+R15=0x00007fc3689f57c0
+0x00007fc3689f57c0 is pointing into the stack for thread: 0x000000000160d800
+"JDWP Transport Listener: dt_socket" daemon prio=10 tid=0x000000000160d800 nid=0x163a runnable [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+
+Top of Stack: (sp=0x00007fc3689f5790)
+0x00007fc3689f5790:   000000000160d800 000000000160d800
+0x00007fc3689f57a0:   00007fc3689f5810 00007fc3b575d118
+0x00007fc3689f57b0:   00007fc3689f5800 00007fc3689f58af
+0x00007fc3689f57c0:   000000000160d800 0000000000000000
+0x00007fc3689f57d0:   0000000000000000 0000000000000000
+0x00007fc3689f57e0:   000000000162ba20 00007fc3689f58af
+0x00007fc3689f57f0:   00007fc3b45d9e60 00007fc3b6181eb8
+0x00007fc3689f5800:   0000000000000028 00007fc3689f58af
+0x00007fc3689f5810:   00007fc3689f5840 00007fc3b43c4e00
+0x00007fc3689f5820:   00007fc3689f5840 00007fc3689f5970
+0x00007fc3689f5830:   00007fc3b6181eb8 0000000000000005
+0x00007fc3689f5840:   00007fc3689f58e0 00007fc3b43a677e
+0x00007fc3689f5850:   00007fc3689f58a0 00007fc3689f5890
+0x00007fc3689f5860:   00007fc3689f5888 00007fc3689f5880
+0x00007fc3689f5870:   00000001689f58a0 00007fc3689f58a4
+0x00007fc3689f5880:   0000000000000000 0000000000000000
+0x00007fc3689f5890:   0000000000000000 0000000001581a80
+0x00007fc3689f58a0:   0000000a689f58e0 00007fc300000006
+0x00007fc3689f58b0:   0000000000000608 00000000000f0200
+0x00007fc3689f58c0:   00007fc3689f5920 0000000000000002
+0x00007fc3689f58d0:   00007fc3689f5970 0000000000000002
+0x00007fc3689f58e0:   00007fc3689f5b30 00007fc3b43b14d8
+0x00007fc3689f58f0:   0000060800000013 00000000010f0200
+0x00007fc3689f5900:   00007fc35c002a10 0000000000000000
+0x00007fc3689f5910:   00007fc3689f5920 0f007fc3b59647b4
+0x00007fc3689f5920:   00007fc35c002a18 000000000000000b
+0x00007fc3689f5930:   0000060800000013 00000000010f0200
+0x00007fc3689f5940:   00007fc35c002a10 0000000001581f90
+0x00007fc3689f5950:   0000060800000013 00000000010f0200
+0x00007fc3689f5960:   00007fc35c002a10 000000000160f2e0
+0x00007fc3689f5970:   00000000015829e5 00007fc300000003
+0x00007fc3689f5980:   0000000001582730 00007fc30000012c 
+
+Instructions: (pc=0x00007fc3b5761ab8)
+0x00007fc3b5761aa8:   8b 43 08 8b 4a 08 48 d3 e0 48 03 02 48 8d 78 10
+0x00007fc3b5761ab8:   48 8b 40 10 ff 90 20 01 00 00 84 c0 75 02 31 db 
+
+Stack: [0x00007fc3688f6000,0x00007fc3689f7000],  sp=0x00007fc3689f5790,  free space=1021k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0x49bab8]
+V  [libjvm.so+0x497118]
+C  [libjdwp.so+0x24e00]
+C  [libjdwp.so+0x677e]
+C  [libjdwp.so+0x114d8]
+C  [libjdwp.so+0x2384e]
+V  [libjvm.so+0x4efbab]
+V  [libjvm.so+0x6d7c1b]
+V  [libjvm.so+0x5d7a12]
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x00007fc36429f000 JavaThread "RMI RenewClean-[127.0.0.1:4444]" daemon [_thread_blocked, id=5708, stack(0x00007fc36368e000,0x00007fc36378f000)]
+  0x00007fc364272000 JavaThread "RMI Scheduler(0)" daemon [_thread_blocked, id=5707, stack(0x00007fc36378f000,0x00007fc363890000)]
+  0x00007fc364243800 JavaThread "GC Daemon" daemon [_thread_blocked, id=5706, stack(0x00007fc363890000,0x00007fc363991000)]
+  0x00007fc364257800 JavaThread "RMI RenewClean-[127.0.0.1:1098]" daemon [_thread_blocked, id=5705, stack(0x00007fc363991000,0x00007fc363a92000)]
+  0x00007fc3641d2800 JavaThread "ReaderThread" [_thread_in_native, id=5700, stack(0x00007fc363c94000,0x00007fc363d95000)]
+  0x00007fc364004000 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=5698, stack(0x00007fc3683f1000,0x00007fc3684f2000)]
+  0x000000000162e800 JavaThread "CompilerThread1" daemon [_thread_blocked, id=5697, stack(0x00007fc3684f2000,0x00007fc3685f3000)]
+  0x000000000162c000 JavaThread "CompilerThread0" daemon [_thread_blocked, id=5696, stack(0x00007fc3685f3000,0x00007fc3686f4000)]
+  0x0000000001614000 JavaThread "JDWP Command Reader" daemon [_thread_in_native, id=5692, stack(0x00007fc3686f4000,0x00007fc3687f5000)]
+  0x0000000001611000 JavaThread "JDWP Event Helper Thread" daemon [_thread_blocked, id=5691, stack(0x00007fc3687f5000,0x00007fc3688f6000)]
+=>0x000000000160d800 JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_in_vm, id=5690, stack(0x00007fc3688f6000,0x00007fc3689f7000)]
+  0x00000000015fd800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=5688, stack(0x00007fc368bfc000,0x00007fc368cfd000)]
+  0x00000000015da000 JavaThread "Finalizer" daemon [_thread_blocked, id=5687, stack(0x00007fc368cfd000,0x00007fc368dfe000)]
+  0x00000000015d8800 JavaThread "Reference Handler" daemon [_thread_blocked, id=5686, stack(0x00007fc368dfe000,0x00007fc368eff000)]
+  0x000000000156d000 JavaThread "main" [_thread_blocked, id=5677, stack(0x00007fc3b6ac0000,0x00007fc3b6bc1000)]
+
+Other Threads:
+  0x00000000015d2000 VMThread [stack: 0x00007fc368eff000,0x00007fc369000000] [id=5685]
+  0x00007fc36400e800 WatcherThread [stack: 0x00007fc3682f0000,0x00007fc3683f1000] [id=5699]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap
+ PSYoungGen      total 17984K, used 16268K [0x00007fc39c4c0000, 0x00007fc39e7e0000, 0x00007fc3b06c0000)
+  eden space 15424K, 97% used [0x00007fc39c4c0000,0x00007fc39d36cb58,0x00007fc39d3d0000)
+  from space 2560K, 48% used [0x00007fc39d3d0000,0x00007fc39d5064d8,0x00007fc39d650000)
+  to   space 2560K, 0% used [0x00007fc39e560000,0x00007fc39e560000,0x00007fc39e7e0000)
+ PSOldGen        total 41216K, used 968K [0x00007fc3740c0000, 0x00007fc376900000, 0x00007fc39c4c0000)
+  object space 41216K, 2% used [0x00007fc3740c0000,0x00007fc3741b2000,0x00007fc376900000)
+ PSPermGen       total 21248K, used 12223K [0x00007fc369ac0000, 0x00007fc36af80000, 0x00007fc3740c0000)
+  object space 21248K, 57% used [0x00007fc369ac0000,0x00007fc36a6afdb8,0x00007fc36af80000)
+
+Dynamic libraries:
+00400000-00409000 r-xp 00000000 08:01 9060277                            /usr/lib/jvm/java-6-openjdk/jre/bin/java
+00608000-00609000 r--p 00008000 08:01 9060277                            /usr/lib/jvm/java-6-openjdk/jre/bin/java
+00609000-0060a000 rw-p 00009000 08:01 9060277                            /usr/lib/jvm/java-6-openjdk/jre/bin/java
+01556000-01d39000 rw-p 00000000 00:00 0                                  [heap]
+7fc35c000000-7fc35c418000 rw-p 00000000 00:00 0 
+7fc35c418000-7fc360000000 ---p 00000000 00:00 0 
+7fc36368e000-7fc363691000 ---p 00000000 00:00 0 
+7fc363691000-7fc36378f000 rw-p 00000000 00:00 0 
+7fc36378f000-7fc363792000 ---p 00000000 00:00 0 
+7fc363792000-7fc363890000 rw-p 00000000 00:00 0 
+7fc363890000-7fc363893000 ---p 00000000 00:00 0 
+7fc363893000-7fc363991000 rw-p 00000000 00:00 0 
+7fc363991000-7fc363994000 ---p 00000000 00:00 0 
+7fc363994000-7fc363a92000 rw-p 00000000 00:00 0 
+7fc363a92000-7fc363a93000 r-xp 00000000 08:01 9046679                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/librmi.so
+7fc363a93000-7fc363c92000 ---p 00001000 08:01 9046679                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/librmi.so
+7fc363c92000-7fc363c93000 r--p 00000000 08:01 9046679                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/librmi.so
+7fc363c93000-7fc363c94000 rw-p 00001000 08:01 9046679                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/librmi.so
+7fc363c94000-7fc363c97000 ---p 00000000 00:00 0 
+7fc363c97000-7fc363d95000 rw-p 00000000 00:00 0 
+7fc363d95000-7fc363daa000 r-xp 00000000 08:01 9046671                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnet.so
+7fc363daa000-7fc363fa9000 ---p 00015000 08:01 9046671                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnet.so
+7fc363fa9000-7fc363faa000 r--p 00014000 08:01 9046671                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnet.so
+7fc363faa000-7fc363fab000 rw-p 00015000 08:01 9046671                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnet.so
+7fc363fab000-7fc363fb2000 r--s 0003f000 08:01 2889329                    /home/aslak/.m2/repository/xml-security/xmlsec/1.3.0/xmlsec-1.3.0.jar
+7fc363fb2000-7fc363fb3000 r--s 00001000 08:01 2889325                    /home/aslak/.m2/repository/org/jboss/slf4j/slf4j-jboss-logging/1.0.0.GA/slf4j-jboss-logging-1.0.0.GA.jar
+7fc363fb3000-7fc363fb5000 r--s 00003000 08:01 2100130                    /home/aslak/.m2/repository/org/slf4j/slf4j-api/1.5.0/slf4j-api-1.5.0.jar
+7fc363fb5000-7fc363fb7000 r--s 0000b000 08:01 1191221                    /home/aslak/.m2/repository/org/jboss/naming/jnp-client/5.0.1.GA/jnp-client-5.0.1.GA.jar
+7fc363fb7000-7fc363fb9000 r--s 00000000 08:01 2889321                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-server/5.0.1.GA/jboss-as-server-5.0.1.GA-jmx-invoker-adaptor-client.jar
+7fc363fb9000-7fc363fbe000 r--s 00029000 08:01 2889347                    /home/aslak/.m2/repository/org/jboss/security/jbosssx-client/2.0.2.SP6/jbosssx-client-2.0.2.SP6.jar
+7fc363fbe000-7fc363fc4000 r--s 00034000 08:01 1450400                    /home/aslak/.m2/repository/junit/junit/4.8.1/junit-4.8.1.jar
+7fc363fc4000-7fc363fc5000 r--s 00004000 08:01 2889345                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-server-manager/1.0.0.GA/jboss-server-manager-1.0.0.GA.jar
+7fc363fc5000-7fc363fc6000 r--s 00004000 08:01 1185833                    /home/aslak/.m2/repository/jboss/profiler/jvmti/jboss-profiler-jvmti/1.0.0.CR5/jboss-profiler-jvmti-1.0.0.CR5.jar
+7fc363fc6000-7fc363fc8000 r--s 00015000 08:01 1185842                    /home/aslak/.m2/repository/org/apache/ant/ant-junit/1.7.0/ant-junit-1.7.0.jar
+7fc363fc8000-7fc363fcb000 r--s 00015000 08:01 2889265                    /home/aslak/.m2/repository/org/jboss/test/jboss-test/1.1.3.GA/jboss-test-1.1.3.GA.jar
+7fc363fcb000-7fc363fcf000 r--s 0002e000 08:01 2889261                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-mbeans/5.0.1.GA/jboss-as-mbeans-5.0.1.GA.jar
+7fc363fcf000-7fc363fd7000 r--s 00056000 08:01 2889263                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-j2se/5.0.1.GA/jboss-as-j2se-5.0.1.GA-tests.jar
+7fc363fd7000-7fc363fda000 r--s 00019000 08:01 2889259                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-jmx/5.0.1.GA/jboss-as-jmx-5.0.1.GA.jar
+7fc363fda000-7fc363fdb000 r--s 00003000 08:01 2889319                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-system-jmx/5.0.1.GA/jboss-as-system-jmx-5.0.1.GA-client.jar
+7fc363fdb000-7fc363fdf000 r--s 00021000 08:01 1186984                    /home/aslak/.m2/repository/org/jboss/microcontainer/jboss-aop-mc-int/2.0.4.GA/jboss-aop-mc-int-2.0.4.GA.jar
+7fc363fdf000-7fc363fe2000 r--s 00012000 08:01 1191193                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-impl/2.0.5.GA/jboss-deployers-impl-2.0.5.GA.jar
+7fc363fe2000-7fc363fe5000 r--s 00014000 08:01 1188981                    /home/aslak/.m2/repository/org/jboss/microcontainer/jboss-dependency/2.0.4.GA/jboss-dependency-2.0.4.GA.jar
+7fc363fe5000-7fc363fe8000 r--s 00016000 08:01 1191168                    /home/aslak/.m2/repository/org/jboss/man/jboss-metatype/2.0.0.GA/jboss-metatype-2.0.0.GA.jar
+7fc363fe8000-7fc363fea000 r--s 00007000 08:01 2889255                    /home/aslak/.m2/repository/org/jboss/integration/jboss-profileservice-spi/5.0.3.GA/jboss-profileservice-spi-5.0.3.GA.jar
+7fc363fea000-7fc364000000 r--s 0012c000 08:01 2359474                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop/2.0.1.GA/jboss-aop-2.0.1.GA.jar
+7fc364000000-7fc3643ce000 rw-p 00000000 00:00 0 
+7fc3643ce000-7fc368000000 ---p 00000000 00:00 0 
+7fc368003000-7fc368004000 r--s 00000000 08:01 2889315                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-system/5.0.1.GA/jboss-as-system-5.0.1.GA-client.jar
+7fc368004000-7fc368007000 r--s 0001c000 08:01 1185677                    /home/aslak/.m2/repository/jboss/jboss-serialization/1.0.3.GA/jboss-serialization-1.0.3.GA.jar
+7fc368007000-7fc36800b000 r--s 0000e000 08:01 2889348                    /home/aslak/.m2/repository/org/jboss/security/jboss-security-spi/2.0.2.SP6/jboss-security-spi-2.0.2.SP6.jar
+7fc36800b000-7fc368021000 r--s 000f1000 08:01 2889217                    /home/aslak/.m2/repository/org/jboss/remoting/jboss-remoting/2.5.0.SP2/jboss-remoting-2.5.0.SP2.jar
+7fc368021000-7fc368034000 r--s 00100000 08:01 2889331                    /home/aslak/.m2/repository/jboss/messaging/jboss-messaging/1.4.1.GA/jboss-messaging-1.4.1.GA.jar
+7fc368034000-7fc368039000 r--s 00026000 08:01 1185630                    /home/aslak/.m2/repository/org/jboss/jboss-mdr/2.0.1.GA/jboss-mdr-2.0.1.GA.jar
+7fc368039000-7fc36803b000 r--s 00000000 08:01 2889327                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-main/5.0.1.GA/jboss-as-main-5.0.1.GA-client.jar
+7fc36803b000-7fc36803d000 r--s 00002000 08:01 1184355                    /home/aslak/.m2/repository/org/jboss/logging/jboss-logging-spi/2.1.0.GA/jboss-logging-spi-2.1.0.GA.jar
+7fc36803d000-7fc36803f000 r--s 00005000 08:01 1185647                    /home/aslak/.m2/repository/org/jboss/logging/jboss-logging-log4j/2.1.0.GA/jboss-logging-log4j-2.1.0.GA.jar
+7fc36803f000-7fc368041000 r--s 0000c000 08:01 2889308                    /home/aslak/.m2/repository/org/jboss/logging/jboss-logging-jdk/2.0.5.GA/jboss-logging-jdk-2.0.5.GA.jar
+7fc368041000-7fc368047000 r--s 0003b000 08:01 2889313                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-cluster/5.0.1.GA/jboss-as-cluster-5.0.1.GA.jar
+7fc368047000-7fc36804c000 r--s 0001d000 08:01 1191186                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-vfs/2.0.5.GA/jboss-deployers-vfs-2.0.5.GA.jar
+7fc36804c000-7fc36804e000 r--s 00005000 08:01 2889297                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-management/5.0.1.GA/jboss-as-management-5.0.1.GA-jsr77-client.jar
+7fc36804e000-7fc368056000 r--s 00022000 08:01 1185918                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-javaee/5.0.1.GA/jboss-javaee-5.0.1.GA.jar
+7fc368056000-7fc368059000 r--s 00014000 08:01 2889243                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-j2se/5.0.1.GA/jboss-as-j2se-5.0.1.GA.jar
+7fc368059000-7fc36805d000 r--s 0000c000 08:01 2889279                    /home/aslak/.m2/repository/org/jboss/integration/jboss-integration/5.0.3.GA/jboss-integration-5.0.3.GA.jar
+7fc36805d000-7fc36805e000 r--s 00005000 08:01 2889281                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-main/5.0.1.GA/jboss-as-main-5.0.1.GA.jar
+7fc36805e000-7fc368060000 r--s 00000000 08:01 1188593                    /home/aslak/.m2/repository/org/jboss/integration/jboss-classloading-spi/5.0.3.GA/jboss-classloading-spi-5.0.3.GA.jar
+7fc368060000-7fc368063000 r--s 0000f000 08:01 1185880                    /home/aslak/.m2/repository/apache-avalon/avalon-framework/4.1.5/avalon-framework-4.1.5.jar
+7fc368063000-7fc368066000 r--s 0001e000 08:01 2889310                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-iiop/5.0.1.GA/jboss-as-iiop-5.0.1.GA-client.jar
+7fc368066000-7fc368069000 r--s 00012000 08:01 2889306                    /home/aslak/.m2/repository/org/jboss/cluster/jboss-ha-server-cache-jbc/1.1.0.GA/jboss-ha-server-cache-jbc-1.1.0.GA.jar
+7fc368069000-7fc36806b000 r--s 00003000 08:01 2889293                    /home/aslak/.m2/repository/org/jboss/cluster/jboss-ha-server-cache-spi/1.1.0.GA/jboss-ha-server-cache-spi-1.1.0.GA.jar
+7fc36806b000-7fc368085000 r--s 001d2000 08:01 1189361                    /home/aslak/.m2/repository/jgroups/jgroups/2.6.7.GA/jgroups-2.6.7.GA.jar
+7fc368085000-7fc368087000 r--s 00009000 08:01 2889296                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-cluster/5.0.1.GA/jboss-as-cluster-5.0.1.GA-jboss-ha-legacy-client.jar
+7fc368087000-7fc368088000 r--s 00004000 08:01 1185644                    /home/aslak/.m2/repository/org/jboss/cluster/jboss-ha-client/1.1.1.GA/jboss-ha-client-1.1.1.GA.jar
+7fc368088000-7fc368089000 r--s 00001000 08:01 1185745                    /home/aslak/.m2/repository/org/jboss/aspects/jboss-current-invocation-aspects/1.0.0.CR1/jboss-current-invocation-aspects-1.0.0.CR1.jar
+7fc368089000-7fc36808b000 r--s 00009000 08:01 1855558                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-security/1.0.0/jboss-ejb3-security-1.0.0-client.jar
+7fc36808b000-7fc36808d000 r--s 00002000 08:01 2889289                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-proxy-clustered/1.0.0/jboss-ejb3-proxy-clustered-1.0.0-client.jar
+7fc36808d000-7fc368090000 r--s 0000f000 08:01 2889287                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-proxy/1.0.0/jboss-ejb3-proxy-1.0.0-client.jar
+7fc368090000-7fc368091000 r--s 00001000 08:01 1185783                    /home/aslak/.m2/repository/sun-jaxws/jsr181-api/2.1.1/jsr181-api-2.1.1.jar
+7fc368091000-7fc368093000 r--s 00007000 08:01 1185779                    /home/aslak/.m2/repository/sun-jaxws/jaxws-api/2.1.1/jaxws-api-2.1.1.jar
+7fc368093000-7fc368099000 r--s 00061000 08:01 1185780                    /home/aslak/.m2/repository/quartz/quartz/1.6.0/quartz-1.6.0.jar
+7fc368099000-7fc36809d000 r--s 00015000 08:01 1185687                    /home/aslak/.m2/repository/org/jboss/ws/jbossws-spi/1.0.3.GA/jbossws-spi-1.0.3.GA.jar
+7fc36809d000-7fc36809f000 r--s 00005000 08:01 1966370                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-transactions/1.0.0/jboss-ejb3-transactions-1.0.0.jar
+7fc36809f000-7fc3680a1000 r--s 00008000 08:01 2889233                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-proxy-clustered/1.0.0/jboss-ejb3-proxy-clustered-1.0.0.jar
+7fc3680a1000-7fc3680a4000 r--s 00013000 08:01 2889231                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-proxy/1.0.0/jboss-ejb3-proxy-1.0.0.jar
+7fc3680a4000-7fc3680a5000 r--s 00003000 08:01 1855489                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-metadata/1.0.0/jboss-ejb3-metadata-1.0.0.jar
+7fc3680a5000-7fc3680a9000 r--s 0001a000 08:01 1835946                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-interceptors/1.0.0/jboss-ejb3-interceptors-1.0.0.jar
+7fc3680a9000-7fc3680ab000 r--s 00009000 08:01 1835207                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-ext-api-impl/1.0.0/jboss-ejb3-ext-api-impl-1.0.0.jar
+7fc3680ab000-7fc3680ad000 r--s 00003000 08:01 1835165                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-ext-api/1.0.0/jboss-ejb3-ext-api-1.0.0.jar
+7fc3680ad000-7fc3680b0000 r--s 00009000 08:01 1835204                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-security/1.0.0/jboss-ejb3-security-1.0.0.jar
+7fc3680b0000-7fc3680b3000 r--s 0000b000 08:01 1835202                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-common/1.0.0/jboss-ejb3-common-1.0.0.jar
+7fc3680b3000-7fc3680b5000 r--s 00007000 08:01 1855450                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-cache/1.0.0/jboss-ejb3-cache-1.0.0.jar
+7fc3680b5000-7fc3680b7000 r--s 00003000 08:01 2889220                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-async/1.0.0/jboss-ejb3-async-1.0.0.jar
+7fc3680b7000-7fc3680b9000 r--s 00008000 08:01 1191109                    /home/aslak/.m2/repository/org/jboss/cluster/jboss-ha-server-api/1.1.0.CR4/jboss-ha-server-api-1.1.0.CR4.jar
+7fc3680b9000-7fc3680ba000 r--s 00005000 08:01 1185723                    /home/aslak/.m2/repository/javax/security/jacc/1.0/jacc-1.0.jar
+7fc3680ba000-7fc3680bc000 r--s 0000b000 08:01 1186958                    /home/aslak/.m2/repository/org/jboss/aspects/jboss-security-aspects/1.0.0.Beta1/jboss-security-aspects-1.0.0.Beta1.jar
+7fc3680bc000-7fc3680be000 r--s 00006000 08:01 1186956                    /home/aslak/.m2/repository/org/jboss/aspects/jboss-transaction-aspects/1.0.0.Beta1/jboss-transaction-aspects-1.0.0.Beta1.jar
+7fc3680be000-7fc3680bf000 r--s 00003000 08:01 2889219                    /home/aslak/.m2/repository/org/jboss/aspects/jboss-remoting-aspects/1.0.1.CR4/jboss-remoting-aspects-1.0.1.CR4.jar
+7fc3680bf000-7fc3680d1000 r--s 000fe000 08:01 2889235                    /home/aslak/.m2/repository/org/jboss/cache/jbosscache-core/3.0.0.CR4/jbosscache-core-3.0.0.CR4.jar
+7fc3680d1000-7fc3680d3000 r--s 00000000 08:01 1185653                    /home/aslak/.m2/repository/org/jboss/integration/jboss-jca-spi/5.0.3.GA/jboss-jca-spi-5.0.3.GA.jar
+7fc3680d3000-7fc3680d9000 r--s 00038000 08:01 2889245                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-core/1.0.0/jboss-ejb3-core-1.0.0-client.jar
+7fc3680d9000-7fc3680db000 r--s 00004000 08:01 1835247                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-common/1.0.0/jboss-ejb3-common-1.0.0-client.jar
+7fc3680db000-7fc3680dd000 r--s 0000d000 08:01 2889241                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-deployment/5.0.1.GA/jboss-as-deployment-5.0.1.GA.jar
+7fc3680dd000-7fc3680df000 r--s 00002000 08:01 1191191                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-core/2.0.5.GA/jboss-deployers-core-2.0.5.GA.jar
+7fc3680df000-7fc3680e1000 r--s 00003000 08:01 2889227                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-core-spi/2.0.5.GA/jboss-deployers-core-spi-2.0.5.GA.jar
+7fc3680e1000-7fc3680e4000 r--s 00014000 08:01 1191163                    /home/aslak/.m2/repository/org/jboss/man/jboss-managed/2.0.0.GA/jboss-managed-2.0.0.GA.jar
+7fc3680e4000-7fc3680e6000 r--s 00002000 08:01 2889229                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-client-spi/2.0.5.GA/jboss-deployers-client-spi-2.0.5.GA.jar
+7fc3680e6000-7fc3680e8000 r--s 00000000 08:01 1191187                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-client/2.0.5.GA/jboss-deployers-client-2.0.5.GA.jar
+7fc3680e8000-7fc3680f2000 r--s 0006f000 08:01 1191159                    /home/aslak/.m2/repository/org/jboss/jboss-common-core/2.2.11.GA/jboss-common-core-2.2.11.GA.jar
+7fc3680f2000-7fc3680f3000 r--s 00003000 08:01 1185674                    /home/aslak/.m2/repository/gnu-getopt/getopt/1.0.12-brew/getopt-1.0.12-brew.jar
+7fc3680f3000-7fc3680f5000 r--s 00012000 08:01 1573112                    /home/aslak/.m2/repository/org/jboss/naming/jnpserver/5.0.1.GA/jnpserver-5.0.1.GA.jar
+7fc3680f5000-7fc3680f6000 r--s 00000000 08:01 1185815                    /home/aslak/.m2/repository/jpl-pattern/jpl-pattern/1.0/jpl-pattern-1.0.jar
+7fc3680f6000-7fc3680f8000 r--s 00003000 08:01 1185816                    /home/aslak/.m2/repository/jpl-util/jpl-util/1.0/jpl-util-1.0.jar
+7fc3680f8000-7fc368101000 r--s 00075000 08:01 1185845                    /home/aslak/.m2/repository/bcel/bcel/5.1/bcel-5.1.jar
+7fc368101000-7fc368104000 r--s 00006000 08:01 1185665                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-jca-api/1.5.0.GA/jboss-jca-api-1.5.0.GA.jar
+7fc368104000-7fc368107000 r--s 00017000 08:01 1185797                    /home/aslak/.m2/repository/javax/security/jaas/1.0.01/jaas-1.0.01.jar
+7fc368107000-7fc368109000 r--s 00005000 08:01 2889213                    /home/aslak/.m2/repository/org/jboss/ws/native/jbossws-native-saaj/3.0.5.GA/jbossws-native-saaj-3.0.5.GA.jar
+7fc368109000-7fc36810a000 r--s 00005000 08:01 1185756                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-jacc-api/1.1.0.GA_SP1/jboss-jacc-api-1.1.0.GA_SP1.jar
+7fc36810a000-7fc36810c000 r--s 00004000 08:01 1191173                    /home/aslak/.m2/repository/org/jboss/integration/jboss-transaction-spi/5.0.3.GA/jboss-transaction-spi-5.0.3.GA.jar
+7fc36810c000-7fc36810f000 r--s 0001a000 08:01 2889247                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-security/5.0.1.GA/jboss-as-security-5.0.1.GA.jar
+7fc36810f000-7fc368114000 r--s 0002a000 08:01 2889257                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-system/5.0.1.GA/jboss-as-system-5.0.1.GA.jar
+7fc368114000-7fc36811a000 r--s 00041000 08:01 2889249                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-system-jmx/5.0.1.GA/jboss-as-system-jmx-5.0.1.GA.jar
+7fc36811a000-7fc36812f000 r--s 00125000 08:01 1186951                    /home/aslak/.m2/repository/org/jboss/metadata/jboss-metadata/1.0.0.CR16/jboss-metadata-1.0.0.CR16.jar
+7fc36812f000-7fc36813c000 r--s 00087000 08:01 2889239                    /home/aslak/.m2/repository/org/jboss/security/jbosssx/2.0.2.SP6/jbosssx-2.0.2.SP6.jar
+7fc36813c000-7fc36813e000 r--s 0000a000 08:01 1189417                    /home/aslak/.m2/repository/org/jboss/jpa/jboss-jpa-deployers/1.0.0-CR1/jboss-jpa-deployers-1.0.0-CR1.jar
+7fc36813e000-7fc36813f000 r--s 00000000 08:01 2889266                    /home/aslak/.m2/repository/org/jboss/integration/jboss-deployment-spi/5.0.3.GA/jboss-deployment-spi-5.0.3.GA.jar
+7fc36813f000-7fc368141000 r--s 00008000 08:01 2889251                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-bootstrap/5.0.1.GA/jboss-as-bootstrap-5.0.1.GA.jar
+7fc368141000-7fc368145000 r--s 00016000 08:01 1187642                    /home/aslak/.m2/repository/sun-jaxb/jaxb-api/2.1.9/jaxb-api-2.1.9.jar
+7fc368145000-7fc36814a000 r--s 0002d000 08:01 2889292                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-server/5.0.1.GA/jboss-as-server-5.0.1.GA-client.jar
+7fc36814a000-7fc36814b000 r--s 00000000 08:01 2889284                    /home/aslak/.m2/repository/org/jboss/integration/jboss-corba-ots-spi/5.0.3.GA/jboss-corba-ots-spi-5.0.3.GA.jar
+7fc36814b000-7fc36815b000 r--s 00082000 08:01 1191121                    /home/aslak/.m2/repository/org/jboss/microcontainer/jboss-kernel/2.0.4.GA/jboss-kernel-2.0.4.GA.jar
+7fc36815b000-7fc36815e000 r--s 0001b000 08:01 1191197                    /home/aslak/.m2/repository/org/jboss/cl/jboss-classloader/2.0.3.GA/jboss-classloader-2.0.3.GA.jar
+7fc36815e000-7fc368161000 r--s 00011000 08:01 1191180                    /home/aslak/.m2/repository/org/jboss/cl/jboss-classloading/2.0.3.GA/jboss-classloading-2.0.3.GA.jar
+7fc368161000-7fc368164000 r--s 00011000 08:01 1191183                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-vfs-spi/2.0.5.GA/jboss-deployers-vfs-spi-2.0.5.GA.jar
+7fc368164000-7fc368166000 r--s 0000b000 08:01 2889225                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-structure-spi/2.0.5.GA/jboss-deployers-structure-spi-2.0.5.GA.jar
+7fc368166000-7fc368168000 r--s 00007000 08:01 1191110                    /home/aslak/.m2/repository/org/jboss/deployers/jboss-deployers-spi/2.0.5.GA/jboss-deployers-spi-2.0.5.GA.jar
+7fc368168000-7fc368187000 r--s 001aa000 08:01 2889317                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-server/5.0.1.GA/jboss-as-server-5.0.1.GA.jar
+7fc368187000-7fc36818d000 r--s 00048000 08:01 2889291                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-iiop/5.0.1.GA/jboss-as-iiop-5.0.1.GA.jar
+7fc36818d000-7fc368193000 r--s 00059000 08:01 1185887                    /home/aslak/.m2/repository/javax/mail/mail/1.4/mail-1.4.jar
+7fc368193000-7fc368195000 r--s 00008000 08:01 2889276                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop-asintegration-mc/2.0.1.GA/jboss-aop-asintegration-mc-2.0.1.GA.jar
+7fc368195000-7fc368197000 r--s 00008000 08:01 2889283                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop-asintegration-jmx/2.0.1.GA/jboss-aop-asintegration-jmx-2.0.1.GA.jar
+7fc368197000-7fc368198000 r--s 00000000 08:01 2889272                    /home/aslak/.m2/repository/org/jboss/aop/pluggable-instrumentor/2.0.1.GA/pluggable-instrumentor-2.0.1.GA.jar
+7fc368198000-7fc36819a000 r--s 00008000 08:01 2889275                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop-asintegration-core/2.0.1.GA/jboss-aop-asintegration-core-2.0.1.GA.jar
+7fc36819a000-7fc36819e000 r--s 00016000 08:01 1574505                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop-aspects/2.0.1.GA/jboss-aop-aspects-2.0.1.GA.jar
+7fc36819e000-7fc3681a2000 r--s 00019000 08:01 2889269                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-aspects/5.0.1.GA/jboss-as-aspects-5.0.1.GA.jar
+7fc3681a2000-7fc3681a4000 r--s 00010000 08:01 2889271                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-profileservice/5.0.1.GA/jboss-as-profileservice-5.0.1.GA.jar
+7fc3681a4000-7fc3681af000 r--s 0007a000 08:01 2889253                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-connector/5.0.1.GA/jboss-as-connector-5.0.1.GA.jar
+7fc3681af000-7fc3681b1000 r--s 00005000 08:01 1185688                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-jms-api/1.1.0.GA/jboss-jms-api-1.1.0.GA.jar
+7fc3681b1000-7fc3681b4000 r--s 00005000 08:01 1185684                    /home/aslak/.m2/repository/org/jboss/ws/native/jbossws-native-jaxrpc/3.0.4.GA/jbossws-native-jaxrpc-3.0.4.GA.jar
+7fc3681b4000-7fc3681b5000 r--s 00002000 08:01 1185681                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-transaction-api/1.0.1.GA/jboss-transaction-api-1.0.1.GA.jar
+7fc3681b5000-7fc3681b8000 r--s 00006000 08:01 1185675                    /home/aslak/.m2/repository/org/jboss/javaee/jboss-ejb-api/3.0.0.GA/jboss-ejb-api-3.0.0.GA.jar
+7fc3681b8000-7fc3681ba000 r--s 00001000 08:01 2889237                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-mc-int/1.0.0/jboss-ejb3-mc-int-1.0.0.jar
+7fc3681ba000-7fc3681bc000 r--s 00000000 08:01 1966368                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-deployers/1.0.0/jboss-ejb3-deployers-1.0.0.jar
+7fc3681bc000-7fc3681c9000 r--s 000b0000 08:01 2889223                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-core/1.0.0/jboss-ejb3-core-1.0.0.jar
+7fc3681c9000-7fc3681ca000 r--s 00000000 08:01 2889214                    /home/aslak/.m2/repository/org/jboss/ejb3/jboss-ejb3-as-int/1.0.0/jboss-ejb3-as-int-1.0.0.jar
+7fc3681ca000-7fc3681cc000 r--s 0000d000 08:01 1185659                    /home/aslak/.m2/repository/javax/activation/activation/1.1.1/activation-1.1.1.jar
+7fc3681cc000-7fc3681ce000 r--s 0000a000 08:01 1185654                    /home/aslak/.m2/repository/wutka-dtdparser/dtdparser121/1.2.1/dtdparser121-1.2.1.jar
+7fc3681ce000-7fc3681e6000 r--s 00115000 08:01 1185661                    /home/aslak/.m2/repository/apache-xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar
+7fc3681e6000-7fc36825b000 r--s 003f7000 08:01 2889323                    /home/aslak/.m2/repository/jacorb/jacorb/2.3.0jboss.patch5-brew/jacorb-2.3.0jboss.patch5-brew.jar
+7fc36825b000-7fc36825d000 r--s 0000d000 08:01 2889209                    /home/aslak/.m2/repository/org/jboss/jbossas/jboss-as-ejb3/5.0.1.GA/jboss-as-ejb3-5.0.1.GA-client.jar
+7fc368261000-7fc368265000 r--s 0007c000 08:01 9060237                    /usr/lib/jvm/java-6-openjdk/jre/lib/jsse.jar
+7fc368265000-7fc36826f000 r--s 0006f000 08:01 1187158                    /home/aslak/.m2/repository/org/jboss/jbossxb/2.0.0.GA/jbossxb-2.0.0.GA.jar
+7fc36826f000-7fc368275000 r--s 00036000 08:01 1186592                    /home/aslak/.m2/repository/org/jboss/jboss-vfs/2.1.0.GA/jboss-vfs-2.1.0.GA.jar
+7fc368275000-7fc368278000 r--s 0001b000 08:01 1185615                    /home/aslak/.m2/repository/org/hibernate/hibernate-entitymanager/3.4.0.GA/hibernate-entitymanager-3.4.0.GA.jar
+7fc368278000-7fc36827e000 r--s 0003f000 08:01 1185643                    /home/aslak/.m2/repository/cglib/cglib/2.1.3/cglib-2.1.3.jar
+7fc36827e000-7fc368285000 r--s 00053000 08:01 1185634                    /home/aslak/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar
+7fc368285000-7fc36828d000 r--s 00051000 08:01 1185641                    /home/aslak/.m2/repository/trove/trove/2.1.1/trove-2.1.1.jar
+7fc36828d000-7fc368290000 r--s 00015000 08:01 1185632                    /home/aslak/.m2/repository/qdox/qdox/1.6.1/qdox-1.6.1.jar
+7fc368290000-7fc368296000 r--s 0002d000 08:01 1185635                    /home/aslak/.m2/repository/org/jboss/jboss-reflect/2.0.2.GA/jboss-reflect-2.0.2.GA.jar
+7fc368296000-7fc36829e000 r--s 0008a000 08:01 1185916                    /home/aslak/.m2/repository/javassist/javassist/3.9.0.GA/javassist-3.9.0.GA.jar
+7fc36829e000-7fc3682b1000 r--s 00128000 08:01 1185617                    /home/aslak/.m2/repository/org/apache/ant/ant/1.7.0/ant-1.7.0.jar
+7fc3682b1000-7fc3682b9000 r--s 00028000 08:01 1184311                    /home/aslak/.m2/repository/apache-xerces/xml-apis/2.9.1/xml-apis-2.9.1.jar
+7fc3682b9000-7fc3682ce000 r--s 0012b000 08:01 2359460                    /home/aslak/.m2/repository/org/jboss/aop/jboss-aop/2.0.1.GA/jboss-aop-2.0.1.GA-client.jar
+7fc3682ce000-7fc3682f0000 r--s 00208000 08:01 1184366                    /home/aslak/.m2/repository/org/hibernate/hibernate-core/3.3.0.SP1/hibernate-core-3.3.0.SP1.jar
+7fc3682f0000-7fc3682f1000 ---p 00000000 00:00 0 
+7fc3682f1000-7fc3683f1000 rw-p 00000000 00:00 0 
+7fc3683f1000-7fc3683f4000 ---p 00000000 00:00 0 
+7fc3683f4000-7fc3684f2000 rw-p 00000000 00:00 0 
+7fc3684f2000-7fc3684f5000 ---p 00000000 00:00 0 
+7fc3684f5000-7fc3685f3000 rw-p 00000000 00:00 0 
+7fc3685f3000-7fc3685f6000 ---p 00000000 00:00 0 
+7fc3685f6000-7fc3686f4000 rw-p 00000000 00:00 0 
+7fc3686f4000-7fc3686f7000 ---p 00000000 00:00 0 
+7fc3686f7000-7fc3687f5000 rw-p 00000000 00:00 0 
+7fc3687f5000-7fc3687f8000 ---p 00000000 00:00 0 
+7fc3687f8000-7fc3688f6000 rw-p 00000000 00:00 0 
+7fc3688f6000-7fc3688f9000 ---p 00000000 00:00 0 
+7fc3688f9000-7fc3689f7000 rw-p 00000000 00:00 0 
+7fc3689f7000-7fc3689fb000 r-xp 00000000 08:01 9046553                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libdt_socket.so
+7fc3689fb000-7fc368bfa000 ---p 00004000 08:01 9046553                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libdt_socket.so
+7fc368bfa000-7fc368bfb000 r--p 00003000 08:01 9046553                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libdt_socket.so
+7fc368bfb000-7fc368bfc000 rw-p 00004000 08:01 9046553                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libdt_socket.so
+7fc368bfc000-7fc368bff000 ---p 00000000 00:00 0 
+7fc368bff000-7fc368cfd000 rw-p 00000000 00:00 0 
+7fc368cfd000-7fc368d00000 ---p 00000000 00:00 0 
+7fc368d00000-7fc368dfe000 rw-p 00000000 00:00 0 
+7fc368dfe000-7fc368e01000 ---p 00000000 00:00 0 
+7fc368e01000-7fc368eff000 rw-p 00000000 00:00 0 
+7fc368eff000-7fc368f00000 ---p 00000000 00:00 0 
+7fc368f00000-7fc369303000 rw-p 00000000 00:00 0 
+7fc369303000-7fc369305000 r--s 0001d000 08:01 9060243                    /usr/lib/jvm/java-6-openjdk/jre/lib/plugin.jar
+7fc369305000-7fc36930a000 r--s 00044000 08:01 9060242                    /usr/lib/jvm/java-6-openjdk/jre/lib/netx.jar
+7fc36930a000-7fc36933c000 rw-p 00000000 00:00 0 
+7fc36933c000-7fc3694ca000 r--s 038af000 08:01 9044219                    /usr/lib/jvm/java-6-openjdk/jre/lib/rt.jar
+7fc3694ca000-7fc3694f2000 rw-p 00000000 00:00 0 
+7fc3694f2000-7fc3694f3000 ---p 00000000 00:00 0 
+7fc3694f3000-7fc3695f3000 rw-p 00000000 00:00 0 
+7fc3695f3000-7fc3695f4000 ---p 00000000 00:00 0 
+7fc3695f4000-7fc3696ff000 rw-p 00000000 00:00 0 
+7fc3696ff000-7fc369747000 rw-p 00000000 00:00 0 
+7fc369747000-7fc36975c000 rw-p 00000000 00:00 0 
+7fc36975c000-7fc369889000 rw-p 00000000 00:00 0 
+7fc369889000-7fc369894000 rw-p 00000000 00:00 0 
+7fc369894000-7fc3698dc000 rw-p 00000000 00:00 0 
+7fc3698dc000-7fc3698f1000 rw-p 00000000 00:00 0 
+7fc3698f1000-7fc369a1e000 rw-p 00000000 00:00 0 
+7fc369a1e000-7fc369a30000 rw-p 00000000 00:00 0 
+7fc369a30000-7fc369abf000 rw-p 00000000 00:00 0 
+7fc369abf000-7fc36af80000 rw-p 00000000 00:00 0 
+7fc36af80000-7fc3740c0000 rw-p 00000000 00:00 0 
+7fc3740c0000-7fc376900000 rw-p 00000000 00:00 0 
+7fc376900000-7fc39c4c0000 rw-p 00000000 00:00 0 
+7fc39c4c0000-7fc39e7e0000 rw-p 00000000 00:00 0 
+7fc39e7e0000-7fc3b06c0000 rw-p 00000000 00:00 0 
+7fc3b06c2000-7fc3b06cf000 r--s 0007c000 08:01 1184361                    /home/aslak/.m2/repository/commons-collections/commons-collections/3.1/commons-collections-3.1.jar
+7fc3b06cf000-7fc3b093f000 rwxp 00000000 00:00 0 
+7fc3b093f000-7fc3b36cf000 rw-p 00000000 00:00 0 
+7fc3b36cf000-7fc3b36d6000 r-xp 00000000 08:01 9060253                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libzip.so
+7fc3b36d6000-7fc3b38d5000 ---p 00007000 08:01 9060253                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libzip.so
+7fc3b38d5000-7fc3b38d6000 r--p 00006000 08:01 9060253                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libzip.so
+7fc3b38d6000-7fc3b38d7000 rw-p 00007000 08:01 9060253                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libzip.so
+7fc3b38d7000-7fc3b38e3000 r-xp 00000000 08:01 8390597                    /lib/libnss_files-2.12.1.so
+7fc3b38e3000-7fc3b3ae2000 ---p 0000c000 08:01 8390597                    /lib/libnss_files-2.12.1.so
+7fc3b3ae2000-7fc3b3ae3000 r--p 0000b000 08:01 8390597                    /lib/libnss_files-2.12.1.so
+7fc3b3ae3000-7fc3b3ae4000 rw-p 0000c000 08:01 8390597                    /lib/libnss_files-2.12.1.so
+7fc3b3ae4000-7fc3b3aee000 r-xp 00000000 08:01 8390599                    /lib/libnss_nis-2.12.1.so
+7fc3b3aee000-7fc3b3ced000 ---p 0000a000 08:01 8390599                    /lib/libnss_nis-2.12.1.so
+7fc3b3ced000-7fc3b3cee000 r--p 00009000 08:01 8390599                    /lib/libnss_nis-2.12.1.so
+7fc3b3cee000-7fc3b3cef000 rw-p 0000a000 08:01 8390599                    /lib/libnss_nis-2.12.1.so
+7fc3b3cef000-7fc3b3cf7000 r-xp 00000000 08:01 8390595                    /lib/libnss_compat-2.12.1.so
+7fc3b3cf7000-7fc3b3ef6000 ---p 00008000 08:01 8390595                    /lib/libnss_compat-2.12.1.so
+7fc3b3ef6000-7fc3b3ef7000 r--p 00007000 08:01 8390595                    /lib/libnss_compat-2.12.1.so
+7fc3b3ef7000-7fc3b3ef8000 rw-p 00008000 08:01 8390595                    /lib/libnss_compat-2.12.1.so
+7fc3b3ef8000-7fc3b419c000 r--p 00000000 08:01 8388853                    /usr/lib/locale/locale-archive
+7fc3b419c000-7fc3b419f000 r-xp 00000000 08:01 9046678                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnpt.so
+7fc3b419f000-7fc3b439e000 ---p 00003000 08:01 9046678                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnpt.so
+7fc3b439e000-7fc3b439f000 r--p 00002000 08:01 9046678                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnpt.so
+7fc3b439f000-7fc3b43a0000 rw-p 00003000 08:01 9046678                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libnpt.so
+7fc3b43a0000-7fc3b43d9000 r-xp 00000000 08:01 9046661                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjdwp.so
+7fc3b43d9000-7fc3b45d8000 ---p 00039000 08:01 9046661                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjdwp.so
+7fc3b45d8000-7fc3b45d9000 r--p 00038000 08:01 9046661                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjdwp.so
+7fc3b45d9000-7fc3b45da000 rw-p 00039000 08:01 9046661                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjdwp.so
+7fc3b45da000-7fc3b45e2000 r-xp 00000000 08:01 9060254                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/native_threads/libhpi.so
+7fc3b45e2000-7fc3b47e1000 ---p 00008000 08:01 9060254                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/native_threads/libhpi.so
+7fc3b47e1000-7fc3b47e2000 r--p 00007000 08:01 9060254                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/native_threads/libhpi.so
+7fc3b47e2000-7fc3b47e3000 rw-p 00008000 08:01 9060254                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/native_threads/libhpi.so
+7fc3b47e3000-7fc3b47fa000 r-xp 00000000 08:01 8390594                    /lib/libnsl-2.12.1.so
+7fc3b47fa000-7fc3b49f9000 ---p 00017000 08:01 8390594                    /lib/libnsl-2.12.1.so
+7fc3b49f9000-7fc3b49fa000 r--p 00016000 08:01 8390594                    /lib/libnsl-2.12.1.so
+7fc3b49fa000-7fc3b49fb000 rw-p 00017000 08:01 8390594                    /lib/libnsl-2.12.1.so
+7fc3b49fb000-7fc3b49fd000 rw-p 00000000 00:00 0 
+7fc3b49fd000-7fc3b4a28000 r-xp 00000000 08:01 9046658                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjava.so
+7fc3b4a28000-7fc3b4c27000 ---p 0002b000 08:01 9046658                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjava.so
+7fc3b4c27000-7fc3b4c28000 r--p 0002a000 08:01 9046658                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjava.so
+7fc3b4c28000-7fc3b4c2b000 rw-p 0002b000 08:01 9046658                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libjava.so
+7fc3b4c2b000-7fc3b4c39000 r-xp 00000000 08:01 9060252                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libverify.so
+7fc3b4c39000-7fc3b4e38000 ---p 0000e000 08:01 9060252                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libverify.so
+7fc3b4e38000-7fc3b4e3a000 r--p 0000d000 08:01 9060252                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libverify.so
+7fc3b4e3a000-7fc3b4e3b000 rw-p 0000f000 08:01 9060252                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/libverify.so
+7fc3b4e3b000-7fc3b4e42000 r-xp 00000000 08:01 8390604                    /lib/librt-2.12.1.so
+7fc3b4e42000-7fc3b5041000 ---p 00007000 08:01 8390604                    /lib/librt-2.12.1.so
+7fc3b5041000-7fc3b5042000 r--p 00006000 08:01 8390604                    /lib/librt-2.12.1.so
+7fc3b5042000-7fc3b5043000 rw-p 00007000 08:01 8390604                    /lib/librt-2.12.1.so
+7fc3b5043000-7fc3b50c5000 r-xp 00000000 08:01 8390592                    /lib/libm-2.12.1.so
+7fc3b50c5000-7fc3b52c4000 ---p 00082000 08:01 8390592                    /lib/libm-2.12.1.so
+7fc3b52c4000-7fc3b52c5000 r--p 00081000 08:01 8390592                    /lib/libm-2.12.1.so
+7fc3b52c5000-7fc3b52c6000 rw-p 00082000 08:01 8390592                    /lib/libm-2.12.1.so
+7fc3b52c6000-7fc3b5b3a000 r-xp 00000000 08:01 9060255                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so
+7fc3b5b3a000-7fc3b5d39000 ---p 00874000 08:01 9060255                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so
+7fc3b5d39000-7fc3b5daf000 r--p 00873000 08:01 9060255                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so
+7fc3b5daf000-7fc3b5dca000 rw-p 008e9000 08:01 9060255                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server/libjvm.so
+7fc3b5dca000-7fc3b5e03000 rw-p 00000000 00:00 0 
+7fc3b5e03000-7fc3b5f7d000 r-xp 00000000 08:01 8388893                    /lib/libc-2.12.1.so
+7fc3b5f7d000-7fc3b617c000 ---p 0017a000 08:01 8388893                    /lib/libc-2.12.1.so
+7fc3b617c000-7fc3b6180000 r--p 00179000 08:01 8388893                    /lib/libc-2.12.1.so
+7fc3b6180000-7fc3b6181000 rw-p 0017d000 08:01 8388893                    /lib/libc-2.12.1.so
+7fc3b6181000-7fc3b6186000 rw-p 00000000 00:00 0 
+7fc3b6186000-7fc3b6188000 r-xp 00000000 08:01 8390591                    /lib/libdl-2.12.1.so
+7fc3b6188000-7fc3b6388000 ---p 00002000 08:01 8390591                    /lib/libdl-2.12.1.so
+7fc3b6388000-7fc3b6389000 r--p 00002000 08:01 8390591                    /lib/libdl-2.12.1.so
+7fc3b6389000-7fc3b638a000 rw-p 00003000 08:01 8390591                    /lib/libdl-2.12.1.so
+7fc3b638a000-7fc3b638e000 r-xp 00000000 08:01 9044773                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/jli/libjli.so
+7fc3b638e000-7fc3b658d000 ---p 00004000 08:01 9044773                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/jli/libjli.so
+7fc3b658d000-7fc3b658e000 r--p 00003000 08:01 9044773                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/jli/libjli.so
+7fc3b658e000-7fc3b658f000 rw-p 00004000 08:01 9044773                    /usr/lib/jvm/java-6-openjdk/jre/lib/amd64/jli/libjli.so
+7fc3b658f000-7fc3b65a7000 r-xp 00000000 08:01 8390602                    /lib/libpthread-2.12.1.so
+7fc3b65a7000-7fc3b67a6000 ---p 00018000 08:01 8390602                    /lib/libpthread-2.12.1.so
+7fc3b67a6000-7fc3b67a7000 r--p 00017000 08:01 8390602                    /lib/libpthread-2.12.1.so
+7fc3b67a7000-7fc3b67a8000 rw-p 00018000 08:01 8390602                    /lib/libpthread-2.12.1.so
+7fc3b67a8000-7fc3b67ac000 rw-p 00000000 00:00 0 
+7fc3b67ac000-7fc3b67c2000 r-xp 00000000 08:01 8394826                    /lib/libz.so.1.2.3.4
+7fc3b67c2000-7fc3b69c2000 ---p 00016000 08:01 8394826                    /lib/libz.so.1.2.3.4
+7fc3b69c2000-7fc3b69c3000 r--p 00016000 08:01 8394826                    /lib/libz.so.1.2.3.4
+7fc3b69c3000-7fc3b69c4000 rw-p 00017000 08:01 8394826                    /lib/libz.so.1.2.3.4
+7fc3b69c4000-7fc3b69e4000 r-xp 00000000 08:01 8388850                    /lib/ld-2.12.1.so
+7fc3b69e4000-7fc3b69e6000 r--s 00007000 08:01 2889211                    /home/aslak/.m2/repository/org/jboss/ws/native/jbossws-native-jaxws/3.0.5.GA/jbossws-native-jaxws-3.0.5.GA.jar
+7fc3b69e6000-7fc3b69eb000 r--s 00048000 08:01 1185618                    /home/aslak/.m2/repository/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar
+7fc3b69eb000-7fc3b69f1000 r--s 00067000 08:01 1184270                    /home/aslak/.m2/repository/antlr/antlr/2.7.6/antlr-2.7.6.jar
+7fc3b69f1000-7fc3b69f4000 r--s 0000e000 08:01 1184359                    /home/aslak/.m2/repository/org/hibernate/hibernate-commons-annotations/3.1.0.GA/hibernate-commons-annotations-3.1.0.GA.jar
+7fc3b69f4000-7fc3b69f9000 r--s 00040000 08:01 1185612                    /home/aslak/.m2/repository/org/hibernate/hibernate-annotations/3.4.0.GA/hibernate-annotations-3.4.0.GA.jar
+7fc3b69f9000-7fc3b6a00000 r--s 00038000 08:01 1185613                    /home/aslak/.m2/repository/oswego-concurrent/concurrent/1.3.4-jboss-update1/concurrent-1.3.4-jboss-update1.jar
+7fc3b6a00000-7fc3b6a0a000 rw-p 00000000 00:00 0 
+7fc3b6a0a000-7fc3b6ac0000 rw-p 00000000 00:00 0 
+7fc3b6ac0000-7fc3b6ac3000 ---p 00000000 00:00 0 
+7fc3b6ac3000-7fc3b6bc6000 rw-p 00000000 00:00 0 
+7fc3b6bc6000-7fc3b6bc7000 r--s 00003000 08:01 1184375                    /home/aslak/.m2/repository/javax/transaction/jta/1.1/jta-1.1.jar
+7fc3b6bc7000-7fc3b6bc8000 r--s 00002000 08:01 1184267                    /home/aslak/.m2/repository/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar
+7fc3b6bc8000-7fc3b6bcb000 r--s 0000a000 08:01 1185610                    /home/aslak/.m2/repository/org/hibernate/ejb3-persistence/1.0.2.GA/ejb3-persistence-1.0.2.GA.jar
+7fc3b6bcb000-7fc3b6bcd000 r--s 0000c000 08:01 1185607                    /home/aslak/.m2/repository/commons-logging/commons-logging/1.1.0.jboss/commons-logging-1.1.0.jboss.jar
+7fc3b6bcd000-7fc3b6bd5000 r--s 00066000 08:01 8522612                    /usr/share/java/gnome-java-bridge.jar
+7fc3b6bd5000-7fc3b6bd8000 r--s 0000f000 08:01 9060225                    /usr/lib/jvm/java-6-openjdk/jre/lib/ext/pulse-java.jar
+7fc3b6bd8000-7fc3b6be0000 rw-s 00000000 08:01 8928321                    /tmp/hsperfdata_aslak/5675
+7fc3b6be0000-7fc3b6be1000 rw-p 00000000 00:00 0 
+7fc3b6be1000-7fc3b6be2000 r--p 00000000 00:00 0 
+7fc3b6be2000-7fc3b6be4000 rw-p 00000000 00:00 0 
+7fc3b6be4000-7fc3b6be5000 r--p 00020000 08:01 8388850                    /lib/ld-2.12.1.so
+7fc3b6be5000-7fc3b6be6000 rw-p 00021000 08:01 8388850                    /lib/ld-2.12.1.so
+7fc3b6be6000-7fc3b6be7000 rw-p 00000000 00:00 0 
+7fffd8979000-7fffd899e000 rw-p 00000000 00:00 0                          [stack]
+7fffd89ff000-7fffd8a00000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+
+VM Arguments:
+jvm_args: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:44113 -Dfile.encoding=UTF-8 
+java_command: org.eclipse.jdt.internal.junit.runner.RemoteTestRunner -version 3 -port 51948 -testLoaderClass org.eclipse.jdt.internal.junit4.runner.JUnit4TestLoader -loaderpluginname org.eclipse.jdt.junit4.runtime -classNames org.jboss.arquillian.container.jbossas.remote_5_0.ProfileServiceTestCase
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+USERNAME=aslak
+LD_LIBRARY_PATH=/usr/lib/jvm/java-6-openjdk/jre/lib/amd64/server:/usr/lib/jvm/java-6-openjdk/jre/lib/amd64:/usr/lib/jvm/java-6-openjdk/jre/../lib/amd64:/usr/lib64/xulrunner-addons
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x712700], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x712700], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x5d4020], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: [libjvm.so+0x5d4020], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGXFSZ: [libjvm.so+0x5d4020], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x5d4020], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x5d3730], sa_mask[0]=0x00000004, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x5d61a0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: [libjvm.so+0x5d61a0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGTERM: [libjvm.so+0x5d61a0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x5d61a0], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:Ubuntu 10.10 (maverick)
+uname:Linux 2.6.35-24-generic #42-Ubuntu SMP Thu Dec 2 02:41:37 UTC 2010 x86_64
+libc:glibc 2.12.1 NPTL 2.12.1 
+rlimit: STACK 8192k, CORE 0k, NPROC infinity, NOFILE 1024, AS infinity
+load average:0.61 0.50 0.50
+
+/proc/meminfo:
+MemTotal:        3951264 kB
+MemFree:           76484 kB
+Buffers:           50664 kB
+Cached:           503568 kB
+SwapCached:        57300 kB
+Active:          2504860 kB
+Inactive:        1093576 kB
+Active(anon):    2378412 kB
+Inactive(anon):   896500 kB
+Active(file):     126448 kB
+Inactive(file):   197076 kB
+Unevictable:         124 kB
+Mlocked:             124 kB
+SwapTotal:       6384636 kB
+SwapFree:        6167448 kB
+Dirty:               168 kB
+Writeback:             0 kB
+AnonPages:       3019780 kB
+Mapped:           113616 kB
+Shmem:            230560 kB
+Slab:              99400 kB
+SReclaimable:      66468 kB
+SUnreclaim:        32932 kB
+KernelStack:        4440 kB
+PageTables:        47148 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     8360268 kB
+Committed_AS:    7013900 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:      379404 kB
+VmallocChunk:   34359282444 kB
+HardwareCorrupted:     0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:       12288 kB
+DirectMap2M:     4077568 kB
+
+
+CPU:total 2 (2 cores per cpu, 1 threads per core) family 6 model 23 stepping 10, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1
+
+Memory: 4k page, physical 3951264k(76484k free), swap 6384636k(6167448k free)
+
+vm_info: OpenJDK 64-Bit Server VM (19.0-b09) for linux-amd64 JRE (1.6.0_20-b20), built on Dec 10 2010 19:45:55 by "buildd" with gcc 4.4.5
+
+time: Wed Jan 26 11:29:47 2011
+elapsed time: 261 seconds
+

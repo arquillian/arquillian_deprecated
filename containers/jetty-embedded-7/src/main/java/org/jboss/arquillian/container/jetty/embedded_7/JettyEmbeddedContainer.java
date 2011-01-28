@@ -22,6 +22,7 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
@@ -29,6 +30,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.client.protocol.metadata.Servlet;
 import org.jboss.arquillian.spi.core.InstanceProducer;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
@@ -172,13 +174,15 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
          ((HandlerCollection) server.getHandler()).addHandler(wctx);
          wctx.start();
          webAppContextProducer.set(wctx);
-
+         
+         HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+         for(ServletHolder servlet : wctx.getServletHandler().getServlets())
+         {
+            httpContext.add(new Servlet(servlet.getName(), servlet.getContextPath()));
+         }
+         
          return new ProtocolMetaData()
-            .addContext(
-                  new HTTPContext(
-                        containerConfig.getBindAddress(), 
-                        containerConfig.getBindHttpPort(), 
-                        wctx.getContextPath()));
+            .addContext(httpContext);
 
       } 
       catch (Exception e) 
