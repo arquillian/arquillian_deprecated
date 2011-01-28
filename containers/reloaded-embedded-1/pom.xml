@@ -37,12 +37,6 @@
     org.jboss.arquillian
      -->
     <dependency>
-      <groupId>org.jboss.arquillian.protocol</groupId>
-      <artifactId>arquillian-protocol-local</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.arquillian.testenricher</groupId>
       <artifactId>arquillian-testenricher-ejb</artifactId>
       <version>${project.version}</version>

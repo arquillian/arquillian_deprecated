@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2009, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2010, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,14 +16,29 @@
  */
 package org.jboss.arquillian.container.reloaded.embedded_1;
 
-import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
+import org.jboss.arquillian.spi.core.Instance;
+import org.jboss.arquillian.spi.core.annotation.Inject;
+import org.jboss.arquillian.spi.core.annotation.Observes;
+import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
+import org.jboss.bootstrap.api.mc.server.MCServer;
 
 /**
- * JBossReloadedConfiguration
+ * TestServiceUninstaller
  *
- * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+ * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossReloadedConfiguration implements ContainerConfiguration
+public class TestServiceUninstaller 
 {
+   @Inject
+   private Instance<MCServer> mcServer;
+
+   public void uninstall(@Observes BeforeUnDeploy event)
+   {
+      MCServer server = mcServer.get();
+      if(server != null)
+      {
+         server.getKernel().getController().uninstall(ReloadedTestEnricher.BIND_NAME_TEST);
+      }
+   }
 }
