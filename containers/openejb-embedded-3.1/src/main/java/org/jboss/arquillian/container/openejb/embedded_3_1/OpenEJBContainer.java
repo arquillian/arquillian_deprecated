@@ -26,12 +26,13 @@ import org.apache.openejb.assembler.classic.TransactionServiceInfo;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.openejb.config.ShrinkWrapConfigurationFactory;
 
 /**
@@ -90,18 +91,30 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
    {
    }
    
-   public ProtocolMetaData deploy(Deployment... deployments) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if(deployments == null || deployments.length > 1 || !deployments[0].isArchiveDeployment())
-      {
-         throw new IllegalArgumentException("Container only supports single Archive Deployments");
-      }
-      
+      throw new UnsupportedOperationException("deploy Descriptor not supported");
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("undeploy Descriptor not supported");
+   }
+   
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
       // Deploy as an archive
       final AppInfo appInfo;
       try
       {
-         appInfo = config.configureApplication(deployments[0].getArchive());
+         appInfo = config.configureApplication(archive);
+         
          this.deployment.set(appInfo);
       }
       catch (final OpenEJBException e)
@@ -146,13 +159,9 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       assembler.destroy();
    }
 
-   public void undeploy(Deployment... deployments) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      if(deployments == null || deployments.length > 1 || !deployments[0].isArchiveDeployment())
-      {
-         throw new IllegalArgumentException("Container only supports single Archive Deployments");
-      }
-      String deploymentName = deployments[0].getName();
+      String deploymentName = archive.getName();
       // Undeploy the archive
       try
       {

@@ -47,7 +47,7 @@ import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
  */
 public class OpenEJBTestEnricher extends EJBInjectionEnricher
 {
-   @Inject
+   @org.jboss.arquillian.spi.core.annotation.Inject
    private Instance<AppInfo> appInfo;
    
    private ArquillianContext arquillianContext = null;
@@ -141,6 +141,18 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
    @Override
    protected Object lookupEJB(Class<?> fieldType) throws Exception
    {
+//      InjectionBuilder injectionBuilder = new InjectionBuilder(Thread.currentThread().getContextClassLoader());
+//
+//      List<Injection> injections = new ArrayList<Injections>();
+//      for(EjbJarInfo info : appInfo.get().ejbJars)
+//      {
+//         for(EnterpriseBeanInfo ejb : info.enterpriseBeans)
+//         {
+//             = injectionBuilder.buildInjections(ejb.jndiEnc);
+//            
+//         }
+//      }
+      
       InitialContext initcontext = createContext();
       return lookupRecursive(fieldType, initcontext, initcontext.listBindings("/"));
    }
