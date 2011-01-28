@@ -61,7 +61,7 @@
 			<groupId>org.jboss.jsfunit</groupId>
 			<artifactId>jboss-jsfunit-core</artifactId>
 			<version>${version.jsfunit}</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- 
