@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <!-- Parent -->
+   <parent>
+      <groupId>org.jboss.arquillian</groupId>
+      <artifactId>arquillian-build</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <relativePath>../../build/pom.xml</relativePath>
+   </parent>
+
+   <!-- Model Version -->
+   <modelVersion>4.0.0</modelVersion>
+
+   <!-- Artifact Configuration -->
+   <groupId>org.jboss.arquillian.container</groupId>
+   <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+   <name>Arquillian Container GlassFish Embedded 3.1</name>
+   <description>Glassfish Embedded 3.1 Container integration for the Arquillian Project</description>
+
+
+   <!-- Properties -->
+   <properties>
+
+      <!-- Versioning -->
+      <version.glassfish>3.1-b38</version.glassfish>
+
+   </properties>
+
+   <!-- Dependencies -->
+   <dependencies>
+
+      <!-- 
+    org.jboss.arquillian
+     -->
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-spi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-extension-glassfish</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.protocol</groupId>
+         <artifactId>arquillian-protocol-servlet</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-cdi</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-ejb</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.jboss.arquillian.testenricher</groupId>
+         <artifactId>arquillian-testenricher-resource</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+      <!-- 
+    org.glassfish.embedded
+     -->
+      <dependency>
+         <groupId>org.glassfish.extras</groupId>
+         <artifactId>glassfish-embedded-all</artifactId>
+         <version>${version.glassfish}</version>
+         <scope>provided</scope>
+      </dependency>
+
+		<!--  
+		Test 		
+		-->
+
+      <dependency>
+         <groupId>org.jboss.shrinkwrap</groupId>
+         <artifactId>shrinkwrap-impl-base</artifactId>
+		 <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-impl-base</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-junit</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <scope>test</scope>
+      </dependency>
+
+   </dependencies>
+</project>
+
