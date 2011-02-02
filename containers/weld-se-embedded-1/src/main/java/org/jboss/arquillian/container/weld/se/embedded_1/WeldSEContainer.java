@@ -26,7 +26,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
-import org.jboss.arquillian.spi.core.annotation.ClassScoped;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
@@ -45,14 +45,13 @@ import org.jboss.weld.manager.api.WeldManager;
  */
 public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
 {
-   // TODO: these should be DeploymentScoped, but TestEnrich is currently happening outside a DeploymentScope.
-   @Inject @ClassScoped // @DeploymentScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<ContextClassLoaderManager> classLoaderManagerProducer;
    
-   @Inject @ClassScoped // @DeploymentScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<WeldManager> weldManagerProducer;
 
-   @Inject @ClassScoped // @DeploymentScoped
+   @Inject @DeploymentScoped
    private InstanceProducer<WeldBootstrap> weldBootstrapProducer;
 
    public ProtocolDescription getDefaultProtocol()

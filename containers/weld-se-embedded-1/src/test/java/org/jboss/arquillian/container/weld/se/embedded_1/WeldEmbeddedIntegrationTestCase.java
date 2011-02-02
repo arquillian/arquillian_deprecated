@@ -26,6 +26,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +48,7 @@ public class WeldEmbeddedIntegrationTestCase
                         WeldEmbeddedIntegrationTestCase.class,
                         MyBean.class)
                   .addManifestResource(
-                        new ByteArrayAsset("<beans/>".getBytes()), ArchivePaths.create("beans.xml"));
+                        EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject
