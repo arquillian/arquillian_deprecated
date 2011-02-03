@@ -20,18 +20,21 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import org.jboss.arquillian.protocol.jmx.JMXMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.logging.Logger;
 import org.jboss.osgi.spi.framework.OSGiBootstrap;
 import org.jboss.osgi.spi.framework.OSGiBootstrapProvider;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -43,26 +46,48 @@ import org.osgi.framework.launch.Framework;
  * @author thomas.diesler@jboss.com
  * @version $Revision: $
  */
-public class OSGiEmbeddedContainer implements DeployableContainer
+public class OSGiEmbeddedContainer implements DeployableContainer<OSGiEmbeddedConfiguration>
 {
    // Provide logging
    private static final Logger log = Logger.getLogger(OSGiEmbeddedContainer.class);
 
-   private Framework framework;
+   @Inject @ContainerScoped
+   private InstanceProducer<Framework> frameworkInst;
 
-   public void setup(Context context, Configuration configuration)
+   @Inject @ContainerScoped
+   private InstanceProducer<BundleContext> bundleContextInst;
+   
+   @Inject @DeploymentScoped
+   private InstanceProducer<Bundle> bundleInst;
+
+   @Override
+   public Class<OSGiEmbeddedConfiguration> getConfigurationClass()
    {
-      OSGiBootstrapProvider provider = OSGiBootstrap.getBootstrapProvider();
-      framework = provider.getFramework();
-      context.add(Framework.class, framework);
+      return OSGiEmbeddedConfiguration.class;
    }
 
-   public void start(Context context) throws LifecycleException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getDefaultProtocol()
+    */
+   @Override
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("JMX");
+   }
+   
+   public void setup(OSGiEmbeddedConfiguration configuration)
+   {
+      OSGiBootstrapProvider provider = OSGiBootstrap.getBootstrapProvider();
+      frameworkInst.set(provider.getFramework());
+   }
+
+   public void start() throws LifecycleException
    {
       try
       {
+         Framework framework = frameworkInst.get();
          framework.start();
-         context.add(BundleContext.class, framework.getBundleContext());
+         bundleContextInst.set(framework.getBundleContext());
          
          Bundle[] bundles = framework.getBundleContext().getBundles();
          if (getInstalledBundle(bundles, "osgi.cmpn") == null)
@@ -77,10 +102,11 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try
       {
+         Framework framework = frameworkInst.get();
          framework.stop();
          framework.waitForStop(3000);
       }
@@ -94,20 +120,20 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       try
       {
          // Export the bundle bytes
          ZipExporter exporter = archive.as(ZipExporter.class);
          ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         exporter.exportZip(baos);
+         exporter.exportTo(baos);
          
          ByteArrayInputStream inputStream = new ByteArrayInputStream(baos.toByteArray());
          
-         BundleContext sysContext = framework.getBundleContext();
+         BundleContext sysContext = frameworkInst.get().getBundleContext();
          Bundle bundle = sysContext.installBundle(archive.getName(), inputStream);
-         context.add(Bundle.class, bundle);
+         bundleInst.set(bundle);
       }
       catch (RuntimeException rte)
       {
@@ -118,15 +144,14 @@ public class OSGiEmbeddedContainer implements DeployableContainer
          throw new DeploymentException("Cannot deploy: " + archive, ex);
       }
       
-      //return new LocalMethodExecutor(); 
-      return new JMXMethodExecutor();
+      return new ProtocolMetaData();
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(Archive<?> archive) throws DeploymentException
    {
       try
       {
-         Bundle bundle = context.get(Bundle.class);
+         Bundle bundle = bundleInst.get();
          if (bundle != null)
             bundle.uninstall();
       }
@@ -134,6 +159,18 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       {
          log.error("Cannot undeploy: " + archive, ex);
       }
+   }
+
+   @Override
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("JBoss Reloaded does not support Descriptor deployment");      
+   }
+   
+   @Override
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("JBoss Reloaded does not support Descriptor deployment");
    }
 
    private Bundle getInstalledBundle(Bundle[] bundles, String symbolicName)
@@ -160,7 +197,7 @@ public class OSGiEmbeddedContainer implements DeployableContainer
       {
          if (path.contains(artifactId))
          {
-            BundleContext sysContext = framework.getBundleContext();
+            BundleContext sysContext = frameworkInst.get().getBundleContext();
             try
             {
                Bundle bundle = sysContext.installBundle(new File(path).toURI().toString());
