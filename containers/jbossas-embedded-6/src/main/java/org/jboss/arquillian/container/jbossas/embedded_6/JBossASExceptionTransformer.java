@@ -33,15 +33,27 @@ public class JBossASExceptionTransformer implements DeploymentExceptionTransform
    @Override
    public Throwable transform(Throwable exception)
    {
-      Throwable failure = exception.getCause();
-      if (failure instanceof IncompleteDeploymentException)
+      IncompleteDeploymentException incompleteDeploymentException = findIncompleteDeploymentException(exception);
+      if(incompleteDeploymentException != null)
       {
-         IncompleteDeploymentException incompleteDeploymentException = (IncompleteDeploymentException) failure;
          for (Entry<String, Throwable> entry : incompleteDeploymentException.getIncompleteDeployments().getContextsInError().entrySet())
          {
             return entry.getValue();
          }
       }
-      return exception;   
+      return null;   
+   }
+   
+   private IncompleteDeploymentException findIncompleteDeploymentException(Throwable throwable)
+   {
+      if(throwable == null)
+      {
+         return null;
+      }
+      if (throwable instanceof IncompleteDeploymentException)
+      {
+         return (IncompleteDeploymentException) throwable;
+      }
+      return findIncompleteDeploymentException(throwable.getCause());
    }
 }
