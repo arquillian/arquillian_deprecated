@@ -16,33 +16,22 @@
  */
 package org.jboss.arquillian.container.openwebbeans.embedded_1;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Logger;
+import java.util.Properties;
 
 import javax.enterprise.inject.spi.BeanManager;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 
-import org.apache.webbeans.context.ContextFactory;
 import org.apache.webbeans.lifecycle.StandaloneLifeCycle;
 import org.apache.webbeans.spi.ContainerLifecycle;
-import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.TestMethodExecutor;
-import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
-import org.jboss.arquillian.spi.client.deployment.Deployment;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
  * An embedded Arquillian container for OpenWebBeans
@@ -69,15 +58,26 @@ import org.jboss.shrinkwrap.api.Archive;
  */
 public class OpenWebBeansSEContainer implements DeployableContainer<OpenWebBeansConfiguration>
 {
-   private static final Logger log = Logger.getLogger(OpenWebBeansSEContainer.class.getName());
-
-   public final static ThreadLocal<ContainerInstanceHolder> CONTAINER_INSTANCE_HOLDER = new ThreadLocal<ContainerInstanceHolder>();
+   @Inject @DeploymentScoped
+   private InstanceProducer<ContainerLifecycle> lifecycleProducer;
+   
+   @Inject @DeploymentScoped
+   private InstanceProducer<BeanManager> beanManagerProducer;
+      
+   /** 
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getDefaultProtocol()
+    */
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Local");
+   }
    
    public Class<OpenWebBeansConfiguration> getConfigurationClass()
    {
       return OpenWebBeansConfiguration.class;
    }
-   public void setup(Configuration configuration)
+
+   public void setup(OpenWebBeansConfiguration configuration)
    {
    }
    
@@ -96,236 +96,79 @@ public class OpenWebBeansSEContainer implements DeployableContainer<OpenWebBeans
    }
 
    /**
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   @Override
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("OpenWebbeans does not support deployment of Descriptors");
+   }
+   
+   /**
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   @Override
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("OpenWebbeans does not support undeployment of Descriptors");
+   }
+   
+   /**
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.api.Archive)
     */
-   public ProtocolMetaData deploy(Deployment... deployments)
+   public ProtocolMetaData deploy(final Archive<?> archive)
          throws DeploymentException
    {
-      if(deployments.length > 1)
-      {
-         throw new IllegalArgumentException("Container only support single deployments");
-      }
-      if(!deployments[0].isArchiveDeployment())
-      {
-         throw new IllegalArgumentException("Container only support archive deployments");
-      }
-      Archive<?> archive = deployments[0].getArchive();
-      
+      /*
+       * TODO: We need to reuse this ClassLoader during Before/Test/After Execution.
+       * OpenWebBeans use the ClassLoader as key in looking up Singletons etc. Setting this CL during deploy
+       * and not have it during Test execution makes it confused. 
+       * 
       ClassLoader cl = new ShrinkWrapClassLoader(archive);
       Thread.currentThread().setContextClassLoader(cl);
-
+       */
       final ShrinkWrapMetaDataDiscovery discovery = new ShrinkWrapMetaDataDiscovery(archive);
       ContainerLifecycle lifecycle = new StandaloneLifeCycle()
       {
-         // TODO this override method will need to change to afterInitApplication(Properties) after 1.0.0-M4
+         /**
+          * Override so we can set out own scannerService.
+          * TODO: We should change this to use the ServiceLoader via openwebbeans.properties, then do something like:
+          * ((ShrinkWrapScannerService)StandardLifecycle.getScannerService()).setArchive(deployment)
+          */
          @Override
-         public void init()
+         protected void afterInitApplication(Properties properties)
          {
-            super.init();
-            log.info("Using discovery service impl class adapted to ShrinkWrap archive : [" + discovery.getClass().getName() + "]");
-            this.discoveryService = discovery;
+            super.afterInitApplication(properties);
+            this.scannerService = discovery;
          }
       };
 
       try
       {
-         lifecycle.start(null);
+         lifecycle.startApplication(null);
       }
       catch (Exception e)
       {
          throw new RuntimeException("Failed to start standalone OpenWebBeans container", e);
       }
 
-      BeanManager manager = lifecycle.getBeanManager();
-
-      // start the application lifecycle
-      ContextFactory.initApplicationContext(null);
-      // start the session lifecycle
-      HttpSession session = new MockHttpSession();
-      ContextFactory.initSessionContext(session);
+      lifecycleProducer.set(lifecycle);
+      beanManagerProducer.set(lifecycle.getBeanManager());
       
-      CONTAINER_INSTANCE_HOLDER.set(new ContainerInstanceHolder(lifecycle, session, manager));
-
-      // TODO: replace with a before/after invoke interceptor ?
-      return new LocalMethodExecutor() {
-         @Override
-         public TestResult invoke(TestMethodExecutor testMethodExecutor)
-         {
-            try 
-            {
-            	// start the request lifecycle
-               ContextFactory.initRequestContext(null);
-               ContextFactory.initConversationContext(null);
-               return super.invoke(testMethodExecutor);
-            } 
-            finally
-            {
-            	// end the request lifecycle
-               ContextFactory.destroyConversationContext();
-               ContextFactory.destroyRequestContext(null);
-            }
-         }
-      };
+      return new ProtocolMetaData();
    }
 
    /**
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.api.Archive)
     */
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      ContainerInstanceHolder holder = CONTAINER_INSTANCE_HOLDER.get();
-      if (holder != null) {
+      ContainerLifecycle lifecycle = lifecycleProducer.get();
+      if (lifecycle != null) {
          // end the session lifecycle
-         ContextFactory.destroySessionContext(holder.getSession());
-         ContextFactory.destroyApplicationContext(null);
          
-         holder.getLifecycle().stop(null);
-         Thread.currentThread().setContextClassLoader(Thread.currentThread().getContextClassLoader().getParent());
-      }
-      CONTAINER_INSTANCE_HOLDER.set(null);
-   }
-   
-   public static class ContainerInstanceHolder {
-      
-      private BeanManager manager;
-
-      private ContainerLifecycle lifecycle;
-
-      private HttpSession session;
-
-      public ContainerInstanceHolder(ContainerLifecycle lifecycle, HttpSession session, BeanManager manager)
-      {
-         super();
-         this.lifecycle = lifecycle;
-         this.session = session;
-         this.manager = manager;
-      }
-
-      public ContainerLifecycle getLifecycle()
-      {
-         return lifecycle;
-      }
-
-      public HttpSession getSession()
-      {
-         return session;
-      }
-
-      public BeanManager getManager()
-      {
-         return manager;
-      }
-   }
-
-   private class MockHttpSession implements HttpSession
-   {
-      private final long creationTime;
-      private final String id;
-      private final Map<String, Object> attributes;
-      private int maxInactiveInterval = 60000;
-
-      public MockHttpSession()
-      {
-         creationTime = System.currentTimeMillis();
-         id = UUID.randomUUID().toString();
-         attributes = new HashMap<String, Object>();
-      }
-
-      public long getCreationTime()
-      {
-         return creationTime;
-      }
-
-      public String getId()
-      {
-         return id;
-      }
-
-      public long getLastAccessedTime()
-      {
-         return creationTime;
-      }
-
-      public ServletContext getServletContext()
-      {
-         throw new UnsupportedOperationException("Not supported.");
-      }
-
-      public void setMaxInactiveInterval(int i)
-      {
-         this.maxInactiveInterval = i;
-      }
-
-      public int getMaxInactiveInterval()
-      {
-         return maxInactiveInterval;
-      }
-
-      public HttpSessionContext getSessionContext()
-      {
-         throw new UnsupportedOperationException("Not supported.");
-      }
-
-      public Object getAttribute(String string)
-      {
-         return attributes.get(string);
-      }
-
-      public Object getValue(String string)
-      {
-         return getAttribute(string);
-      }
-
-      public Enumeration getAttributeNames()
-      {
-         final Iterator<String> nameIt = attributes.keySet().iterator();
-         return new Enumeration() {
-
-            public boolean hasMoreElements()
-            {
-               return nameIt.hasNext();
-            }
-
-            public Object nextElement()
-            {
-               return nameIt.next();
-            }
-         };
-      }
-
-      public String[] getValueNames()
-      {
-         return attributes.keySet().toArray(new String[0]);
-      }
-
-      public void setAttribute(String string, Object value)
-      {
-         attributes.put(string, value);
-      }
-
-      public void putValue(String string, Object value)
-      {
-         setAttribute(string, value);
-      }
-
-      public void removeAttribute(String string)
-      {
-         attributes.remove(string);
-      }
-
-      public void removeValue(String string)
-      {
-         removeAttribute(string);
-      }
-
-      public void invalidate()
-      {
-         attributes.clear();
-      }
-
-      public boolean isNew()
-      {
-         return true;
+         lifecycle.stopApplication(null);
+         //Thread.currentThread().setContextClassLoader(Thread.currentThread().getContextClassLoader().getParent());
       }
    }
 }

@@ -23,7 +23,7 @@ import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.Map;
 
-import org.apache.webbeans.spi.deployer.AbstractMetaDataDiscovery;
+import org.apache.webbeans.corespi.scanner.AbstractMetaDataDiscovery;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Filters;

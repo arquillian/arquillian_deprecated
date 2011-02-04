@@ -25,7 +25,7 @@ import org.jboss.arquillian.container.openwebbeans.embedded_1.beans.MyBean;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,12 +43,12 @@ public class OpenWebBeansIntegrationTestCase
    @Deployment
    public static JavaArchive createdeployment() 
    {
-      return ShrinkWrap.create(JavaArchive.class, "test.jar")
+      return ShrinkWrap.create(JavaArchive.class)
                   .addClasses(
                         OpenWebBeansIntegrationTestCase.class,
                         MyBean.class)
                   .addManifestResource(
-                        new ByteArrayAsset("<beans/>".getBytes()), ArchivePaths.create("beans.xml"));
+                        EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject

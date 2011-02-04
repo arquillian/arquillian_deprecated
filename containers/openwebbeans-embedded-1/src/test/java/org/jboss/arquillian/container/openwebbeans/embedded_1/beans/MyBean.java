@@ -17,13 +17,13 @@
 package org.jboss.arquillian.container.openwebbeans.embedded_1.beans;
 
 
+
 /**
  * MyBean
  *
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-//@ApplicationScoped // https://issues.apache.org/jira/browse/OWB-339 Non-Contextual injection cause nullpointer
 public class MyBean
 {
    public String getName() 
