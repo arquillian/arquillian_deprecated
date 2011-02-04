@@ -16,14 +16,11 @@
  */
 package org.jboss.arquillian.container.jetty.embedded_6_1;
 
-import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -42,13 +39,12 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-@Run(AS_CLIENT)
 public class JettyEmbeddedClientTestCase
 {
    /**
     * Deployment for the test
     */
-   @Deployment
+   @Deployment(testable = false)
    public static WebArchive getTestArchive()
    {
       return ShrinkWrap.create(WebArchive.class, "client-test.war")

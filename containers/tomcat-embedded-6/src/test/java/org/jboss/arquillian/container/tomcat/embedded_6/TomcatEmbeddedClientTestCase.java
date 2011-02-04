@@ -21,8 +21,6 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Run;
-import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -42,7 +40,6 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-@Run(RunModeType.AS_CLIENT)
 public class TomcatEmbeddedClientTestCase
 {
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
@@ -63,9 +60,9 @@ public class TomcatEmbeddedClientTestCase
 	/**
 	 * Define the deployment
 	 */
-	@Deployment
+	@Deployment(testable = false)
 	public static WebArchive createDeployment()
-   {
+	{
 		return ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestServlet.class)
          .setWebXML(new StringAsset(
