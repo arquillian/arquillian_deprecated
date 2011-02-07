@@ -18,8 +18,10 @@ package org.jboss.arquillian.container.jbossas.managed_6;
 
 import java.io.File;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
+import org.jboss.arquillian.spi.util.Validate;
 
 /**
  * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
@@ -36,13 +38,21 @@ public class JBossASConfiguration implements ContainerConfiguration
 
    private String profileName = "default";
    
-   // 
    private String jbossHome = System.getenv("JBOSS_HOME");
    
    private String javaHome = System.getenv("JAVA_HOME");
    
    private String javaVmArguments = "-Xmx512m -XX:MaxPermSize=128m";
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   public void validate() throws ConfigurationException
+   {
+      Validate.configurationDirectoryExists(jbossHome, "JBOSS_HOME environment variable must be set to a valid directory");
+      Validate.configurationDirectoryExists(javaHome, "JAVA_HOME environment variable must be set to a valid directory");
+   }
+   
    public ContainerProfile getContainerProfile()
    {
       return ContainerProfile.CLIENT;
@@ -123,4 +133,5 @@ public class JBossASConfiguration implements ContainerConfiguration
    {
       return javaVmArguments;
    }
+
 }
