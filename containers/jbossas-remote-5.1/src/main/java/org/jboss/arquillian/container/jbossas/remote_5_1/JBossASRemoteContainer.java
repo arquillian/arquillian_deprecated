@@ -16,13 +16,7 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_5_1;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +35,8 @@ import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.virtual.VFS;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * JbossRemoteContainer
@@ -58,17 +47,12 @@ import com.sun.net.httpserver.HttpServer;
 public class JBossASRemoteContainer implements DeployableContainer<JBossASConfiguration>
 {
    private final List<String> failedUndeployments = new ArrayList<String>();
-
    private ProfileService profileService;
-   
    private DeploymentManager deploymentManager;
-
-   private HttpServer httpFileServer;
-   
-   private JBossASConfiguration configuration;
-   
    private InitialContext context;
 
+   private JBossASConfiguration configuration;
+   
    public ProtocolDescription getDefaultProtocol()
    {
       return new ProtocolDescription("Servlet 2.5");
@@ -88,14 +72,6 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
    {
       try 
       {
-         // TODO: configure http bind address
-         httpFileServer = HttpServer.create();
-         httpFileServer.bind(
-               new InetSocketAddress(
-                     InetAddress.getByName(configuration.getLocalDeploymentBindAddress()), 
-                     configuration.getLocalDeploymentBindPort()), 
-               -1);
-         httpFileServer.start();
          initDeploymentManager();
       } 
       catch (Exception e) 
@@ -108,7 +84,6 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
    {
       try 
       {
-         httpFileServer.stop(0);
          removeFailedUnDeployments();
       } 
       catch (Exception e) 
@@ -138,30 +113,30 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       String deploymentName = archive.getName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
+      
+      deploy(deploymentName, deploymentUrl);
+      try
+      {
+         return ManagementViewParser.parse(deploymentName, profileService);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
+   }
 
+   public void undeploy(final Archive<?> archive) throws DeploymentException
+   {
+      undeploy(archive.getName());
+   }
+
+   private void deploy(String deploymentName, URL url) throws DeploymentException
+   {
       Exception failure = null;
       try
       {
-         httpFileServer.createContext("/" + deploymentName, new HttpHandler()
-         {
-            public void handle(HttpExchange exchange) throws IOException
-            {
-               InputStream zip = archive.as(ZipExporter.class).exportAsInputStream();
-               ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-               JBossASRemoteContainer.copy(zip, zipStream);
-               zip.close();
-
-               byte[] zipArray = zipStream.toByteArray();
-               exchange.sendResponseHeaders(200, zipArray.length);
-
-               OutputStream out = exchange.getResponseBody();
-               out.write(zipArray);
-               out.close();                     
-            }
-         });
-         URL fileServerUrl = createFileServerURL(deploymentName);
-         
-         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, url, true);
          distribute.run();
          DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
          if(uploadStatus.isFailed()) 
@@ -189,19 +164,6 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       {
          throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
-      try
-      {
-         return ManagementViewParser.parse(deploymentName, profileService);
-      }
-      catch (Exception e) 
-      {
-         throw new DeploymentException("Could not extract deployment metadata", e);
-      }
-   }
-
-   public void undeploy(final Archive<?> archive) throws DeploymentException
-   {
-      undeploy(archive.getName());
    }
 
    private void undeploy(String name) throws DeploymentException
@@ -217,7 +179,6 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
          {
             failedUndeployments.add(name);
          }
-         httpFileServer.removeContext("/" + name);
       }
       catch (Exception e)
       {
@@ -249,23 +210,6 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       return context;
    }
 
-   private URL createFileServerURL(String archiveName) 
-   {
-      try 
-      {
-         InetSocketAddress address = httpFileServer.getAddress();
-         return new URL(
-               "http", 
-               address.getHostName(), 
-               address.getPort(), 
-               "/" + archiveName);
-      }
-      catch (MalformedURLException e) 
-      {
-         throw new RuntimeException("Could not create fileserver url", e);
-      }
-   }
-   
    private void removeFailedUnDeployments() throws IOException
    {
       List<String> remainingDeployments = new ArrayList<String>();
@@ -292,23 +236,5 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
          //log.error("Failed to undeploy these artifacts: " + remainingDeployments);
       }
       failedUndeployments.clear();
-   }
-
-   private static void copy(InputStream source, OutputStream destination) throws IOException
-   {
-      if (source == null)
-      {
-         throw new IllegalArgumentException("source must be specified");
-      }
-      if (destination == null)
-      {
-         throw new IllegalArgumentException("destination must be specified");
-      }
-      byte[] readBuffer = new byte[2156]; 
-      int bytesIn = 0; 
-      while((bytesIn = source.read(readBuffer)) != -1) 
-      { 
-         destination.write(readBuffer, 0, bytesIn); 
-      }
    }
 }

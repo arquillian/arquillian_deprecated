@@ -68,7 +68,7 @@ public final class ManagementViewParser
       if (contextRootDeployments.size() > 0)
       {
          String deploymentName = contextRootDeployments.iterator().next();
-         String expression = ".*\\-(.*)-(.*)";
+         String expression = ".*[A-Z]([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})-([0-9]+)";
          return new HTTPContext(deploymentName.replaceAll(expression, "$1"), Integer.parseInt(deploymentName
                .replaceAll(expression, "$2")));
       }

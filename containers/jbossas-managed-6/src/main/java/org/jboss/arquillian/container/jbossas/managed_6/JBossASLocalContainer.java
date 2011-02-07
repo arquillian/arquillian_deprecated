@@ -18,23 +18,29 @@ package org.jboss.arquillian.container.jbossas.managed_6;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.naming.Context;
 
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.deployers.spi.management.deploy.DeploymentManager;
+import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
+import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.jbossas.servermanager.Argument;
 import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
+import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
@@ -53,6 +59,9 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
+   private ProfileService profileService;
+   private DeploymentManager deploymentManager;
+   
    public ProtocolDescription getDefaultProtocol()
    {
       return new ProtocolDescription("Servlet 3.0");
@@ -85,8 +94,9 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
          }
          
          manager.startServer(server.getName());
+         initProfileService(server);
       }
-      catch (IOException e)
+      catch (Exception e)
       {
          throw new LifecycleException("Could not start remote container", e);
       }
@@ -140,22 +150,13 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       final String deploymentName = archive.getName();
-
-      File file = new File(deploymentName);
-      Server server = manager.getServer(configuration.getProfileName());
-      try
-      {
-         archive.as(ZipExporter.class).exportTo(file, true);
-         server.deploy(file);
-      }
-      catch (Exception e)
-      {
-         throw new DeploymentException("Could not deploy " + deploymentName, e);
-      }
+      URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
+      
+      deploy(deploymentName, deploymentUrl);
 
       try
       {
-         return ManagementViewParser.parse(deploymentName, (ProfileService)server.getNamingContext().lookup("ProfileService"));
+         return ManagementViewParser.parse(deploymentName, profileService);
       }
       catch (Exception e) 
       {
@@ -165,26 +166,61 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
 
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
-      // we only need the File, not the content to undeploy.
-      File file = new File(archive.getName());
-      undeploy(file);
+      undeploy(archive.getName());
    }
 
-   private void undeploy(File file) throws DeploymentException
+   private void deploy(String deploymentName, URL url) throws DeploymentException
    {
-      Server server = manager.getServer(configuration.getProfileName());
+      Exception failure = null;
       try
       {
-         server.undeploy(file);
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, url, true);
+         distribute.run();
+         DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
+         if(uploadStatus.isFailed()) 
+         {
+            failure = uploadStatus.getFailure();
+            undeploy(deploymentName);
+         } 
+         else 
+         {
+            DeploymentProgress progress = deploymentManager.start(deploymentName);
+            progress.run();
+            DeploymentStatus status = progress.getDeploymentStatus();
+            if (status.isFailed())
+            {
+               failure = status.getFailure();
+               undeploy(deploymentName);
+            }
+         }
       }
       catch (Exception e)
       {
-         failedUndeployments.add(file.getName());
-         throw new DeploymentException("Could not undeploy " + file.getName(), e);
-      } 
-      finally
+         throw new DeploymentException("Could not deploy " + deploymentName, e);
+      }
+      if (failure != null)
       {
-         file.delete();
+         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
+      }
+   }
+   
+   private void undeploy(String name) throws DeploymentException
+   {
+      try
+      {
+         DeploymentProgress stopProgress = deploymentManager.stop(name);
+         stopProgress.run();
+
+         DeploymentProgress undeployProgress = deploymentManager.remove(name);
+         undeployProgress.run();
+         if (undeployProgress.getDeploymentStatus().isFailed())
+         {
+            failedUndeployments.add(name);
+         }
+      }
+      catch (Exception e)
+      {
+         throw new DeploymentException("Could not undeploy " + name, e);
       }
    }
 
@@ -211,6 +247,18 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
          log.severe("Failed to undeploy these artifacts: " + remainingDeployments);
       }
       failedUndeployments.clear();
+   }
+   
+   private void initProfileService(Server server) throws Exception 
+   {
+      String profileName = configuration.getProfileName();
+      Context ctx = server.getNamingContext();
+      profileService = (ProfileService) ctx.lookup("ProfileService");
+
+      deploymentManager = profileService.getDeploymentManager();
+
+      ProfileKey defaultKey = new ProfileKey(profileName);
+      deploymentManager.loadProfile(defaultKey);
    }
 
    /*

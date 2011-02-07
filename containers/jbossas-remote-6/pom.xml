@@ -24,7 +24,7 @@
    <properties>
 
       <!-- Versioning -->
-      <version.org.jboss.jbossas>6.0.0.20100721-M4</version.org.jboss.jbossas>
+      <version.org.jboss.jbossas>6.0.0.Final</version.org.jboss.jbossas>
 
    </properties>
 

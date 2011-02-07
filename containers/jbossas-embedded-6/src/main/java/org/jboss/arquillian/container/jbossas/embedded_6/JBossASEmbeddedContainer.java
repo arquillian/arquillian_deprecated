@@ -16,6 +16,9 @@
  */
 package org.jboss.arquillian.container.jbossas.embedded_6;
 
+import java.net.URL;
+
+import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
@@ -23,25 +26,31 @@ import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
-import org.jboss.arquillian.spi.core.InstanceProducer;
-import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
-import org.jboss.arquillian.spi.core.annotation.Inject;
+import org.jboss.deployers.spi.management.deploy.DeploymentManager;
+import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
+import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.embedded.api.server.JBossASEmbeddedServer;
 import org.jboss.embedded.api.server.JBossASEmbeddedServerFactory;
+import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
- * JbossEmbeddedContainer
+ * JBoss Embedded 6.0 Container implementation. <br/>
+ * 
+ * Embedded uses MainDeployer which seems to not register the correct information with the ProfileService so we can retrieve 
+ * it for inspection of Servlet etc. So we do not use embedded.deploy but rather lookup the ProfileService and deploy via that.
  *
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
 public class JBossASEmbeddedContainer implements DeployableContainer<JBossASContainerConfiguration>
 {
-   @Inject @ContainerScoped
-   private InstanceProducer<JBossASEmbeddedServer> serverInst;
+   private JBossASEmbeddedServer server;
+   private ProfileService profileService;
+   private DeploymentManager deploymentManager;
+   private InitialContext context;
    
    private JBossASContainerConfiguration configuration;
    
@@ -68,12 +77,10 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    {
       this.configuration = configuration;
 
-      JBossASEmbeddedServer server = JBossASEmbeddedServerFactory.createServer();
+      server = JBossASEmbeddedServerFactory.createServer();
       server.getConfiguration()
                .bindAddress(configuration.getBindAddress())
                .serverName(configuration.getProfileName());
-
-      this.serverInst.set(server);
    }
 
    /* (non-Javadoc)
@@ -83,7 +90,8 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    {
       try 
       {
-         serverInst.get().start();
+         server.start();
+         initDeploymentManager();
       }
       catch (Exception e) 
       {
@@ -98,7 +106,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    {
       try 
       {
-         serverInst.get().stop();
+         server.stop();
       }
       catch (Exception e) 
       {
@@ -129,15 +137,10 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
     */
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
-      try 
-      {
-         serverInst.get().deploy(archive);
-      }
-      catch (Exception e) 
-      {
-         throw new DeploymentException("Could not deploy to container", e);
-      }
-
+      String deploymentName = archive.getName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
+      
+      deploy(deploymentName, deploymentUrl);
       try
       {
          return ManagementViewParser.parse(archive.getName(), (ProfileService)new InitialContext().lookup("ProfileService"));
@@ -155,11 +158,84 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    {
       try 
       {
-         serverInst.get().undeploy(archive);
+         undeploy(archive.getName());
       }
       catch (Exception e) 
       {
          throw new DeploymentException("Could not undeploy from container", e);
+      }
+   }
+
+
+   private void initDeploymentManager() throws Exception 
+   {
+      String profileName = configuration.getProfileName();
+      Context ctx = createContext();
+      profileService = (ProfileService) ctx.lookup("ProfileService");
+      
+      deploymentManager = profileService.getDeploymentManager();
+
+      ProfileKey defaultKey = new ProfileKey(profileName);
+      deploymentManager.loadProfile(defaultKey);
+   }
+   
+   private InitialContext createContext() throws Exception
+   {
+      if(context == null)
+      {
+         context = new InitialContext();
+      }
+      return context;
+   }
+   
+   private void deploy(String deploymentName, URL url) throws DeploymentException
+   {
+      Exception failure = null;
+      try
+      {
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, url, true);
+         distribute.run();
+         DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
+         if(uploadStatus.isFailed()) 
+         {
+            failure = uploadStatus.getFailure();
+            undeploy(deploymentName);
+         } 
+         else 
+         {
+            DeploymentProgress progress = deploymentManager.start(deploymentName);
+            progress.run();
+            DeploymentStatus status = progress.getDeploymentStatus();
+            if (status.isFailed())
+            {
+               failure = status.getFailure();
+               undeploy(deploymentName);
+            }
+         }
+      }
+      catch (Exception e)
+      {
+         throw new DeploymentException("Could not deploy " + deploymentName, e);
+      }
+      if (failure != null)
+      {
+         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
+      }
+   }
+   
+   private void undeploy(String name) throws DeploymentException
+   {
+      try
+      {
+         DeploymentProgress stopProgress = deploymentManager.stop(name);
+         stopProgress.run();
+
+         DeploymentProgress undeployProgress = deploymentManager.remove(name);
+         undeployProgress.run();
+      }
+      catch (Exception e)
+      {
+         throw new DeploymentException("Could not undeploy " + name, e);
       }
    }
 }
