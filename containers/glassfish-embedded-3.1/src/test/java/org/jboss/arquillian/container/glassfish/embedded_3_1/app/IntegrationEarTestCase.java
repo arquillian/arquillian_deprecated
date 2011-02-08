@@ -36,27 +36,20 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-@Ignore // GlassFish bug
+@Ignore // GlassFish bug, can't Inject @EJB from a ejb module in a war ? 
 @RunWith(Arquillian.class)
 public class IntegrationEarTestCase
 {
    @Deployment
    public static EnterpriseArchive createDeployment() throws Exception 
    {
-      JavaArchive ejb = ShrinkWrap.create(JavaArchive.class)
-                     .addClasses(
-                           NoInterfaceEJB.class,
-                           NameProvider.class)
-                     .addManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-      
       return ShrinkWrap.create(EnterpriseArchive.class)
-//                  .setApplicationXML(new StringAsset(
-//                        Descriptors.create(ApplicationDescriptor.class)
-//                           .version("6")
-//                           .ejbModule(ejb.getName())
-//                           .webModule("test.war", "/test")
-//                        .exportAsString()))
-                  .addModule(ejb);
+                  .addModule(
+                        ShrinkWrap.create(JavaArchive.class)
+                           .addClasses(
+                                 NoInterfaceEJB.class,
+                                 NameProvider.class)
+                           .addManifestResource(EmptyAsset.INSTANCE, "beans.xml"));
    }
    
    @EJB
