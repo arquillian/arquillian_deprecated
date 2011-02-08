@@ -17,6 +17,7 @@
 package org.jboss.arquillian.container.glassfish.embedded_3_1;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Map;
 
 import javax.servlet.ServletRegistration;
@@ -37,7 +38,6 @@ import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.client.protocol.metadata.Servlet;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 import com.sun.enterprise.web.WebModule;
@@ -159,11 +159,9 @@ public class GlassFishContainer implements DeployableContainer<GlassFishConfigur
       String deploymentName = createDeploymentName(archive.getName());
       try
       {
-         File deployment = File.createTempFile("arq", "deployment");
-         deployment.deleteOnExit();
+         URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
          
-         archive.as(ZipExporter.class).exportTo(deployment, true);
-         glassfish.getDeployer().deploy(deployment, "--name", deploymentName);
+         glassfish.getDeployer().deploy(deploymentUrl.toURI(), "--name", deploymentName);
       }
       catch (Exception e) 
       {
