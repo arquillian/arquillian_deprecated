@@ -28,7 +28,6 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.impl.base.asset.ClassAsset;
 
 /**
  * A ScannerService implementation that processes a ShrinkWrap bean archive
@@ -94,16 +93,13 @@ public class ShrinkWrapMetaDataDiscovery extends AbstractMetaDataDiscovery
          Map<ArchivePath, Node> classes = archive.getContent(Filters.include(".*\\.class"));
          for (Map.Entry<ArchivePath, Node> classEntry : classes.entrySet())
          {
-            if (classEntry.getValue().getAsset() instanceof ClassAsset)
+            try
             {
-               try
-               {
-                  getAnnotationDB().scanClass(classEntry.getValue().getAsset().openStream());
-               }
-               catch (Exception e)
-               {
-                  e.printStackTrace();
-               }
+               getAnnotationDB().scanClass(classEntry.getValue().getAsset().openStream());
+            }
+            catch (Exception e)
+            {
+               throw new RuntimeException("Could not scan class", e);
             }
          }
 	  }
