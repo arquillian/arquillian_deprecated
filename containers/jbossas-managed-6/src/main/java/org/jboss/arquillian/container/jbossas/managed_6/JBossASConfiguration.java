@@ -49,8 +49,8 @@ public class JBossASConfiguration implements ContainerConfiguration
     */
    public void validate() throws ConfigurationException
    {
-      Validate.configurationDirectoryExists(jbossHome, "JBOSS_HOME environment variable must be set to a valid directory");
-      Validate.configurationDirectoryExists(javaHome, "JAVA_HOME environment variable must be set to a valid directory");
+      Validate.configurationDirectoryExists(jbossHome, "Either JBOSS_HOME environment variable or jbossHome property in Arquillian configuration must be set and point to a valid directory");
+      Validate.configurationDirectoryExists(javaHome, "Either JAVA_HOME environment variable or javaHome property in Arquillian configuration must be set and point to a valid directory");
    }
    
    public ContainerProfile getContainerProfile()
