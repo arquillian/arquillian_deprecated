@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.glassfish.embedded_3_1;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -32,6 +33,13 @@ public class GlassFishConfiguration implements ContainerConfiguration
    private boolean configurationReadOnly = true;
    private String configurationXml;
    private String sunResourcesXml;
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   public void validate() throws ConfigurationException
+   {
+   }
    
    public int getBindHttpPort()
    {

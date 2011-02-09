@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -30,6 +31,14 @@ public class WeldEEMockConfiguration implements ContainerConfiguration
     * Flag to enable the Conversation Scope outside a JSF Request 
     */
    private boolean enableConversationScope = false;
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
+   {
+   }
    
    public void setEnableConversationScope(boolean enableConversationScope)
    {

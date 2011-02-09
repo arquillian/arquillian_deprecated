@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_5_1;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -39,6 +40,14 @@ public class JBossASConfiguration implements ContainerConfiguration
    
    private String providerUrl = "jnp://localhost:1099";
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
+   {
+   }
+   
    public String getProfileName()
    {
       return profileName;

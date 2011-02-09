@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.jetty.embedded_7;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -33,6 +34,14 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
 
    private boolean jettyPlus = true;
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
+   {
+   }
+   
    public int getBindHttpPort()
    {
       return bindHttpPort;

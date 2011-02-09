@@ -16,6 +16,7 @@
  */
 package org.jboss.arquillian.container.tomcat.embedded_6;
 
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -41,6 +42,14 @@ public class TomcatConfiguration implements ContainerConfiguration
    
    private boolean unpackArchive = false;
 
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
+   {
+   }
+   
    public String getBindAddress()
    {
       return bindAddress;
