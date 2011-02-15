@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <parent>
       <groupId>org.jboss.arquillian</groupId>
@@ -16,8 +17,21 @@
    <description>Resin4 Embedded container integration for the Arquillian project</description>
 
    <properties>
-       <resin4.version>4.0-SNAPSHOT</resin4.version>
+      <resin4.version>4.0.14</resin4.version>
    </properties>
+
+   <repositories>
+      <repository>
+         <id>caucho</id>
+         <name>Caucho Maven Repository</name>
+         <url>http://caucho.com/m2/</url>
+         <layout>default</layout>
+         <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+         </releases>
+      </repository>
+   </repositories>
 
    <dependencies>
 
@@ -48,8 +62,8 @@
       </dependency>
 
       <!--<dependency>-->
-         <!--<groupId>org.jboss.shrinkwrap</groupId>-->
-         <!--<artifactId>shrinkwrap-extension-resin-4</artifactId>-->
+      <!--<groupId>org.jboss.shrinkwrap</groupId>-->
+      <!--<artifactId>shrinkwrap-extension-resin-4</artifactId>-->
       <!--</dependency>-->
 
       <dependency>
@@ -58,12 +72,12 @@
          <version>${project.version}</version>
          <scope>test</scope>
       </dependency>
-      
+
       <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-junit</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
+         <groupId>org.jboss.arquillian</groupId>
+         <artifactId>arquillian-junit</artifactId>
+         <version>${project.version}</version>
+         <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -81,298 +95,296 @@
 
       <!-- Logging -->
       <dependency>
-    <groupId>commons-logging</groupId>
-    <artifactId>commons-logging</artifactId>
-    <version>1.1.1</version>
-</dependency>
-
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.6.1</version>
-    </dependency>
-
-      <dependency>
-           <groupId>log4j</groupId>
-           <artifactId>log4j</artifactId>
-           <version>1.2.14</version>
-       </dependency>
-
-       <!-- end logging -->
-
-
-
-       <!-- resin -->
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-      <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-kernel</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-       
-
-
-       <!-- end resin -->
-              <!--<dependency>-->
-           <!--<groupId>com.caucho</groupId>-->
-           <!--<artifactId>resin-kernel</artifactId>-->
-           <!--<version>${resin4.version}</version>-->
-       <!--</dependency>-->
-
-
-<!--
-      <dependency>
-          <groupId>com.caucho</groupId>
-          <artifactId>resin</artifactId>
-          <version>4.0-SNAPSHOT</version>
+         <groupId>commons-logging</groupId>
+         <artifactId>commons-logging</artifactId>
+         <version>1.1.1</version>
       </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.6.1</version>
+      </dependency>
+
+      <dependency>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+         <version>1.2.14</version>
+      </dependency>
+
+      <!-- end logging -->
+
+
+      <!-- resin -->
+      <dependency>
+         <groupId>com.caucho</groupId>
+         <artifactId>resin</artifactId>
+         <version>${resin4.version}</version>
+      </dependency>
+
+      <!-- dependency>
+         <groupId>com.caucho</groupId>
+         <artifactId>resin-kernel</artifactId>
+         <version>${resin4.version}</version>
+      </dependency -->
+
+
+      <!-- end resin -->
+      <!--<dependency>-->
+      <!--<groupId>com.caucho</groupId>-->
+      <!--<artifactId>resin-kernel</artifactId>-->
+      <!--<version>${resin4.version}</version>-->
+      <!--</dependency>-->
+
+
+      <!--
+            <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>resin</artifactId>
+                <version>4.0-SNAPSHOT</version>
+            </dependency>
+
+               <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>resin-kernel</artifactId>
+                <version>4.0-SNAPSHOT</version>
+            </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>candi</artifactId>
+                 <version>4.0-SNAPSHOT</version>
+             </dependency>
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-compat</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-deploy</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-eclipselink</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-ecmascript</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-ejb</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-experiment</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-hessian</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-hibernate</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-j2ee-deploy</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-j2ee-management</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-javaee</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jaxb</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jaxrpc</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jaxstream</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jaxws</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jca</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jcache</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jcr</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jdk15</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jpa</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jsdk</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jstl</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jta</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-junit</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-jws</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-osgi</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-portlet</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-quercus</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-saaj</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-script</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+             <dependency>
+                 <groupId>com.caucho</groupId>
+                 <artifactId>resin-webutil</artifactId>
+                 <version>${resin4.version}</version>
+             </dependency>
+
+
+
 
          <dependency>
-          <groupId>com.caucho</groupId>
-          <artifactId>resin-kernel</artifactId>
-          <version>4.0-SNAPSHOT</version>
+          <groupId>xml-resolver</groupId>
+          <artifactId>xml-resolver</artifactId>
+          <version>1.2</version>
+      </dependency>
+
+      <dependency>
+          <groupId>org.apache.ws.commons.schema</groupId>
+          <artifactId>XmlSchema</artifactId>
+          <version>1.3.2</version>
+      </dependency>
+
+
+       <dependency>
+          <groupId>org.apache.neethi</groupId>
+          <artifactId>neethi</artifactId>
+          <version>2.0.2</version>
+      </dependency>
+
+
+        <dependency>
+          <groupId>jivesoftware</groupId>
+          <artifactId>smack</artifactId>
+          <version>3.1.0</version>
       </dependency>
 
        <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>candi</artifactId>
-           <version>4.0-SNAPSHOT</version>
-       </dependency>
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
+          <groupId>org.igniterealtime.smack</groupId>
+          <artifactId>smackx</artifactId>
+          <version>3.1.0</version>
+      </dependency>
 
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-compat</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-deploy</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-eclipselink</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-ecmascript</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-ejb</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-experiment</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-hessian</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-hibernate</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-j2ee-deploy</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-j2ee-management</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-javaee</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jaxb</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jaxrpc</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jaxstream</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jaxws</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jca</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jcache</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jcr</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jdk15</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jpa</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jsdk</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jstl</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jta</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-junit</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-jws</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-osgi</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-portlet</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-quercus</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-saaj</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-script</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       <dependency>
-           <groupId>com.caucho</groupId>
-           <artifactId>resin-webutil</artifactId>
-           <version>${resin4.version}</version>
-       </dependency>
-
-       
-
-
-   <dependency>
-    <groupId>xml-resolver</groupId>
-    <artifactId>xml-resolver</artifactId>
-    <version>1.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.apache.ws.commons.schema</groupId>
-    <artifactId>XmlSchema</artifactId>
-    <version>1.3.2</version>
-</dependency>
-
-
- <dependency>
-    <groupId>org.apache.neethi</groupId>
-    <artifactId>neethi</artifactId>
-    <version>2.0.2</version>
-</dependency>
-
-
-  <dependency>
-    <groupId>jivesoftware</groupId>
-    <artifactId>smack</artifactId>
-    <version>3.1.0</version>
-</dependency>
-
- <dependency>
-    <groupId>org.igniterealtime.smack</groupId>
-    <artifactId>smackx</artifactId>
-    <version>3.1.0</version>
-</dependency>
-      
--->       
+      -->
 
    </dependencies>
 </project>
