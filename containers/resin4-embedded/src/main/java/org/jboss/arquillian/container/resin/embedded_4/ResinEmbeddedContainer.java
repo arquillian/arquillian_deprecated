@@ -17,24 +17,33 @@
 package org.jboss.arquillian.container.resin.embedded_4;
 
 
-import com.caucho.resin.HttpEmbed;
-import com.caucho.resin.ResinEmbed;
-import com.caucho.resin.WebAppEmbed;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Logger;
+
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
-import org.jboss.arquillian.spi.*;
+import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.ContainerMethodExecutor;
+import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.spi.DeployableContainer;
+import org.jboss.arquillian.spi.DeploymentException;
+import org.jboss.arquillian.spi.LifecycleException;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
-import java.io.File;
-import java.net.URL;
-import java.util.logging.Logger;
+import com.caucho.resin.HttpEmbed;
+import com.caucho.resin.ResinEmbed;
+import com.caucho.resin.WebAppEmbed;
 
 /**
  * <p>Resin4 Embedded container for the Arquillian project.</p>
  *
  * @author Dominik Dorn
+ * @author ales.justin@jboss.org
  * @version $Revision: $
  */
+@SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class ResinEmbeddedContainer implements DeployableContainer
 {
    public static final String HTTP_PROTOCOL = "http";
@@ -44,27 +53,31 @@ public class ResinEmbeddedContainer implements DeployableContainer
    private ResinEmbed server;
 
    private ResinEmbeddedConfiguration containerConfig;
-   
-   public ResinEmbeddedContainer()
-   {
-   }
-   
+
+   private File base;
+
    public void setup(Context context, Configuration arquillianConfig)
    {
       containerConfig = arquillianConfig.getContainerConfig(ResinEmbeddedConfiguration.class);
-       arquillianConfig.setDeploymentExportPath("/tmp/arquillian");
+      arquillianConfig.setDeploymentExportPath("/target/tmp/arquillian");
    }
-   
+
    public void start(Context context) throws LifecycleException
    {
-      try 
+      String basePath = "/target/resin4_arquillian";
+      base = new File(basePath);
+      if (base.exists() == false)
+         base.mkdirs();
+
+      try
       {
-          server = new ResinEmbed();
-          server.addPort(new HttpEmbed(containerConfig.getBindHttpPort()));
+         server = new ResinEmbed();
+         server.setRootDirectory(basePath);
+         server.addPort(new HttpEmbed(containerConfig.getBindHttpPort()));
       }
-      catch (Exception e) 
+      catch (Exception e)
       {
-         throw new LifecycleException("Could not start container", e);
+         throw new LifecycleException("Could not create Resin4 container", e);
       }
    }
 
@@ -72,49 +85,44 @@ public class ResinEmbeddedContainer implements DeployableContainer
    {
       try
       {
-         log.info("Stopping Resin Embedded Server [id:" + server.hashCode() + "]");
-         server.stop();
-      } 
-      catch (Exception e) 
+         log.info("Destroying Resin Embedded Server [id:" + server.hashCode() + "]");
+         server.destroy();
+
+         deleteRecursively(base);
+      }
+      catch (Exception e)
       {
-         throw new LifecycleException("Could not stop container", e);
+         throw new LifecycleException("Could not destroy Resin4 container", e);
       }
    }
 
    public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
    {
-      try 
+      try
       {
-          String basePath = "/tmp/resinarquillian";
+         File warFile = new File(base, archive.getName());
+         if (warFile.exists())
+            warFile.delete();
 
-          File base = new File(basePath);
+         log.finer("Web archive = " + archive.getName());
+         ZipExporter exporter = archive.as(ZipExporter.class);
+         exporter.exportZip(warFile.getAbsoluteFile());
 
-          File warFile = new File(basePath, archive.getName());
+         WebAppEmbed webApp = new WebAppEmbed();
+         webApp.setContextPath("/test");
+         webApp.setRootDirectory(base + "/tmp");
+         webApp.setArchivePath(warFile.getAbsolutePath());
+         log.info("Adding webapp to server: " + webApp);
+         server.addWebApp(webApp);
 
-          base.mkdirs();
-          warFile.delete();
-
-          log.finer("deploying");
-          log.finer("archive.getName() = " + archive.getName());
-//          new File("/tmp/" + archive.getName()).delete();
-          ZipExporter exporter = archive.as(ZipExporter.class);
-//          exporter.exportZip(new File("/tmp/" + archive.getName()));
-          exporter.exportZip(warFile.getAbsoluteFile());
-
-          WebAppEmbed webApp = new WebAppEmbed();
-          webApp.setContextPath("/test");
-          webApp.setRootDirectory(base + "/tmp");
-          webApp.setArchivePath(warFile.getAbsolutePath() );
-          log.info("adding webapp to server");
-          server.addWebApp(webApp);
-          server.start();
+         server.start();
       }
-      catch (Exception e) 
+      catch (Exception e)
       {
          throw new DeploymentException("Could not deploy " + archive.getName(), e);
       }
 
-      try 
+      try
       {
          return new ServletMethodExecutor(
                new URL(
@@ -122,9 +130,9 @@ public class ResinEmbeddedContainer implements DeployableContainer
                      containerConfig.getBindAddress(),
                      containerConfig.getBindHttpPort(),
                      "/")
-               );
-      } 
-      catch (Exception e) 
+         );
+      }
+      catch (Exception e)
       {
          throw new RuntimeException("Could not create ContainerMethodExecutor", e);
       }
@@ -132,21 +140,29 @@ public class ResinEmbeddedContainer implements DeployableContainer
 
    public void undeploy(Context context, Archive<?> archive) throws DeploymentException
    {
-//       new File("/tmp"+archive.getName()).delete();
-//      WebAppContext wctx = context.get(WebAppContext.class);
-//      if (wctx != null)
-//      {
-//         try
-//         {
-//            wctx.stop();
-//         }
-//         catch (Exception e)
-//         {
-//            e.printStackTrace();
-//            log.severe("Could not stop context " + wctx.getContextPath() + ": " + e.getMessage());
-//         }
-//         ((HandlerCollection) server.getHandler()).removeHandler(wctx);
-//      }
+      server.stop();
    }
 
+   static void deleteRecursively(File file) throws IOException
+   {
+      if (file.isDirectory())
+         deleteDirectoryContents(file);
+
+      if (file.delete() == false)
+      {
+         throw new IOException("Failed to delete " + file);
+      }
+   }
+
+   static void deleteDirectoryContents(File directory) throws IOException
+   {
+      File[] files = directory.listFiles();
+      if (files == null)
+         throw new IOException("Error listing files for " + directory);
+
+      for (File file : files)
+      {
+         deleteRecursively(file);
+      }
+   }
 }
