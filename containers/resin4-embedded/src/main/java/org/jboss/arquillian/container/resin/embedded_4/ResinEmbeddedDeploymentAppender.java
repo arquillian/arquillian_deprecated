@@ -14,17 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.caucho.arquillian.container.resin.embedded_4;
+package org.jboss.arquillian.container.resin.embedded_4;
 
-import javax.annotation.Resource;
+import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
+import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
-public class TestBean
+public class ResinEmbeddedDeploymentAppender implements AuxiliaryArchiveAppender
 {
-   @Resource(name = "name")
-   private String name;
-
-   public String getName()
+   public Archive<?> createAuxiliaryArchive()
    {
-      return name;
+      return ShrinkWrap
+            .create(JavaArchive.class, "arquillian-resin-testenrichers.jar")
+            .addPackages(false, CDIInjectionEnricher.class.getPackage())
+            .addServiceProvider(TestEnricher.class, CDIInjectionEnricher.class);
    }
 }
