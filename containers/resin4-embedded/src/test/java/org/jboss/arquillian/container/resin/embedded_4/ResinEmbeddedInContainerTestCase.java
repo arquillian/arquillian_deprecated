@@ -111,4 +111,12 @@ public class ResinEmbeddedInContainerTestCase
       Assert.assertNotNull(testBean);
       Assert.assertEquals("Resin", testBean.getName());
    }
+
+   @Test
+   public void secondTest() throws Exception
+   {
+      // Do almost nothing -- just check if the 2nd deploy is also OK
+      Assert.assertNotNull(testBean);
+      Assert.assertEquals("Resin", testBean.getName());
+   }
 }
