@@ -50,7 +50,7 @@ public class WeldEmbeddedIntegrationConversationScopeTestCase
                   .addClasses(
                         WeldEmbeddedIntegrationConversationScopeTestCase.class,
                         TalkingChicken.class)
-                  .addManifestResource(
+                  .addAsManifestResource(
                         EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    

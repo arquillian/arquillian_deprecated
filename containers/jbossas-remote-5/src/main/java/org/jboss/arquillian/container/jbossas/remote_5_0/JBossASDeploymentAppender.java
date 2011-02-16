@@ -43,7 +43,7 @@ public class JBossASDeploymentAppender implements AuxiliaryArchiveAppender
                               true, 
                               EJBInjectionEnricher.class.getPackage(),
                               ResourceInjectionEnricher.class.getPackage())
-                        .addServiceProvider(
+                        .addAsServiceProvider(
                               TestEnricher.class, 
                               EJBInjectionEnricher.class,
                               ResourceInjectionEnricher.class);

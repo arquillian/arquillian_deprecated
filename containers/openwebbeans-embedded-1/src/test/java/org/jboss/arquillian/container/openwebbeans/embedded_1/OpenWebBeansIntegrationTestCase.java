@@ -47,7 +47,7 @@ public class OpenWebBeansIntegrationTestCase
                   .addClasses(
                         OpenWebBeansIntegrationTestCase.class,
                         MyBean.class)
-                  .addManifestResource(
+                  .addAsManifestResource(
                         EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    

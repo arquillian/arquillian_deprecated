@@ -45,7 +45,7 @@ public class WeldEmbeddedIntegrationTestCase
                   .addClasses(
                         WeldEmbeddedIntegrationTestCase.class,
                         MyBean.class)
-                  .addManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+                  .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
    }
    
    @Inject

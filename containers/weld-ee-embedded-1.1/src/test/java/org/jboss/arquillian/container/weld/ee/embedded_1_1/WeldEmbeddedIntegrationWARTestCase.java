@@ -46,7 +46,7 @@ public class WeldEmbeddedIntegrationWARTestCase
                   .addClasses(
                         WeldEmbeddedIntegrationWARTestCase.class,
                         MyBean.class)
-                  .addWebResource(
+                  .addAsWebResource(
                         EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    

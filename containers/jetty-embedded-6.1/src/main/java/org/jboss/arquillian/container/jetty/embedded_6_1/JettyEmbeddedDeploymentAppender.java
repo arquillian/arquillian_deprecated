@@ -41,7 +41,7 @@ public class JettyEmbeddedDeploymentAppender implements AuxiliaryArchiveAppender
                               false,
                               CDIInjectionEnricher.class.getPackage(),
                               ResourceInjectionEnricher.class.getPackage())
-                        .addServiceProvider(
+                        .addAsServiceProvider(
                               TestEnricher.class,
                               CDIInjectionEnricher.class,
                               ResourceInjectionEnricher.class);

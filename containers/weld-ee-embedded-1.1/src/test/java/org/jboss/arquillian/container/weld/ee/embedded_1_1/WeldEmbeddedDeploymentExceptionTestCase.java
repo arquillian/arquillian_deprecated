@@ -42,7 +42,7 @@ public class WeldEmbeddedDeploymentExceptionTestCase
    {
       return ShrinkWrap.create(JavaArchive.class)
                   .addClass(LoopingProducer.class)
-                  .addManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+                  .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
    }
    
    @Test // this method will be called even with deployment exception, @Expected marks DeploymentExceptions as acceptable behavior.

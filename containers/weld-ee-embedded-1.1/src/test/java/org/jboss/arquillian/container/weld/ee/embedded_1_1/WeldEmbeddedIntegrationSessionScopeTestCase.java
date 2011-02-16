@@ -46,7 +46,7 @@ public class WeldEmbeddedIntegrationSessionScopeTestCase
                   .addClasses(
                         WeldEmbeddedIntegrationSessionScopeTestCase.class,
                         Chicken.class)
-                  .addManifestResource(
+                  .addAsManifestResource(
                         EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    

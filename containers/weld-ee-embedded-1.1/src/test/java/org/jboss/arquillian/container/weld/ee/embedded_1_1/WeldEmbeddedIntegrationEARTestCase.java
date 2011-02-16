@@ -44,12 +44,12 @@ public class WeldEmbeddedIntegrationEARTestCase
    public static EnterpriseArchive createdeployment() 
    {
       return ShrinkWrap.create(EnterpriseArchive.class)
-                  .addModule(
+                  .addAsModule(
                         ShrinkWrap.create(WebArchive.class)
                            .addClasses(
                               WeldEmbeddedIntegrationWARTestCase.class,
                               MyBean.class)
-                           .addWebResource(
+                           .addAsWebResource(
                               EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"))
                   );
    }

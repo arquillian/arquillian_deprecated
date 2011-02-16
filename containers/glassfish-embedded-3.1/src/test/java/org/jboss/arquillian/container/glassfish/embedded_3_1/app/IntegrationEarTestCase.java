@@ -44,12 +44,12 @@ public class IntegrationEarTestCase
    public static EnterpriseArchive createDeployment() throws Exception 
    {
       return ShrinkWrap.create(EnterpriseArchive.class)
-                  .addModule(
+                  .addAsModule(
                         ShrinkWrap.create(JavaArchive.class)
                            .addClasses(
                                  NoInterfaceEJB.class,
                                  NameProvider.class)
-                           .addManifestResource(EmptyAsset.INSTANCE, "beans.xml"));
+                           .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml"));
    }
    
    @EJB

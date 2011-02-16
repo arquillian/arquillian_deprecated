@@ -44,7 +44,7 @@ public class IntegrationWarTestCase
                .addClasses(
                      NoInterfaceEJB.class,
                      NameProvider.class)
-               .addWebResource(EmptyAsset.INSTANCE, "beans.xml");
+               .addAsWebResource(EmptyAsset.INSTANCE, "beans.xml");
    }
    
    @EJB

@@ -26,7 +26,7 @@ public class WorkHardCdiTestCase
                .addPackage(
                        WorkHard.class.getPackage()
                )
-               .addManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
+               .addAsManifestResource(EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject HardWorker worker;

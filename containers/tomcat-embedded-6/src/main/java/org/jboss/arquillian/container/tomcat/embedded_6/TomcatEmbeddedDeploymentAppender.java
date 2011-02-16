@@ -40,7 +40,7 @@ public class TomcatEmbeddedDeploymentAppender implements AuxiliaryArchiveAppende
                   false,
                   CDIInjectionEnricher.class.getPackage(),
                   ResourceInjectionEnricher.class.getPackage())
-            .addServiceProvider(
+            .addAsServiceProvider(
                   TestEnricher.class,
                   CDIInjectionEnricher.class,
                   ResourceInjectionEnricher.class);
