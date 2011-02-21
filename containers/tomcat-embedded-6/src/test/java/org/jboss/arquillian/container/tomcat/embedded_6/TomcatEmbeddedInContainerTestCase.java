@@ -67,8 +67,8 @@ public class TomcatEmbeddedInContainerTestCase
         return ShrinkWrap.create(WebArchive.class, "test2.war")
          .addClasses(TestServlet.class, TestBean.class)
          .addAsLibraries(Dependencies.artifact("org.jboss.weld.servlet:weld-servlet:1.1.0.Beta2").resolve())
-         .addAsWebResource(EmptyAsset.INSTANCE, "beans.xml")
-         .addAsResource("in-container-context.xml", "META-INF/context.xml")
+         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+         .addAsManifestResource("in-container-context.xml", "context.xml")
          .setWebXML("in-container-web.xml");
     }
 

@@ -47,6 +47,7 @@
 	<module>jsr88-remote-1.2</module>
         <module>glassfish-remote-3</module>
         <module>glassfish-embedded-3</module> 
+	<module>osgi-embedded-4.2</module>
 -->
 	<module>glassfish-embedded-3.1</module>
         <module>jetty-embedded-6.1</module> 
@@ -57,7 +58,6 @@
         <module>weld-ee-embedded-1.1</module>
         <module>openejb-embedded-3.1</module>
         <module>openwebbeans-embedded-1</module>
-        <module>osgi-embedded-4.2</module>
       </modules>
     </profile>
 
