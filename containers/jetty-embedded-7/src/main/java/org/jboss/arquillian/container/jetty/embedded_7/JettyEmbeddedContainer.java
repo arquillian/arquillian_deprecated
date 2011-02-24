@@ -49,13 +49,14 @@ import org.jboss.shrinkwrap.jetty_7.api.ShrinkWrapWebAppContext;
  * running in-container. However, the container is still configured properly during setup.</p>
  *
  * @author Dan Allen
+ * @author Ales Justin
  * @version $Revision: $
  */
 public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbeddedConfiguration>
 {
    public static final String HTTP_PROTOCOL = "http";
 
-   public static final String[] JETTY_PLUS_CONFIGURATION_CLASSES =
+   public static final String[] JETTY_PLUS_PRE_7_2_CONFIGURATION_CLASSES =
    {
        "org.eclipse.jetty.webapp.WebInfConfiguration",
        "org.eclipse.jetty.webapp.WebXmlConfiguration",
@@ -66,9 +67,22 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
        "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
    };
 
+   public static final String[] JETTY_PLUS_CONFIGURATION_CLASSES =
+   {
+       "org.eclipse.jetty.webapp.WebInfConfiguration",
+       "org.eclipse.jetty.webapp.WebXmlConfiguration",
+       "org.eclipse.jetty.webapp.MetaInfConfiguration",
+       "org.eclipse.jetty.webapp.FragmentConfiguration",
+       "org.eclipse.jetty.plus.webapp.EnvConfiguration",
+       "org.eclipse.jetty.plus.webapp.PlusConfiguration",
+       "org.eclipse.jetty.webapp.JettyWebXmlConfiguration"
+   };
+
    private static final Logger log = Logger.getLogger(JettyEmbeddedContainer.class.getName());
 
    private Server server;
+   
+   private String[] configurationClasses = null;
 
    private JettyEmbeddedConfiguration containerConfig;
 
@@ -104,6 +118,24 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
    {
       try 
       {
+         // explicit configuration classes, as they have changed between jetty7 minor versions
+         String configuredConfigurationClasses = containerConfig.getConfigurationClasses();
+         if (configuredConfigurationClasses != null && configuredConfigurationClasses.trim().length() > 0)
+         {
+            this.configurationClasses = configuredConfigurationClasses.split(",");
+         }
+         else if (containerConfig.isJettyPlus())
+         {
+            if(VersionUtil.isGraterThenOrEqual(Server.getVersion(), "7.2"))
+            {
+               configurationClasses = JETTY_PLUS_CONFIGURATION_CLASSES;
+            }
+            else
+            {
+               configurationClasses = JETTY_PLUS_PRE_7_2_CONFIGURATION_CLASSES;
+            }
+         }
+         
          server = new Server();
          Connector connector = new SelectChannelConnector();
          connector.setHost(containerConfig.getBindAddress());
@@ -153,11 +185,12 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
       try 
       {
          WebAppContext wctx = archive.as(ShrinkWrapWebAppContext.class);
-         // Jetty plus is required to support in-container invocation and enrichment
-         if (containerConfig.isJettyPlus())
+
+         if(configurationClasses != null)
          {
-            wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
+            wctx.setConfigurationClasses(configurationClasses);
          }
+
          // possible configuration parameters
          wctx.setExtractWAR(true);
          wctx.setLogUrlOnStart(true);

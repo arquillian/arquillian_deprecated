@@ -24,6 +24,7 @@ import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
  * the Jetty Embedded 7.x and 8.x containers.
  *
  * @author Dan Allen
+ * @author Ales Justin
  * @version $Revision: $
  */
 public class JettyEmbeddedConfiguration implements ContainerConfiguration
@@ -33,6 +34,8 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
    private int bindHttpPort = 9090;
 
    private boolean jettyPlus = true;
+
+   private String configurationClasses;
 
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
@@ -70,5 +73,18 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
    public void setJettyPlus(boolean jettyPlus)
    {
       this.jettyPlus = jettyPlus;
+   }
+
+   public String getConfigurationClasses()
+   {
+      return configurationClasses;
+   }
+
+   /**
+    * @param configurationClasses A comma separated list of fully qualified configuration classes
+    */
+   public void setConfigurationClasses(String configurationClasses)
+   {
+      this.configurationClasses = configurationClasses;
    }
 }

@@ -34,6 +34,8 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
 
    private boolean jettyPlus = true;
 
+   private String configurationClasses;
+
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
     */
@@ -70,5 +72,18 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
    public void setJettyPlus(boolean jettyPlus)
    {
       this.jettyPlus = jettyPlus;
+   }
+   
+   public String getConfigurationClasses()
+   {
+      return configurationClasses;
+   }
+
+   /**
+    * @param configurationClasses A comma separated list of fully qualified configuration classes
+    */
+   public void setConfigurationClasses(String configurationClasses)
+   {
+      this.configurationClasses = configurationClasses;
    }
 }

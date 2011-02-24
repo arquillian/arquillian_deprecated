@@ -76,6 +76,8 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
 
    private Server server;
 
+   private String[] configurationClasses = null;
+
    private JettyEmbeddedConfiguration containerConfig;
    
    @Inject @DeploymentScoped
@@ -104,6 +106,18 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
    {
       try 
       {
+         // explicit configuration classes, as they have changed between jetty7 minor versions
+         String configuredConfigurationClasses = containerConfig.getConfigurationClasses();
+         if (configuredConfigurationClasses != null && configuredConfigurationClasses.trim().length() > 0)
+         {
+            this.configurationClasses = configuredConfigurationClasses.split(",");
+         }
+         else if (containerConfig.isJettyPlus())
+         {
+            // Jetty plus is required to support in-container invocation and enrichment
+            configurationClasses = JETTY_PLUS_CONFIGURATION_CLASSES;
+         }
+
          server = new Server();
          Connector connector = new SelectChannelConnector();
          connector.setHost(containerConfig.getBindAddress());
@@ -150,10 +164,9 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
       try 
       {
          WebAppContext wctx = archive.as(ShrinkWrapWebAppContext.class);
-         // Jetty plus is required to support in-container invocation and enrichment
-         if (containerConfig.isJettyPlus())
+         if (configurationClasses != null)
          {
-            wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
+            wctx.setConfigurationClasses(configurationClasses);
          }
          // possible configuration parameters
          wctx.setExtractWAR(true);
