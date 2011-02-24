@@ -45,6 +45,7 @@ import org.jboss.shrinkwrap.jetty_7.api.ShrinkWrapWebAppContext;
  * running in-container. However, the container is still configured properly during setup.</p>
  *
  * @author Dan Allen
+ * @author Ales Justin
  * @version $Revision: $
  */
 public class JettyEmbeddedContainer implements DeployableContainer
@@ -114,9 +115,16 @@ public class JettyEmbeddedContainer implements DeployableContainer
       try 
       {
          WebAppContext wctx = archive.as(ShrinkWrapWebAppContext.class);
-         // Jetty plus is required to support in-container invocation and enrichment
-         if (containerConfig.isJettyPlus())
+         // explicit configuration classes, as they have changed between jetty7 minor versions
+         String configurationClasses = containerConfig.getConfigurationClasses();
+         if (configurationClasses != null && configurationClasses.trim().length() > 0)
          {
+            String[] classes = configurationClasses.split(",");
+            wctx.setConfigurationClasses(classes);
+         }
+         else if (containerConfig.isJettyPlus())
+         {
+            // Jetty plus is required to support in-container invocation and enrichment
             wctx.setConfigurationClasses(JETTY_PLUS_CONFIGURATION_CLASSES);
          }
          // possible configuration parameters

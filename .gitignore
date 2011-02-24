@@ -1,3 +1,10 @@
+containers/resin4-embedded/
+extensions/performance/arq-perf/
+resin-data/
+*.iml
+*.iws
+*.ipr
+.idea
 .project
 .settings/
 .classpath
