@@ -28,6 +28,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.bootstrap.api.descriptor.BootstrapDescriptor;
@@ -89,10 +90,10 @@ public class ReloadedContainer implements DeployableContainer<JBossReloadedConfi
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
-   @Inject @DeploymentScoped
+   @Inject @ContainerScoped
    private InstanceProducer<ShrinkWrapDeployer> shrinkwrapDeployer;
    
-   @Inject @DeploymentScoped
+   @Inject @ContainerScoped
    private InstanceProducer<MCServer> mcServer;
 
    //-------------------------------------------------------------------------------------||
