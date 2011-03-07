@@ -5,8 +5,8 @@
 	
        <container qualifier="jboss" default="true">
            <configuration>
-               <property name="jbossHome">/home/aslak/dev/servers/jboss-5.1.0.GA/</property>
-               <property name="javaHome">/usr/lib/jvm/java-6-openjdk/</property>
+<!--               <property name="jbossHome">/home/aslak/dev/servers/jboss-5.1.0.GA/</property> -->
+<!--               <property name="javaHome">/usr/lib/jvm/java-6-openjdk/</property> -->
                <property name="bindAddress">127.0.0.1</property>
                <property name="httpPort">8080</property>
            </configuration>
