@@ -16,13 +16,19 @@
  */
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import javax.naming.InitialContext;
+
 import org.apache.openejb.NoSuchApplicationException;
+import org.apache.openejb.OpenEJB;
 import org.apache.openejb.OpenEJBException;
 import org.apache.openejb.UndeployException;
 import org.apache.openejb.assembler.classic.AppInfo;
 import org.apache.openejb.assembler.classic.Assembler;
-import org.apache.openejb.assembler.classic.SecurityServiceInfo;
-import org.apache.openejb.assembler.classic.TransactionServiceInfo;
+import org.apache.openejb.client.LocalInitialContextFactory;
+import org.apache.openejb.loader.SystemInstance;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
@@ -59,7 +65,7 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
     * OpenEJB Assembler
     */
    private Assembler assembler;
-
+   
    /**
     * OpenEJB Configuration backing the Container
     */
@@ -70,7 +76,6 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
     */
    @Inject @DeploymentScoped
    private InstanceProducer<AppInfo> deployment;
-
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -136,22 +141,24 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
 
    public void start() throws LifecycleException
    {
-      final ShrinkWrapConfigurationFactory config = new ShrinkWrapConfigurationFactory();
-      final Assembler assembler = new Assembler();
+      ShrinkWrapConfigurationFactory config = null;
+      OpenEJBAssembler assembler = null;
       try
       {
-         // These two objects pretty much encompass all the EJB Container
-         assembler.createTransactionManager(config.configureService(TransactionServiceInfo.class));
-         assembler.createSecurityService(config.configureService(SecurityServiceInfo.class));
+         // Allow the OpenEJB startup code to run services required and configured
+         // by the user via external configuration resources.
+         OpenEJB.init(getInitialProperties());
+         assembler = (OpenEJBAssembler) SystemInstance.get().getComponent(Assembler.class);
+         config = (ShrinkWrapConfigurationFactory) assembler.getConfigurationFactory();
       }
-      catch (final OpenEJBException e)
+      catch (final Exception e)
       {
          throw new LifecycleException("Could not configure the OpenEJB Container", e);
       }
 
       // Set
       this.assembler = assembler;
-      this.config = new ShrinkWrapConfigurationFactory();
+      this.config = config;
    }
 
    public void stop() throws LifecycleException
@@ -166,6 +173,8 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       try
       {
          assembler.destroyApplication(deployment.get().jarPath);
+         {
+         }
       }
       catch (final UndeployException e)
       {
@@ -176,4 +185,28 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
          throw new DeploymentException("Application was not deployed; cannot undeploy: " + deploymentName, e);
       }
    }
+
+   // Sets up properties for OpenEJB including those from a jndi.properties file
+   private Properties getInitialProperties() throws IOException
+   {
+      Properties properties = new Properties();
+      properties.put(InitialContext.INITIAL_CONTEXT_FACTORY, LocalInitialContextFactory.class.getName());
+
+      // Load properties from a jndi.properties file if it exists.
+      // OpenEJB would have done this if started via the InitialContext
+      InputStream jndiPropertiesStream = ClassLoader.getSystemResourceAsStream("jndi.properties");
+      if (jndiPropertiesStream != null)
+      {
+         properties.load(jndiPropertiesStream);
+      }
+
+      // configure OpenEJB to not deploy apps from the classpath
+      properties.put("openejb.deployments.classpath", "false");
+      // configure OpenEJB to use integration classes from Arquillian
+      properties.put("openejb.configurator", ShrinkWrapConfigurationFactory.class.getName());
+      properties.put("openejb.assembler", OpenEJBAssembler.class.getName());
+
+      return properties;
+   }
+
 }

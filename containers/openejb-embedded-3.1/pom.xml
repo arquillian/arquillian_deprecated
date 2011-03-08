@@ -24,7 +24,7 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
+		<version.org.apache.openejb_openejb.core>3.1.4</version.org.apache.openejb_openejb.core>
 
 	</properties>
 
