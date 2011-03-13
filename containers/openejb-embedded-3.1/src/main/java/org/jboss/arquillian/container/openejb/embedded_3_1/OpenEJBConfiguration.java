@@ -16,6 +16,8 @@
  */
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
+import java.io.File;
+
 import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
@@ -23,15 +25,56 @@ import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
  * OpenEJBConfiguration
  *
  * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
+ * @author David Allen
  * @version $Revision: $
  */
 public class OpenEJBConfiguration implements ContainerConfiguration
 {
+   private String openEjbXml;
+   
+   private String jndiProperties;
+
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
     */
    @Override
    public void validate() throws ConfigurationException
    {
+      // Verify that the jndi.properties file exists, if specified
+      if (jndiProperties != null)
+      {
+         if (!new File(jndiProperties).canRead())
+         {
+            throw new ConfigurationException("Cannot locate the jndi.properties file " + jndiProperties);
+         }
+      }
+      // Verify that the openejb.xml resource exists, if specified
+      if (openEjbXml != null)
+      {
+         if (!new File(openEjbXml).canRead())
+         {
+            throw new ConfigurationException("Cannot locate OpenEJB Configuration file " + openEjbXml);
+         }
+      }
+   }
+
+   public String getJndiProperties()
+   {
+      return jndiProperties;
+   }
+
+   public void setJndiProperties(String jndiProperties)
+   {
+      this.jndiProperties = jndiProperties;
+   }
+
+   public String getOpenEjbXml()
+   {
+      return openEjbXml;
+   }
+
+   public void setOpenEjbXml(String openEjbXml)
+   {
+      this.openEjbXml = openEjbXml;
    }
 }

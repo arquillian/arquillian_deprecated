@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<arquillian
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian-1.0.xsd">
+
+       <container qualifier="openejb" default="true">
+           <configuration>
+               <property name="jndiProperties">src/test/resources/test-jndi.properties</property>
+           </configuration>
+       </container>
+</arquillian>

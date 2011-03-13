@@ -16,9 +16,12 @@
  */
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import javax.naming.InitialContext;
 
 import org.apache.openejb.NoSuchApplicationException;
@@ -67,9 +70,14 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
    private Assembler assembler;
    
    /**
-    * OpenEJB Configuration backing the Container
+    * OpenEJB Configuration Factory for the Container
     */
    private ShrinkWrapConfigurationFactory config;
+
+   /**
+    * OpenEJB Container configuration for Arquillian
+    */
+   private OpenEJBConfiguration containerConfig;
 
    /**
     * The deployment
@@ -94,6 +102,7 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
    @Override
    public void setup(OpenEJBConfiguration configuration)
    {
+      containerConfig = configuration;
    }
    
    /* (non-Javadoc)
@@ -194,7 +203,8 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
 
       // Load properties from a jndi.properties file if it exists.
       // OpenEJB would have done this if started via the InitialContext
-      InputStream jndiPropertiesStream = ClassLoader.getSystemResourceAsStream("jndi.properties");
+      String propertiesFile = containerConfig.getJndiProperties() == null ? "jndi.properties" : containerConfig.getJndiProperties();
+      InputStream jndiPropertiesStream = new FileInputStream(new File(propertiesFile));
       if (jndiPropertiesStream != null)
       {
          properties.load(jndiPropertiesStream);
@@ -205,6 +215,10 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       // configure OpenEJB to use integration classes from Arquillian
       properties.put("openejb.configurator", ShrinkWrapConfigurationFactory.class.getName());
       properties.put("openejb.assembler", OpenEJBAssembler.class.getName());
+      if (containerConfig.getOpenEjbXml() != null)
+      {
+         properties.put("openejb.configuration", containerConfig.getOpenEjbXml());
+      }
 
       return properties;
    }
