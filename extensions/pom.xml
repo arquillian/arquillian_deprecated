@@ -24,7 +24,7 @@
   <!-- Aggregate Modules -->
   <modules>
     <module>performance</module>
-    <module>selenium</module>
+    <module>drone</module>
   </modules>
 
 </project>
