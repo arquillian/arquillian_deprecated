@@ -265,7 +265,10 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
    
    private ServerManager createAndConfigureServerManager()
    {
-      ServerManager manager = new ServerManager();
+      ServerManager manager = new ArquillianServerManager(
+            configuration.getStartupTimeoutInSeconds(),
+            configuration.getShutdownTimeoutInSeconds()
+      );
       if(configuration.getJbossHome() != null) 
       {
          manager.setJbossHome(configuration.getJbossHome());

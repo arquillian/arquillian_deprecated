@@ -47,6 +47,10 @@ public class JBossASConfiguration implements ContainerConfiguration
    
    private String javaVmArguments = "-Xmx512m -XX:MaxPermSize=128m";
 
+   private int startupTimeoutInSeconds = 120;
+
+   private int shutdownTimeoutInSeconds = 45;
+
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
     */
@@ -169,5 +173,37 @@ public class JBossASConfiguration implements ContainerConfiguration
    public String getJavaVmArguments()
    {
       return javaVmArguments;
+   }
+
+   /**
+    * @return the startupTimeoutInSeconds
+    */
+   public int getStartupTimeoutInSeconds()
+   {
+      return startupTimeoutInSeconds;
+   }
+   
+   /**
+    * @param startupTimeoutInSeconds the startupTimeoutInSeconds to set
+    */
+   public void setStartupTimeoutInSeconds(int startupTimeoutInSeconds)
+   {
+      this.startupTimeoutInSeconds = startupTimeoutInSeconds;
+   }
+
+   /**
+    * @return the shutdownTimeoutInSeconds
+    */
+   public int getShutdownTimeoutInSeconds()
+   {
+      return shutdownTimeoutInSeconds;
+   }
+
+   /**
+    * @param shutdownTimeoutInSeconds the shutdownTimeoutInSeconds to set
+    */
+   public void setShutdownTimeoutInSeconds(int shutdownTimeoutInSeconds)
+   {
+      this.shutdownTimeoutInSeconds = shutdownTimeoutInSeconds;
    }
 }
