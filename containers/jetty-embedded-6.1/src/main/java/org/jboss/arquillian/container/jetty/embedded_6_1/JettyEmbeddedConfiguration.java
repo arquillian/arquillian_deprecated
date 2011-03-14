@@ -17,7 +17,6 @@
 package org.jboss.arquillian.container.jetty.embedded_6_1;
 
 import org.jboss.arquillian.spi.ConfigurationException;
-import org.jboss.arquillian.spi.ContainerProfile;
 import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
@@ -43,11 +42,6 @@ public class JettyEmbeddedConfiguration implements ContainerConfiguration
    {
    }
    
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
-   }
-
    public int getBindHttpPort()
    {
       return bindHttpPort;
