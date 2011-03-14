@@ -38,6 +38,8 @@ public class JBossASConfiguration implements ContainerConfiguration
    private int rmiPort = 1099;
 
    private String profileName = "default";
+
+   private boolean useRmiPortForAliveCheck = false;
    
    private String jbossHome = System.getenv("JBOSS_HOME");
    
@@ -109,6 +111,24 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setProfileName(String profileName)
    {
       this.profileName = profileName;
+   }
+
+   /**
+    * If true, RMI port and not HTTP port is used to see if the Server is running.
+    * 
+    * @param checkAliveUsingRmiPort the checkAliveUsingRmiPort to set
+    */
+   public void setUseRmiPortForAliveCheck(boolean checkAliveUsingRmiPort)
+   {
+      this.useRmiPortForAliveCheck = checkAliveUsingRmiPort;
+   }
+   
+   /**
+    * @return the checkAliveUsingRmiPort
+    */
+   public boolean isUseRmiPortForAliveCheck()
+   {
+      return useRmiPortForAliveCheck;
    }
 
    public void setJbossHome(String jbossHome)
