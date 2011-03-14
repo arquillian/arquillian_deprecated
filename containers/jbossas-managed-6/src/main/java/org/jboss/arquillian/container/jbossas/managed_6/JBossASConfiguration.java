@@ -36,6 +36,8 @@ public class JBossASConfiguration implements ContainerConfiguration
 
    private int httpPort = 8080;
 
+   private int rmiPort = 1099;
+
    private String profileName = "default";
    
    private String jbossHome = System.getenv("JBOSS_HOME");
@@ -83,6 +85,26 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setHttpPort(int httpPort)
    {
       this.httpPort = httpPort;
+   }
+   
+   /**
+    * @return the rmiPort
+    */
+   public int getRmiPort()
+   {
+      return rmiPort;
+   }
+   
+   /**
+    * Set the RMI Connect port. <br/>
+    * This is not the JBoss AS RMI Bind port, bind port must be set in the JBoss XML configuration.<br/>
+    * <b>Only set this if default RMI port is changed in JBoss AS!</b>
+    * 
+    * @param rmiPort the rmiPort to set
+    */
+   public void setRmiPort(int rmiPort)
+   {
+      this.rmiPort = rmiPort;
    }
 
    public String getProfileName()

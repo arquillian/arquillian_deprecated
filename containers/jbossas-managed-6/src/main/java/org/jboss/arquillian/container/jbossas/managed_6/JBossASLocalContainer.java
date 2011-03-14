@@ -285,6 +285,7 @@ public class JBossASLocalContainer implements DeployableContainer<JBossASConfigu
       Server server = new Server();
       server.setName(configuration.getProfileName());
       server.setHttpPort(configuration.getHttpPort());
+      server.setRmiPort(configuration.getRmiPort());
       server.setHost(configuration.getBindAddress());
       
       server.setUsername("admin");
