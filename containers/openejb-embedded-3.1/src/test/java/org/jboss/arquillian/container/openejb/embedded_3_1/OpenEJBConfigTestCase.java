@@ -18,7 +18,6 @@
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
 import javax.ejb.EJB;
-import javax.naming.NamingException;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.DataBean;
@@ -60,7 +59,7 @@ public class OpenEJBConfigTestCase
    /**
     * The EJB proxy used for invocations
     */
-   @EJB
+   @EJB(mappedName="dataBeans/DataLocalBusinessLocal")
    private DataLocalBusiness bean;
 
    //-------------------------------------------------------------------------------------||

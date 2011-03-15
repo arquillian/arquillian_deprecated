@@ -5,7 +5,7 @@ import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.sql.DataSource;
 
-@Stateless
+@Stateless(name="dataBeans/DataLocalBusiness")
 @Local(DataLocalBusiness.class)
 public class DataBean implements DataLocalBusiness
 {

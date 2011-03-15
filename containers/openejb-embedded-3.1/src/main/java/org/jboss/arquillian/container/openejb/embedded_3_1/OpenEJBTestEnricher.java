@@ -139,7 +139,7 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
    }
 
    @Override
-   protected Object lookupEJB(Class<?> fieldType) throws Exception
+   protected Object lookupEJB(Class<?> fieldType, String mappedName) throws Exception
    {
 //      InjectionBuilder injectionBuilder = new InjectionBuilder(Thread.currentThread().getContextClassLoader());
 //
@@ -154,6 +154,10 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 //      }
       
       InitialContext initcontext = createContext();
+      if(mappedName != null)
+      {
+         return initcontext.lookup(mappedName);
+      }
       return lookupRecursive(fieldType, initcontext, initcontext.listBindings("/"));
    }
 
