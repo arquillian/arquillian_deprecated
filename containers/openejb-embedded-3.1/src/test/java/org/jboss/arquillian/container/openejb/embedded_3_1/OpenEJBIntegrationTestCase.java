@@ -23,12 +23,13 @@ import javax.ejb.EJB;
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoBean;
 import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.EchoLocalBusiness;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.SimpleBean;
+import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.SimpleLocalBusiness;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * Tests that EJB deployments into the OpenEJB server
@@ -37,8 +38,7 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:andrew.rubinger@jboss.org">ALR</a>
  * @version $Revision: $
  */
-@RunWith(Arquillian.class)
-public class OpenEJBIntegrationTestCase
+public class OpenEJBIntegrationTestCase extends OpenEJBTestBase
 {
 
    //-------------------------------------------------------------------------------------||
@@ -60,7 +60,7 @@ public class OpenEJBIntegrationTestCase
    @Deployment
    public static JavaArchive createDeployment()
    {
-      return ShrinkWrap.create(JavaArchive.class, "slsb.jar").addClasses(EchoLocalBusiness.class, EchoBean.class);
+      return ShrinkWrap.create(JavaArchive.class, "slsb.jar").addClasses(EchoLocalBusiness.class, EchoBean.class, SimpleLocalBusiness.class, SimpleBean.class);
    }
 
    /**
@@ -90,5 +90,25 @@ public class OpenEJBIntegrationTestCase
       Assert.assertEquals("Expected output was not equal by value", expected, received);
       Assert.assertTrue("Expected output was not equal by reference", expected == received);
       log.info("Got expected result from EJB: " + received);
+   }
+   
+   /**
+    * Tests that inherited injections work (ARQ-372).
+    */
+   @Test
+   public void testInheritedEJBInjections()
+   {
+      Assert.assertNotNull(simpleBean);
+   }
+   
+   /**
+    * Tests that inherited Resource injections work.
+    * TODO This requires a JIRA issue since these injections don't work here.
+    */
+   @Ignore
+   @Test
+   public void testInheritedResourceInjections()
+   {
+      Assert.assertNotNull(testDatabase);
    }
 }

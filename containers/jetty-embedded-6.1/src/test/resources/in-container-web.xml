@@ -12,7 +12,6 @@
       <env-entry-value>Jetty</env-entry-value>
    </env-entry>
 
-   <!-- Should be overridden by jetty-env.xml -->
    <env-entry>
       <env-entry-name>type</env-entry-name>
       <env-entry-type>java.lang.String</env-entry-type>

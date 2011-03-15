@@ -17,7 +17,7 @@
 package org.jboss.arquillian.container.weld.se.embedded_1.shrinkwrap;
 
 import org.jboss.shrinkwrap.api.Assignable;
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
+import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.weld.bootstrap.api.Bootstrap;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 

@@ -21,11 +21,12 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Run;
-import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.api.spec.servlet.web.WebAppDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,14 +40,12 @@ import org.junit.runner.RunWith;
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
-@Run(RunModeType.AS_CLIENT)
 public class TomcatEmbeddedClientTestCase
 {
 	private static final String HELLO_WORLD_URL = "http://localhost:8888/test/Test";
 
 	// -------------------------------------------------------------------------------------||
-	// Class Members
-	// ----------------------------------------------------------------------||
+	// Class Members -----------------------------------------------------------------------||
 	// -------------------------------------------------------------------------------------||
 
 	/**
@@ -55,24 +54,27 @@ public class TomcatEmbeddedClientTestCase
 	private static final Logger log = Logger.getLogger(TomcatEmbeddedClientTestCase.class.getName());
 
 	// -------------------------------------------------------------------------------------||
-	// Instance Members
-	// -------------------------------------------------------------------||
+	// Instance Members --------------------------------------------------------------------||
 	// -------------------------------------------------------------------------------------||
 
 	/**
 	 * Define the deployment
 	 */
-	@Deployment
+	@Deployment(testable = false)
 	public static WebArchive createDeployment()
-   {
+	{
 		return ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestServlet.class)
-         .addWebResource("client-web.xml", "web.xml");
+         .setWebXML(new StringAsset(
+               Descriptors.create(WebAppDescriptor.class)
+                  .version("2.5")
+                  .servlet(TestServlet.class, "/Test")
+                  .exportAsString()
+         ));
 	}
 
 	// -------------------------------------------------------------------------------------||
-	// Tests
-	// ------------------------------------------------------------------------------||
+	// Tests -------------------------------------------------------------------------------||
 	// -------------------------------------------------------------------------------------||
 
 	/**

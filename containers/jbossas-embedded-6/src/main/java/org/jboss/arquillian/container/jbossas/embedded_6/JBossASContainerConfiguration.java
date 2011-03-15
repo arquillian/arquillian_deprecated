@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.jbossas.embedded_6;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.ConfigurationException;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * JBossContainerConfiguration
@@ -36,20 +36,20 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
     * Address the server should bind to. 
     */
    private String bindAddress = "localhost";
-   
+      
    /**
     * Used by Servlet Protocol to connect to the server. 
     */
    private int httpPort = 8080;
    
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.ContainerConfiguration#getContainerProfile()
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
     */
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.STANDALONE;
+   @Override
+   public void validate() throws ConfigurationException
+   {  
    }
-
+   
    public String getProfileName()
    {
       return profileName;

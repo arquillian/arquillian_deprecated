@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.glassfish.embedded_3;
 
-import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;

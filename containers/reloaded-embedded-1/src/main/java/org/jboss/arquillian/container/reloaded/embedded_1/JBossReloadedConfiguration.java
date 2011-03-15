@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.reloaded.embedded_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.ConfigurationException;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * JBossReloadedConfiguration
@@ -27,10 +27,11 @@ import org.jboss.arquillian.spi.ContainerProfile;
  */
 public class JBossReloadedConfiguration implements ContainerConfiguration
 {
-
-   public ContainerProfile getContainerProfile()
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
    {
-      return ContainerProfile.STANDALONE;
    }
-
 }

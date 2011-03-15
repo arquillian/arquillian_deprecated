@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.ConfigurationException;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
  * WeldSEConfiguration
@@ -32,11 +32,14 @@ public class WeldEEMockConfiguration implements ContainerConfiguration
     */
    private boolean enableConversationScope = false;
    
-   public ContainerProfile getContainerProfile()
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   @Override
+   public void validate() throws ConfigurationException
    {
-      return ContainerProfile.STANDALONE;
    }
-
+   
    public void setEnableConversationScope(boolean enableConversationScope)
    {
       this.enableConversationScope = enableConversationScope;

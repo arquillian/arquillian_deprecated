@@ -16,8 +16,8 @@
  */
 package org.jboss.arquillian.junit;
 
-import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestRunner;
+import org.jboss.arquillian.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -38,10 +38,13 @@ public class JUnitDeploymentAppender implements AuxiliaryArchiveAppender
       JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "arquillian-junit.jar")
                         .addPackages(
                               true, 
-                              Package.getPackage("org.junit"),
-                              Package.getPackage("org.hamcrest"),
-                              Package.getPackage("org.jboss.arquillian.junit"))
-                        .addServiceProvider(
+                              junit.framework.Assert.class.getPackage(),
+                              junit.extensions.TestSetup.class.getPackage(),
+                              junit.runner.BaseTestRunner.class.getPackage(),
+                              org.junit.Assert.class.getPackage(),
+                              org.hamcrest.Matcher.class.getPackage(),
+                              Arquillian.class.getPackage())
+                        .addAsServiceProvider(
                               TestRunner.class, 
                               JUnitTestRunner.class);
       try 

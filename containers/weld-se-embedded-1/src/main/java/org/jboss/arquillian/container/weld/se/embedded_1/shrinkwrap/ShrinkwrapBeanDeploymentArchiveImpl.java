@@ -29,10 +29,10 @@ import java.util.Map;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.Assignable;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.Node;
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
-import org.jboss.shrinkwrap.impl.base.AssignableBase;
+import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.impl.base.Validate;
 import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.api.helpers.SimpleServiceRegistry;
@@ -45,7 +45,7 @@ import org.jboss.weld.ejb.spi.EjbDescriptor;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implements ShrinkwrapBeanDeploymentArchive 
+public class ShrinkwrapBeanDeploymentArchiveImpl implements ShrinkwrapBeanDeploymentArchive, Assignable 
 {
    private Archive<?> archive;
    
@@ -61,7 +61,6 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       this.classLoader = new ShrinkWrapClassLoader(archive.getClass().getClassLoader(), archive);
    }
 
-   @Override
    protected Archive<?> getArchive()
    {
       return archive;
@@ -164,5 +163,13 @@ public class ShrinkwrapBeanDeploymentArchiveImpl extends AssignableBase implemen
       className = className.replaceAll("\\.class", "");
       className = className.replaceAll("/", ".");
       return className;
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.shrinkwrap.api.Assignable#as(java.lang.Class)
+    */
+   public <TYPE extends Assignable> TYPE as(Class<TYPE> clazz)
+   {
+      return getArchive().as(clazz);
    }
 }

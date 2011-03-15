@@ -20,32 +20,21 @@ import static org.jboss.arquillian.container.weld.ee.embedded_1_1.Utils.findArch
 import static org.jboss.arquillian.container.weld.ee.embedded_1_1.Utils.findBeanClasses;
 import static org.jboss.arquillian.container.weld.ee.embedded_1_1.Utils.findBeansXml;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
-import org.jboss.arquillian.container.weld.ee.embedded_1_1.mock.MockHttpSession;
-import org.jboss.arquillian.container.weld.ee.embedded_1_1.mock.MockServletContext;
 import org.jboss.arquillian.container.weld.ee.embedded_1_1.mock.TestContainer;
-import org.jboss.arquillian.protocol.local.LocalMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.arquillian.spi.event.container.AfterDeploy;
-import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
-import org.jboss.arquillian.spi.event.suite.After;
-import org.jboss.arquillian.spi.event.suite.Before;
-import org.jboss.arquillian.spi.event.suite.EventHandler;
-import org.jboss.arquillian.spi.event.suite.TestEvent;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
+import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
+import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.weld.bootstrap.api.Bootstrap;
 import org.jboss.weld.manager.api.WeldManager;
-import org.jboss.weld.servlet.HttpSessionManager;
 
 /**
  * WeldEEMockConainer
@@ -53,89 +42,86 @@ import org.jboss.weld.servlet.HttpSessionManager;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class WeldEEMockContainer implements DeployableContainer
+public class WeldEEMockContainer implements DeployableContainer<WeldEEMockConfiguration>
 {
-   public void setup(Context context, Configuration configuration)
-   {
-   }
+   @Inject @ContainerScoped
+   private InstanceProducer<WeldEEMockConfiguration> configuration;
+   
+   @Inject @DeploymentScoped
+   private InstanceProducer<TestContainer> testContainerProducer; 
+   
+   @Inject @DeploymentScoped
+   private InstanceProducer<Bootstrap> bootstrapProducer; 
 
-   public void start(Context context) throws LifecycleException
-   {
-   }
+   @Inject @DeploymentScoped
+   private InstanceProducer<WeldManager> weldManagerProducer; 
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
-   {
-      boolean enableConversation = context.get(Configuration.class)
-                                          .getContainerConfig(WeldEEMockConfiguration.class)
-                                          .isEnableConversationScope();
+   @Inject @DeploymentScoped
+   private InstanceProducer<ContextClassLoaderManager> contextClassLoaderManagerProducer; 
       
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Local");
+   }
+   
+   public Class<WeldEEMockConfiguration> getConfigurationClass()
+   {
+      return WeldEEMockConfiguration.class;
+   }
+   
+   public void setup(WeldEEMockConfiguration configuration)
+   {
+      this.configuration.set(configuration);
+   }
+
+   public void start() throws LifecycleException
+   {
+   }
+
+   public ProtocolMetaData deploy(Archive<?> archive) throws DeploymentException
+   {  
       ShrinkWrapClassLoader classLoader = new ShrinkWrapClassLoader(archive.getClass().getClassLoader(), archive);
       ContextClassLoaderManager classLoaderManager = new ContextClassLoaderManager(classLoader);
       classLoaderManager.enable();
       
       TestContainer container = new TestContainer(findArchiveId(archive), findBeansXml(archive), findBeanClasses(archive, classLoader));
-      Bootstrap bootstrap = container.getLifecycle().getBootstrap();
+      Bootstrap bootstrap = container.getBootstrap();
 
-      context.add(ContextClassLoaderManager.class, classLoaderManager);
+      contextClassLoaderManagerProducer.set(classLoaderManager);
 
       container.startContainer();
-      
-      context.add(TestContainer.class, container);
-      context.add(Bootstrap.class, bootstrap);
+
+      testContainerProducer.set(container);
+      bootstrapProducer.set(bootstrap);
+
       // Assume a flat structure
-      context.add(WeldManager.class, container.getBeanManager(container.getDeployment().getBeanDeploymentArchives().iterator().next()));
+      weldManagerProducer.set(container.getBeanManager(container.getDeployment().getBeanDeploymentArchives().iterator().next()));
 
-      context.register(AfterDeploy.class, new SessionLifeCycleCreator());
-      context.register(BeforeUnDeploy.class, new SessionLifeCycleDestoryer());
-      
-      context.register(Before.class, new RequestLifeCycleCreator());
-
-      // handler to 'Produce' a fake HTTPSession
-      // TODO: Weld ConversationManager should communicate with a Service so it's possible to override the HttpSessionManager as part of Bootstrap.
-      context.register(Before.class, new EventHandler<TestEvent>()
-      {
-         private Map<String, HttpSession> sessionStore = new HashMap<String, HttpSession>();
-         
-         public void callback(Context context, TestEvent event) throws Exception
-         {
-            WeldManager manager = context.get(WeldManager.class);
-            CDISessionID id = context.get(CDISessionID.class);
-            if(id != null)
-            {
-               HttpSessionManager sessionManager = Utils.getBeanReference(manager, HttpSessionManager.class);
-
-               HttpSession session = sessionStore.get(id.getId()); 
-               if(session == null)
-               {
-                  session = new MockHttpSession(id.getId(), new MockServletContext("/"));
-               }
-               sessionManager.setSession(session);
-               sessionStore.put(id.getId(), session);
-            }
-         }
-      });
-      if(enableConversation)
-      {
-         context.register(Before.class, new ConversationLifeCycleCreator());         
-         context.register(After.class, new ConversationLifeCycleDestoryer());
-      }
-      context.register(After.class, new RequestLifeCycleDestroyer());
-      
-      return new LocalMethodExecutor();
+      return new ProtocolMetaData();
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public void undeploy(Archive<?> archive) throws DeploymentException
    {
-      TestContainer container = context.get(TestContainer.class);
+      TestContainer container = testContainerProducer.get();
       if(container != null)
       {
          container.stopContainer();
       }
-      ContextClassLoaderManager classLoaderManager = context.get(ContextClassLoaderManager.class);
+      ContextClassLoaderManager classLoaderManager = contextClassLoaderManagerProducer.get();
       classLoaderManager.disable();
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
+   }
+   
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("Weld EE Container does not support deployment of Descriptors");      
+   }
+   
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      throw new UnsupportedOperationException("Weld EE Container does not support undeployment of Descriptors");
    }
 }

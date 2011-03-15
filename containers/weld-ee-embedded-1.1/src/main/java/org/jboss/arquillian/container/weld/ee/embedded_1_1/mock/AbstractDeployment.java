@@ -31,7 +31,6 @@ import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 import org.jboss.weld.bootstrap.spi.Deployment;
 import org.jboss.weld.bootstrap.spi.Metadata;
 import org.jboss.weld.ejb.spi.EjbServices;
-import org.jboss.weld.resources.spi.ResourceLoader;
 import org.jboss.weld.security.spi.SecurityServices;
 import org.jboss.weld.transaction.spi.TransactionServices;
 import org.jboss.weld.validation.spi.ValidationServices;
@@ -67,7 +66,6 @@ public abstract class AbstractDeployment implements Deployment
       services.add(SecurityServices.class, new MockSecurityServices());
       services.add(ValidationServices.class, new MockValidationServices());
       services.add(EjbServices.class, new MockEjBServices());
-      services.add(ResourceLoader.class, new MockResourceLoader());
    }
 
    public Collection<BeanDeploymentArchive> getBeanDeploymentArchives()

@@ -18,7 +18,7 @@ package org.jboss.arquillian.container.weld.se.embedded_1;
 
 import java.io.IOException;
 
-import org.jboss.shrinkwrap.classloader.ShrinkWrapClassLoader;
+import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 
 /**
  * ContextClassLoaderManager

@@ -32,6 +32,33 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Deployment {
-
+public @interface Deployment 
+{
+   /**
+    * Name the deployment so you can reference it using the Deployer API
+    * @return The name of this Deployment
+    */
+   String name() default "NO-NAME";
+   
+   /**
+    * Describes whether or not this deployment should be deployed during Test startup.
+    * 
+    * @return
+    */
+   boolean startup() default true;
+   
+   /**
+    * If multiple deployments are specified against the same target and defined as startup, this control the order of which they
+    * will be given to the Container.
+    * 
+    * @return
+    */
+   int order() default -1;
+   
+   /**
+    * Defines if this deployment should be wrapped up based on the protocol so the testcase can be executed incontainer. 
+    * 
+    * @return
+    */
+   boolean testable() default true;
 }

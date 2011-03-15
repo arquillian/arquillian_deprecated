@@ -22,7 +22,7 @@
    <!-- Properties -->
    <properties>
       <arquillian.version>${project.parent.version}</arquillian.version>
-      <weld-core.version>1.1.0.Beta1</weld-core.version>
+      <weld-core.version>1.1.0.Final</weld-core.version>
    </properties>
 
    <dependencyManagement>
@@ -59,11 +59,6 @@
          <groupId>org.jboss.arquillian.testenricher</groupId>
          <artifactId>arquillian-testenricher-cdi</artifactId>
          <version>${arquillian.version}</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.jboss.shrinkwrap</groupId>
-         <artifactId>shrinkwrap-extension-classloader</artifactId>
       </dependency>
 
       <dependency>
@@ -198,5 +193,4 @@
          </pluginRepositories>
       </profile>
    </profiles>
-
 </project>

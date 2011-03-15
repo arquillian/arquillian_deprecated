@@ -23,20 +23,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
+import javax.naming.Context;
+
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.deployers.spi.management.deploy.DeploymentManager;
+import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
+import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.jbossas.servermanager.Argument;
 import org.jboss.jbossas.servermanager.Property;
 import org.jboss.jbossas.servermanager.Server;
 import org.jboss.jbossas.servermanager.ServerController;
 import org.jboss.jbossas.servermanager.ServerManager;
+import org.jboss.profileservice.spi.ProfileKey;
+import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 /**
  * JbossLocalContainer
@@ -44,7 +49,7 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
  * @author <a href="mailto:aamonten@gmail.com">Alejandro Montenegro</a>
  * @version $Revision: $
  */
-public class JBossASLocalContainer implements DeployableContainer
+public class JBossASLocalContainer implements DeployableContainer<JBossASConfiguration>
 {
    private static Logger log = Logger.getLogger(JBossASLocalContainer.class.getName());
 
@@ -54,20 +59,27 @@ public class JBossASLocalContainer implements DeployableContainer
 
    private final List<String> failedUndeployments = new ArrayList<String>();
 
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#setup(org.jboss.arquillian.spi.Context, org.jboss.arquillian.spi.Configuration)
-   */
-   public void setup(Context context, Configuration configuration)
+   private ProfileService profileService;
+   private DeploymentManager deploymentManager;
+
+   public ProtocolDescription getDefaultProtocol()
    {
-      this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
+      return new ProtocolDescription("Servlet 2.5");
+   }
+   
+   public Class<JBossASConfiguration> getConfigurationClass()
+   {
+      return JBossASConfiguration.class;
+   }
+   
+   public void setup(JBossASConfiguration configuration)
+   {
+      this.configuration = configuration;
       
       manager = createAndConfigureServerManager();
    }
    
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#start(org.jboss.arquillian.spi.Context)
-   */
-   public void start(Context context) throws LifecycleException
+   public void start() throws LifecycleException
    {
       try
       {
@@ -82,17 +94,15 @@ public class JBossASLocalContainer implements DeployableContainer
          }
          
          manager.startServer(server.getName());
+         initProfileService(server);
       }
-      catch (IOException e)
+      catch (Exception e)
       {
          throw new LifecycleException("Could not start remote container", e);
       }
    }
 
-   /* (non-Javadoc)
-   * @see org.jboss.arquillian.spi.DeployableContainer#stop(org.jboss.arquillian.spi.Context)
-   */
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       Server server = manager.getServer(configuration.getProfileName());
       if(!server.isRunning())
@@ -119,71 +129,96 @@ public class JBossASLocalContainer implements DeployableContainer
    }
 
    /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#deploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
     */
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if (archive == null)
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      if (manager == null)
-      {
-         throw new IllegalStateException("Container has not been setup");
-      }
+      // TODO Auto-generated method stub
+      
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
       final String deploymentName = archive.getName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
 
-      File file = new File(deploymentName);
-      archive.as(ZipExporter.class).exportZip(file, true);
-
-      Server server = manager.getServer(configuration.getProfileName());
+      deploy(deploymentName, deploymentUrl);
       try
       {
-         server.deploy(file);
+         return ManagementViewParser.parse(deploymentName, profileService);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
+   }
+
+   public void undeploy(final Archive<?> archive) throws DeploymentException
+   {
+      undeploy(archive.getName());
+   }
+
+   private void deploy(String deploymentName, URL url) throws DeploymentException
+   {
+      Exception failure = null;
+      try
+      {
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, url, true);
+         distribute.run();
+         DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
+         if(uploadStatus.isFailed()) 
+         {
+            failure = uploadStatus.getFailure();
+            undeploy(deploymentName);
+         } 
+         else 
+         {
+            DeploymentProgress progress = deploymentManager.start(deploymentName);
+            progress.run();
+            DeploymentStatus status = progress.getDeploymentStatus();
+            if (status.isFailed())
+            {
+               failure = status.getFailure();
+               undeploy(deploymentName);
+            }
+         }
       }
       catch (Exception e)
       {
          throw new DeploymentException("Could not deploy " + deploymentName, e);
       }
+      if (failure != null)
+      {
+         throw new DeploymentException("Failed to deploy " + deploymentName, failure);
+      }
+   }
+   
+   private void undeploy(String name) throws DeploymentException
+   {
       try
       {
-         return new ServletMethodExecutor(new URL(server.getHttpUrl().toExternalForm() + "/"));
+         DeploymentProgress stopProgress = deploymentManager.stop(name);
+         stopProgress.run();
+
+         DeploymentProgress undeployProgress = deploymentManager.remove(name);
+         undeployProgress.run();
+         if (undeployProgress.getDeploymentStatus().isFailed())
+         {
+            failedUndeployments.add(name);
+         }
       }
       catch (Exception e)
       {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
-      }
-   }
-
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.DeployableContainer#undeploy(org.jboss.arquillian.spi.Context, org.jboss.shrinkwrap.api.Archive)
-    */
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
-   {
-      if (archive == null)
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      // we only need the File, not the content to undeploy.
-      File file = new File(archive.getName());
-      undeploy(file);
-   }
-
-   private void undeploy(File file) throws DeploymentException
-   {
-      Server server = manager.getServer(configuration.getProfileName());
-      try
-      {
-         server.undeploy(file);
-      }
-      catch (Exception e)
-      {
-         failedUndeployments.add(file.getName());
-         throw new DeploymentException("Could not undeploy " + file.getName(), e);
-      } 
-      finally
-      {
-         file.delete();
+         throw new DeploymentException("Could not undeploy " + name, e);
       }
    }
 
@@ -212,13 +247,28 @@ public class JBossASLocalContainer implements DeployableContainer
       failedUndeployments.clear();
    }
 
+   private void initProfileService(Server server) throws Exception 
+   {
+      String profileName = configuration.getProfileName();
+      Context ctx = server.getNamingContext();
+      profileService = (ProfileService) ctx.lookup("ProfileService");
+
+      deploymentManager = profileService.getDeploymentManager();
+
+      ProfileKey defaultKey = new ProfileKey(profileName);
+      deploymentManager.loadProfile(defaultKey);
+   }
+
    /*
     * Internal Helpers for Creating and Configuring ServerManager and Server.
     */
    
    private ServerManager createAndConfigureServerManager()
    {
-      ServerManager manager = new ServerManager();
+      ServerManager manager = new ArquillianServerManager(
+            configuration.getStartupTimeoutInSeconds(),
+            configuration.getShutdownTimeoutInSeconds()
+      );
       if(configuration.getJbossHome() != null) 
       {
          manager.setJbossHome(configuration.getJbossHome());
@@ -236,7 +286,9 @@ public class JBossASLocalContainer implements DeployableContainer
       Server server = new Server();
       server.setName(configuration.getProfileName());
       server.setHttpPort(configuration.getHttpPort());
+      server.setRmiPort(configuration.getRmiPort());
       server.setHost(configuration.getBindAddress());
+      server.setHasWebServer(!configuration.isUseRmiPortForAliveCheck());
       
       server.setUsername("admin");
       server.setPassword("admin");

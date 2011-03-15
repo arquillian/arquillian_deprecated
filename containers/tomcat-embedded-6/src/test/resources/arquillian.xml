@@ -1,25 +1,14 @@
-<?xml version="1.0"?>
-<arquillian xmlns="http://jboss.com/arquillian"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:tomcat6="urn:arq:org.jboss.arquillian.container.tomcat.embedded_6">
-
-   <!-- Uncomment to have test archives exported to the file system for inspection -->
-   <!--
-   <engine>
-      <deploymentExportPath>target/test-archives</deploymentExportPath>
-   </engine>
-   -->
-
-	<tomcat6:container>
-		<tomcat6:tomcatHome>target/tomcat-embedded-6</tomcat6:tomcatHome>
-      <!-- other options for setting tomcatHome -->
-		<!--tomcat6:tomcatHome>/path/to/apache-tomcat-6.0.20</tomcat6:tomcatHome-->
-		<!--tomcat6:tomcatHome>${env.CATALINA_HOME}</tomcat6:tomcatHome-->
-		<tomcat6:workDir>work</tomcat6:workDir> 
-		<tomcat6:appBase>webapps</tomcat6:appBase> 
-		<tomcat6:bindHttpPort>8888</tomcat6:bindHttpPort>
-      <!-- unpackArchive must be true if using the Weld Servlet module -->
-		<tomcat6:unpackArchive>true</tomcat6:unpackArchive>
-	</tomcat6:container>
-
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<arquillian 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+	
+       <container qualifier="tomcat" default="true">
+           <configuration>
+               <property name="tomcatHome">target/tomcat-embedded-6</property>
+               <property name="workDir">work</property>
+               <property name="bindHttpPort">8888</property>
+               <property name="unpackArchive">true</property>
+           </configuration>
+       </container>
 </arquillian>

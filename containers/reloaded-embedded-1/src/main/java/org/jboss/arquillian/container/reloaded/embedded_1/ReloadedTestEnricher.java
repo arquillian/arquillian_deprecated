@@ -18,11 +18,9 @@ package org.jboss.arquillian.container.reloaded.embedded_1;
 
 import java.lang.reflect.Method;
 
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestEnricher;
-import org.jboss.arquillian.spi.event.container.BeforeUnDeploy;
-import org.jboss.arquillian.spi.event.container.ContainerEvent;
-import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.arquillian.spi.core.Instance;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.beans.info.spi.BeanAccessMode;
 import org.jboss.beans.metadata.plugins.builder.BeanMetaDataBuilderFactory;
 import org.jboss.beans.metadata.spi.builder.BeanMetaDataBuilder;
@@ -39,7 +37,6 @@ import org.jboss.kernel.spi.dependency.KernelController;
  */
 public class ReloadedTestEnricher implements TestEnricher
 {
-
    //-------------------------------------------------------------------------------------||
    // Class Members ----------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
@@ -52,6 +49,13 @@ public class ReloadedTestEnricher implements TestEnricher
    static final String BIND_NAME_TEST = "org.jboss.arquillian.CurrentTest";
 
    //-------------------------------------------------------------------------------------||
+   // Instance Members -------------------------------------------------------------------||
+   //-------------------------------------------------------------------------------------||
+
+   @Inject 
+   private Instance<MCServer> mcServer;
+   
+   //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
@@ -59,10 +63,10 @@ public class ReloadedTestEnricher implements TestEnricher
     * {@inheritDoc}
     * @see org.jboss.arquillian.spi.TestEnricher#enrich(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
-   public void enrich(final Context context, final Object testCase)
+   public void enrich(final Object testCase)
    {
       // Obtain the server as set from the container
-      final MCServer server = context.get(MCServer.class);
+      final MCServer server = mcServer.get();
       assert server != null : "MC Server was not set by the container";
 
       // Get the Controller
@@ -74,7 +78,6 @@ public class ReloadedTestEnricher implements TestEnricher
       try
       {
          controller.install(bmdb.getBeanMetaData(), testCase);
-         context.getParentContext().register(BeforeUnDeploy.class, new TestCaseUnInstaller());
       }
       catch (final Throwable e)
       {
@@ -84,24 +87,10 @@ public class ReloadedTestEnricher implements TestEnricher
 
    /**
     * {@inheritDoc}
-    * @see org.jboss.arquillian.spi.TestEnricher#resolve(org.jboss.arquillian.spi.Context, java.lang.reflect.Method)
+    * @see org.jboss.arquillian.spi.TestEnricher#resolve(java.lang.reflect.Method)
     */
-   public Object[] resolve(final Context context, final Method method)
+   public Object[] resolve(final Method method)
    {
       return new Object[method.getParameterTypes().length];
-   }
-
-   /**
-    * Uninstall the installed test case from the MCServer before undeploying. 
-    *
-    * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
-    * @version $Revision: $
-    */
-   private static class TestCaseUnInstaller implements EventHandler<ContainerEvent>
-   {
-      public void callback(final Context context, final ContainerEvent event) throws Exception
-      {
-         context.get(MCServer.class).getKernel().getController().uninstall(ReloadedTestEnricher.BIND_NAME_TEST);
-      }
    }
 }

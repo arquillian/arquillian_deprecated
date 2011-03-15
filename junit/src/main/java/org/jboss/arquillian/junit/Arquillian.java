@@ -23,12 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jboss.arquillian.impl.DeployableTestBuilder;
-import org.jboss.arquillian.impl.XmlConfigurationBuilder;
-import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
-import org.jboss.arquillian.spi.util.TestEnrichers;
 import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunListener;
@@ -81,8 +79,7 @@ public class Arquillian extends BlockJUnit4ClassRunner
             {
                 throw new RuntimeException("Arquillian has previously been attempted initialized, but failed. See previous exceptions for cause.");
             }
-            Configuration configuration = new XmlConfigurationBuilder().build();
-            TestRunnerAdaptor adaptor = DeployableTestBuilder.build(configuration);
+            TestRunnerAdaptor adaptor = DeployableTestBuilder.build();
             try 
             {
                // don't set it if beforeSuite fails
@@ -114,8 +111,11 @@ public class Arquillian extends BlockJUnit4ClassRunner
                if(deployableTest.get() != null && lastCreatedRunner.get() == Arquillian.this) 
                {
                   deployableTest.get().afterSuite();
+                  deployableTest.get().shutdown();
                   lastCreatedRunner.set(null);
+                  lastCreatedRunner.remove();
                   deployableTest.set(null);
+                  deployableTest.remove();
                }
             } 
             catch (Exception e) 
@@ -148,24 +148,29 @@ public class Arquillian extends BlockJUnit4ClassRunner
       }
    }
       
+   /*
+    * Override BeforeClass/AfterClass and Before/After handling.
+    * 
+    * Let super create the Before/After chain against a EmptyStatement so our newly created Statement
+    * only contains the method that are of interest to us(@Before..etc). 
+    * They can then optionally be executed if we get expected callback.
+    * 
+    */
+   
+   
    @Override
    protected Statement withBeforeClasses(final Statement originalStatement)
    {
-      final Statement statementWithBefores = super.withBeforeClasses(originalStatement);
+      final Statement onlyBefores = super.withBeforeClasses(new EmptyStatement());
       return new Statement() 
       {
          @Override
          public void evaluate() throws Throwable
          {
-            try
-            {
-               deployableTest.get().beforeClass(Arquillian.this.getTestClass().getJavaClass());
-               statementWithBefores.evaluate();
-            } 
-            catch (Exception e) // catch and rethrow only to be able to set a break point. 
-            {
-               throw e;
-            }
+            deployableTest.get().beforeClass(
+                  Arquillian.this.getTestClass().getJavaClass(), 
+                  new StatementLifecycleExecutor(onlyBefores));
+            originalStatement.evaluate();
          }
       };
    }
@@ -173,38 +178,40 @@ public class Arquillian extends BlockJUnit4ClassRunner
    @Override
    protected Statement withAfterClasses(final Statement originalStatement)
    {
-      final Statement statementWithAfters = super.withAfterClasses(originalStatement);
+      final Statement onlyAfters = super.withAfterClasses(new EmptyStatement());
       return new Statement() 
       {
          @Override
          public void evaluate() throws Throwable
          {
-            new MultiStatementExecutor().execute
+            multiExecute
             (
-                  new Statement() { public void evaluate() throws Throwable
-                  {
-                     statementWithAfters.evaluate();
-                  }},
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     deployableTest.get().afterClass(Arquillian.this.getTestClass().getJavaClass());
-                  }}
+               originalStatement,
+               new Statement() { @Override public void evaluate() throws Throwable 
+               {
+                  deployableTest.get().afterClass(
+                        Arquillian.this.getTestClass().getJavaClass(), 
+                        new StatementLifecycleExecutor(onlyAfters));
+               }}
             );
          }
       };
-   }
+   }   
    
    @Override
    protected Statement withBefores(final FrameworkMethod method, final Object target, final Statement originalStatement)
    {
-      final Statement statementWithBefores = super.withBefores(method, target, originalStatement);
+      final Statement onlyBefores = super.withBefores(method, target, new EmptyStatement());
       return new Statement()
       {
          @Override
          public void evaluate() throws Throwable
          {
-            deployableTest.get().before(target, method.getMethod());
-            statementWithBefores.evaluate();
+            deployableTest.get().before(
+                  target, 
+                  method.getMethod(), 
+                  new StatementLifecycleExecutor(onlyBefores));
+            originalStatement.evaluate();
          }
       };
    }
@@ -212,27 +219,27 @@ public class Arquillian extends BlockJUnit4ClassRunner
    @Override
    protected Statement withAfters(final FrameworkMethod method, final Object target, final Statement originalStatement)
    {
-      final Statement statementWithAfters = super.withAfters(method, target, originalStatement);
+      final Statement onlyAfters = super.withAfters(method, target, new EmptyStatement());
       return new Statement()
       {
          @Override
          public void evaluate() throws Throwable
          {
-            new MultiStatementExecutor().execute
+            multiExecute
             (
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     statementWithAfters.evaluate();
-                  }},
-                  new Statement() { public void evaluate() throws Throwable 
-                  {
-                     deployableTest.get().after(target, method.getMethod());
-                  }}
+               originalStatement, 
+               new Statement() { @Override public void evaluate() throws Throwable
+               {
+                  deployableTest.get().after(
+                        target, 
+                        method.getMethod(), 
+                        new StatementLifecycleExecutor(onlyAfters));
+               }}
             );
          }
       };
    }
-   
+      
    @Override
    protected Statement methodInvoker(final FrameworkMethod method, final Object test)
    {
@@ -243,12 +250,13 @@ public class Arquillian extends BlockJUnit4ClassRunner
          {
             TestResult result = deployableTest.get().test(new TestMethodExecutor()
             {
-               public void invoke() throws Throwable
+               @Override
+               public void invoke(Object... parameters) throws Throwable
                {
                   try
                   {
-                     Object parameterValues = TestEnrichers.enrich(deployableTest.get().getActiveContext(), getMethod());
-                     method.invokeExplosively(test, (Object[])parameterValues);
+                     //Object parameterValues = TestEnrichers.enrich(deployableTest.get().getActiveContext(), getMethod());
+                     method.invokeExplosively(test, parameters); //, (Object[])parameterValues);
                   } 
                   catch (Throwable e) 
                   {
@@ -277,7 +285,7 @@ public class Arquillian extends BlockJUnit4ClassRunner
    }
 
    /**
-    * A helper class to safely execute multiple statements in one.<br/>
+    * A helper to safely execute multiple statements in one.<br/>
     * 
     * Will execute all statements even if they fail, all exceptions will be kept. If multiple {@link Statement}s
     * fail, a {@link MultipleFailureException} will be thrown.
@@ -285,31 +293,51 @@ public class Arquillian extends BlockJUnit4ClassRunner
     * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
     * @version $Revision: $
     */
-   private class MultiStatementExecutor 
+   private void multiExecute(Statement... statements) throws Throwable 
    {
-      public void execute(Statement... statements) throws Throwable 
+      List<Throwable> exceptions = new ArrayList<Throwable>();
+      for(Statement command : statements) 
       {
-         List<Throwable> exceptions = new ArrayList<Throwable>();
-         for(Statement command : statements) 
+         try
          {
-            try
-            {
-               command.evaluate();
-            } 
-            catch (Exception e) 
-            {
-               exceptions.add(e);
-            }
-         }
-         if(exceptions.isEmpty())
+            command.evaluate();
+         } 
+         catch (Exception e) 
          {
-            return;
+            exceptions.add(e);
          }
-         if(exceptions.size() == 1)
-         {
-            throw exceptions.get(0);
-         }
-         throw new MultipleFailureException(exceptions);
+      }
+      if(exceptions.isEmpty())
+      {
+         return;
+      }
+      if(exceptions.size() == 1)
+      {
+         throw exceptions.get(0);
+      }
+      throw new MultipleFailureException(exceptions);
+   }
+   
+   private static class EmptyStatement extends Statement
+   {
+      @Override
+      public void evaluate() throws Throwable
+      {
+      }
+   }
+ 
+   private static class StatementLifecycleExecutor implements LifecycleMethodExecutor
+   {
+      private Statement statement;
+      
+      public StatementLifecycleExecutor(Statement statement)
+      {
+         this.statement = statement;
+      }
+      
+      public void invoke() throws Throwable
+      {
+         statement.evaluate();
       }
    }
 }

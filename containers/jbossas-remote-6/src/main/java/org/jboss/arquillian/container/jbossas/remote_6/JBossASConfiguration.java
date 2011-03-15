@@ -16,11 +16,11 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_6;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.ConfigurationException;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the JBoss AS container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
@@ -34,32 +34,17 @@ public class JBossASConfiguration implements ContainerConfiguration
     */
    private String profileName = "default";
       
-   /**
-    * Used by Servlet Protocol to connect to deployment.
-    * // TODO: these belongs to the configuration of Servlet Protocol. Extract out. 
-    */
-   private String remoteServerAddress = "localhost";
-
-   /**
-    * Used by Servlet Protocol to connect to deployment.
-    */
-   private int remoteServerHttpPort = 8080;
-
-   /**
-    * Bind Address for HTTP server for serving deployments to the remote server.
-    * Address should be reachable from remote server. 
-    */
-   private String localDeploymentBindAddress = "localhost";
+   private String contextFactory = "org.jnp.interfaces.NamingContextFactory";
    
-   /**
-    * Bind Port for HTTP server for serving deployments to remote server.
-    * Port must be reachable from remote server.
-    */
-   private int localDeploymentBindPort = 9999;
+   private String urlPkgPrefix = "org.jboss.naming:org.jnp.interfaces";
    
-   public ContainerProfile getContainerProfile()
-   {
-      return ContainerProfile.CLIENT;
+   private String providerUrl = "jnp://localhost:1099";
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   public void validate() throws ConfigurationException
+   {  
    }
    
    public String getProfileName()
@@ -72,43 +57,51 @@ public class JBossASConfiguration implements ContainerConfiguration
       this.profileName = profileName;
    }
 
-   public String getRemoteServerAddress()
+   /**
+    * @param contextFactory the contextFactory to set
+    */
+   public void setContextFactory(String contextFactory)
    {
-      return remoteServerAddress;
-   }
-
-   public void setRemoteServerAddress(String remoteServerAddress)
-   {
-      this.remoteServerAddress = remoteServerAddress;
-   }
-
-   public int getRemoteServerHttpPort()
-   {
-      return remoteServerHttpPort;
-   }
-
-   public void setRemoteServerHttpPort(int remoteServerHttpPort)
-   {
-      this.remoteServerHttpPort = remoteServerHttpPort;
+      this.contextFactory = contextFactory;
    }
    
-   public String getLocalDeploymentBindAddress()
+   /**
+    * @return the contextFactory
+    */
+   public String getContextFactory()
    {
-      return localDeploymentBindAddress;
+      return contextFactory;
    }
    
-   public void setLocalDeploymentBindAddress(String localDeploymentBindAddress)
+   /**
+    * @param provierUrl the provierUrl to set
+    */
+   public void setProviderUrl(String provierUrl)
    {
-      this.localDeploymentBindAddress = localDeploymentBindAddress;
+      this.providerUrl = provierUrl;
    }
    
-   public int getLocalDeploymentBindPort()
+   /**
+    * @return the provierUrl
+    */
+   public String getProviderUrl()
    {
-      return localDeploymentBindPort;
+      return providerUrl;
    }
    
-   public void setLocalDeploymentBindPort(int localDeploymentBindPort)
+   /**
+    * @param urlPkgPrefix the urlPkgPrefix to set
+    */
+   public void setUrlPkgPrefix(String urlPkgPrefix)
    {
-      this.localDeploymentBindPort = localDeploymentBindPort;
+      this.urlPkgPrefix = urlPkgPrefix;
+   }
+   
+   /**
+    * @return the urlPkgPrefix
+    */
+   public String getUrlPkgPrefix()
+   {
+      return urlPkgPrefix;
    }
 }

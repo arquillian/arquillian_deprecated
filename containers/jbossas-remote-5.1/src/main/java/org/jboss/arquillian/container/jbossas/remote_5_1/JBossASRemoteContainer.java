@@ -16,38 +16,27 @@
  */
 package org.jboss.arquillian.container.jbossas.remote_5_1;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.InitialContext;
 
-import org.jboss.arquillian.protocol.servlet_2_5.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.deployers.spi.management.deploy.DeploymentManager;
 import org.jboss.deployers.spi.management.deploy.DeploymentProgress;
 import org.jboss.deployers.spi.management.deploy.DeploymentStatus;
 import org.jboss.profileservice.spi.ProfileKey;
 import org.jboss.profileservice.spi.ProfileService;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.virtual.VFS;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
 /**
  * JbossRemoteContainer
@@ -55,32 +44,34 @@ import com.sun.net.httpserver.HttpServer;
  * @author <a href="mailto:aslak@conduct.no">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class JBossASRemoteContainer implements DeployableContainer
+public class JBossASRemoteContainer implements DeployableContainer<JBossASConfiguration>
 {
    private final List<String> failedUndeployments = new ArrayList<String>();
+   private ProfileService profileService;
    private DeploymentManager deploymentManager;
+   private InitialContext context;
 
-   private HttpServer httpFileServer;
-   
    private JBossASConfiguration configuration;
    
-   public void setup(Context context, Configuration configuration)
+   public ProtocolDescription getDefaultProtocol()
    {
-      this.configuration = configuration.getContainerConfig(JBossASConfiguration.class);
+      return new ProtocolDescription("Servlet 2.5");
    }
    
-   public void start(Context context) throws LifecycleException
+   public Class<JBossASConfiguration> getConfigurationClass()
+   {
+      return JBossASConfiguration.class;
+   }
+   
+   public void setup(JBossASConfiguration configuration)
+   {
+      this.configuration = configuration;
+   }
+   
+   public void start() throws LifecycleException
    {
       try 
       {
-         // TODO: configure http bind address
-         httpFileServer = HttpServer.create();
-         httpFileServer.bind(
-               new InetSocketAddress(
-                     InetAddress.getByName(configuration.getLocalDeploymentBindAddress()), 
-                     configuration.getLocalDeploymentBindPort()), 
-               -1);
-         httpFileServer.start();
          initDeploymentManager();
       } 
       catch (Exception e) 
@@ -89,11 +80,10 @@ public class JBossASRemoteContainer implements DeployableContainer
       }
    }
    
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try 
       {
-         httpFileServer.stop(0);
          removeFailedUnDeployments();
       } 
       catch (Exception e) 
@@ -102,42 +92,51 @@ public class JBossASRemoteContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, final Archive<?> archive) throws DeploymentException
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      if(archive == null) 
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      if (deploymentManager == null)
-      {
-         throw new IllegalStateException("start has not been called!");
-      }
-      String deploymentName = archive.getName();
+      // TODO Auto-generated method stub
       
+   }
+   
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
+    */
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO Auto-generated method stub
+      
+   }
+
+   public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
+   {
+      String deploymentName = archive.getName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(archive);
+      
+      deploy(deploymentName, deploymentUrl);
+      try
+      {
+         return ManagementViewParser.parse(deploymentName, profileService);
+      }
+      catch (Exception e) 
+      {
+         throw new DeploymentException("Could not extract deployment metadata", e);
+      }
+   }
+
+   public void undeploy(final Archive<?> archive) throws DeploymentException
+   {
+      undeploy(archive.getName());
+   }
+
+   private void deploy(String deploymentName, URL url) throws DeploymentException
+   {
       Exception failure = null;
       try
       {
-         httpFileServer.createContext("/" + deploymentName, new HttpHandler()
-         {
-            public void handle(HttpExchange exchange) throws IOException
-            {
-               InputStream zip = archive.as(ZipExporter.class).exportZip();
-               ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-               JBossASRemoteContainer.copy(zip, zipStream);
-               zip.close();
-
-               byte[] zipArray = zipStream.toByteArray();
-               exchange.sendResponseHeaders(200, zipArray.length);
-
-               OutputStream out = exchange.getResponseBody();
-               out.write(zipArray);
-               out.close();
-
-            }
-         });
-         URL fileServerUrl = createFileServerURL(deploymentName);
-         
-         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, fileServerUrl, true);
+         DeploymentProgress distribute = deploymentManager.distribute(deploymentName, url, true);
          distribute.run();
          DeploymentStatus uploadStatus = distribute.getDeploymentStatus(); 
          if(uploadStatus.isFailed()) 
@@ -165,29 +164,6 @@ public class JBossASRemoteContainer implements DeployableContainer
       {
          throw new DeploymentException("Failed to deploy " + deploymentName, failure);
       }
-      try 
-      {
-         return new ServletMethodExecutor(
-               new URL(
-                     "http",
-                     configuration.getRemoteServerAddress(),
-                     configuration.getRemoteServerHttpPort(), 
-                     "/")
-               );
-      } 
-      catch (Exception e) 
-      {
-         throw new RuntimeException("Could not create ContianerMethodExecutor", e);
-      }
-   }
-
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
-   {
-      if(archive == null) 
-      {
-         throw new IllegalArgumentException("Archive must be specified");
-      }
-      undeploy(archive.getName());
    }
 
    private void undeploy(String name) throws DeploymentException
@@ -203,7 +179,6 @@ public class JBossASRemoteContainer implements DeployableContainer
          {
             failedUndeployments.add(name);
          }
-         httpFileServer.removeContext("/" + name);
       }
       catch (Exception e)
       {
@@ -214,31 +189,27 @@ public class JBossASRemoteContainer implements DeployableContainer
    private void initDeploymentManager() throws Exception 
    {
       String profileName = configuration.getProfileName();
-      InitialContext ctx = new InitialContext();
-      ProfileService ps = (ProfileService) ctx.lookup("ProfileService");
-      deploymentManager = ps.getDeploymentManager();
+      InitialContext ctx = createContext();
+      profileService = (ProfileService) ctx.lookup("ProfileService");
+      deploymentManager = profileService.getDeploymentManager();
       ProfileKey defaultKey = new ProfileKey(profileName);
       deploymentManager.loadProfile(defaultKey);
       VFS.init();
    }
    
-   private URL createFileServerURL(String archiveName) 
+   private InitialContext createContext() throws Exception
    {
-      try 
+      if(context == null)
       {
-         InetSocketAddress address = httpFileServer.getAddress();
-         return new URL(
-               "http", 
-               address.getHostName(), 
-               address.getPort(), 
-               "/" + archiveName);
+         Properties props = new Properties();
+         props.put(InitialContext.INITIAL_CONTEXT_FACTORY, configuration.getContextFactory());
+         props.put(InitialContext.URL_PKG_PREFIXES, configuration.getUrlPkgPrefix());
+         props.put(InitialContext.PROVIDER_URL, configuration.getProviderUrl());
+         context = new InitialContext(props);
       }
-      catch (MalformedURLException e) 
-      {
-         throw new RuntimeException("Could not create fileserver url", e);
-      }
+      return context;
    }
-   
+
    private void removeFailedUnDeployments() throws IOException
    {
       List<String> remainingDeployments = new ArrayList<String>();
@@ -265,23 +236,5 @@ public class JBossASRemoteContainer implements DeployableContainer
          //log.error("Failed to undeploy these artifacts: " + remainingDeployments);
       }
       failedUndeployments.clear();
-   }
-
-   private static void copy(InputStream source, OutputStream destination) throws IOException
-   {
-      if (source == null)
-      {
-         throw new IllegalArgumentException("source must be specified");
-      }
-      if (destination == null)
-      {
-         throw new IllegalArgumentException("destination must be specified");
-      }
-      byte[] readBuffer = new byte[2156]; 
-      int bytesIn = 0; 
-      while((bytesIn = source.read(readBuffer)) != -1) 
-      { 
-         destination.write(readBuffer, 0, bytesIn); 
-      }
    }
 }

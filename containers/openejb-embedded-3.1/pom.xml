@@ -24,7 +24,7 @@
 	<properties>
 
 		<!-- Versioning -->
-		<version.org.apache.openejb_openejb.core>3.1.2</version.org.apache.openejb_openejb.core>
+		<version.org.apache.openejb_openejb.core>3.1.4</version.org.apache.openejb_openejb.core>
 
 	</properties>
 
@@ -34,11 +34,6 @@
 		<!-- 
     org.jboss.arquillian
      -->
-		<dependency>
-			<groupId>org.jboss.arquillian.protocol</groupId>
-			<artifactId>arquillian-protocol-local</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.arquillian.testenricher</groupId>

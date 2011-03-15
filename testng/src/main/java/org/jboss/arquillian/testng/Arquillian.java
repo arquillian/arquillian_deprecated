@@ -19,12 +19,10 @@ package org.jboss.arquillian.testng;
 import java.lang.reflect.Method;
 
 import org.jboss.arquillian.impl.DeployableTestBuilder;
-import org.jboss.arquillian.impl.XmlConfigurationBuilder;
-import org.jboss.arquillian.spi.Configuration;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
-import org.jboss.arquillian.spi.util.TestEnrichers;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITestResult;
@@ -53,8 +51,7 @@ public abstract class Arquillian implements IHookable
    {
       if(deployableTest.get() == null)
       {
-         Configuration configuration = new XmlConfigurationBuilder().build();
-         TestRunnerAdaptor adaptor = DeployableTestBuilder.build(configuration);
+         TestRunnerAdaptor adaptor = DeployableTestBuilder.build();
          adaptor.beforeSuite(); 
          deployableTest.set(adaptor); // don't set TestRunnerAdaptor if beforeSuite fails
       }
@@ -68,31 +65,33 @@ public abstract class Arquillian implements IHookable
          return; // beforeSuite failed
       }
       deployableTest.get().afterSuite();
+      deployableTest.get().shutdown();
       deployableTest.set(null);
+      deployableTest.remove();
    }
 
    @BeforeClass(alwaysRun = true)
    public void arquillianBeforeClass() throws Exception
    {
-      deployableTest.get().beforeClass(getClass());
+      deployableTest.get().beforeClass(getClass(), LifecycleMethodExecutor.NO_OP);
    }
 
    @AfterClass(alwaysRun = true)
    public void arquillianAfterClass() throws Exception
    {
-      deployableTest.get().afterClass(getClass());
+      deployableTest.get().afterClass(getClass(), LifecycleMethodExecutor.NO_OP);
    }
    
    @BeforeMethod(alwaysRun = true)
    public void arquillianBeforeTest(Method testMethod) throws Exception 
    {
-      deployableTest.get().before(this, testMethod);
+      deployableTest.get().before(this, testMethod, LifecycleMethodExecutor.NO_OP);
    }
 
    @AfterMethod(alwaysRun = true)
    public void arquillianAfterTest(Method testMethod) throws Exception 
    {
-      deployableTest.get().after(this, testMethod);
+      deployableTest.get().after(this, testMethod, LifecycleMethodExecutor.NO_OP);
    }
 
    public void run(final IHookCallBack callback, final ITestResult testResult)
@@ -102,27 +101,41 @@ public abstract class Arquillian implements IHookable
       {
          result = deployableTest.get().test(new TestMethodExecutor()
          {
-            public void invoke() throws Throwable
+            public void invoke(Object... parameters) throws Throwable
             {
+               /*
+                *  The parameters are stored in the InvocationHandler, so we can't set them on the test result directly.
+                *  Copy the Arquillian found parameters to the InvocationHandlers parameters
+                */
+               copyParameters(parameters, callback.getParameters());
                callback.runTestMethod(testResult);
                
-               clearParameters(testResult);
+               // Parameters can be contextual, so extract information 
+               swapWithClassNames(callback.getParameters());
+               testResult.setParameters(callback.getParameters());
             }
-
-            private void clearParameters(final ITestResult testResult)
+            
+            private void copyParameters(Object[] source, Object[] target)
+            {
+               for(int i = 0; i < source.length; i++)
+               {
+                  target[i] = source[i];
+               }
+            }
+            
+            private void swapWithClassNames(Object[] source)
             {
                // clear parameters. they can be contextual and might fail TestNG during the report writing.
-               Object[] parameters = testResult.getParameters();
-               for(int i = 0; parameters != null && i < parameters.length; i++)
+               for(int i = 0; source != null && i < source.length; i++)
                {
-                  Object parameter = parameters[i];
+                  Object parameter = source[i];
                   if(parameter != null)
                   {
-                     parameters[i] = parameter.getClass().getName();
+                     source[i] = parameter.toString();
                   }
                   else
                   {
-                     parameters[i] = "null";
+                     source[i] = "null";
                   }
                }
             }
@@ -161,7 +174,7 @@ public abstract class Arquillian implements IHookable
          return values;
       }
 
-      Object[] parameterValues = TestEnrichers.enrich(deployableTest.get().getActiveContext(), method);
+      Object[] parameterValues = new Object[method.getParameterTypes().length]; 
       values[0] = parameterValues; 
       
       return values;

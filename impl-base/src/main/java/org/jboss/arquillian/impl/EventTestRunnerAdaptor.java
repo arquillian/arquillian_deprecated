@@ -17,14 +17,17 @@
 package org.jboss.arquillian.impl;
 
 import java.lang.reflect.Method;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.jboss.arquillian.impl.context.ContextLifecycleManager;
-import org.jboss.arquillian.impl.context.TestContext;
-import org.jboss.arquillian.spi.Context;
+import org.jboss.arquillian.impl.core.spi.Manager;
+import org.jboss.arquillian.impl.core.spi.NonManagedObserver;
+import org.jboss.arquillian.spi.LifecycleMethodExecutor;
 import org.jboss.arquillian.spi.TestMethodExecutor;
 import org.jboss.arquillian.spi.TestResult;
 import org.jboss.arquillian.spi.TestRunnerAdaptor;
+import org.jboss.arquillian.spi.core.Instance;
+import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.arquillian.spi.event.suite.After;
 import org.jboss.arquillian.spi.event.suite.AfterClass;
 import org.jboss.arquillian.spi.event.suite.AfterSuite;
@@ -41,120 +44,76 @@ import org.jboss.arquillian.spi.event.suite.Test;
  */
 public class EventTestRunnerAdaptor implements TestRunnerAdaptor
 {
-   private ContextLifecycleManager contextLifecycle;
-   private Stack<Context> activeContext = new Stack<Context>();
+   private Manager manager;
    
-   public EventTestRunnerAdaptor(ContextLifecycleManager contextLifecycle)
+   public EventTestRunnerAdaptor(Manager manager)
    {
-      Validate.notNull(contextLifecycle, "ContextLifecycle must be specified");
+      Validate.notNull(manager, "Manager must be specified");
       
-      this.contextLifecycle = contextLifecycle;
+      this.manager = manager;
    }
 
-   public Context getActiveContext()
-   {
-      if(activeContext.empty())
-      {
-         return null;
-      }
-      return activeContext.peek();
-   }
-   
    public void beforeSuite() throws Exception
    {
-      Context suiteContext = contextLifecycle.createRestoreSuiteContext();
-      try
-      {
-         suiteContext.fire(new BeforeSuite());
-      }
-      finally
-      {
-         activeContext.push(suiteContext);         
-      }
+      manager.fire(new BeforeSuite());
    }
 
    public void afterSuite() throws Exception
    {
-      contextLifecycle.createRestoreSuiteContext().fire(new AfterSuite());
-      try
-      {
-         contextLifecycle.destroySuiteContext();
-      }
-      finally
-      {
-         activeContext.pop();                  
-      }
+      manager.fire(new AfterSuite());
    }
 
-   public void beforeClass(Class<?> testClass) throws Exception
+   public void beforeClass(Class<?> testClass, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testClass, "TestClass must be specified");
       
-      Context classContext = contextLifecycle.createRestoreClassContext(testClass);
-      try
-      {
-         classContext.fire(new BeforeClass(testClass));
-      }
-      finally
-      {
-         activeContext.push(classContext);
-      }
+      manager.fire(new BeforeClass(testClass, executor));
    }
 
-   public void afterClass(Class<?> testClass) throws Exception
+   public void afterClass(Class<?> testClass, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testClass, "TestClass must be specified");
       
-      contextLifecycle.createRestoreClassContext(testClass).fire(new AfterClass(testClass));
-      try
-      {
-         contextLifecycle.destroyClassContext(testClass);         
-      }
-      finally
-      {
-         activeContext.pop();
-      }
+      manager.fire(new AfterClass(testClass, executor));
    }
 
-   public void before(Object testInstance, Method testMethod) throws Exception
+   public void before(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testInstance, "TestInstance must be specified");
       Validate.notNull(testMethod, "TestMethod must be specified");
       
-      TestContext testContext = contextLifecycle.createRestoreTestContext(testInstance);
-      try
-      {
-         testContext.fire(new Before(testInstance, testMethod));
-      }
-      finally
-      {
-         activeContext.push(testContext);
-      }
+      manager.fire(new Before(testInstance, testMethod, executor));
    }
 
-   public void after(Object testInstance, Method testMethod) throws Exception
+   public void after(Object testInstance, Method testMethod, LifecycleMethodExecutor executor) throws Exception
    {
       Validate.notNull(testInstance, "TestInstance must be specified");
       Validate.notNull(testMethod, "TestMethod must be specified");
 
-      contextLifecycle.createRestoreTestContext(testInstance).fire(new After(testInstance, testMethod));
-      try
-      {
-         contextLifecycle.destroyTestContext(testInstance);
-      }
-      finally
-      {
-         activeContext.pop();
-      }
+      manager.fire(new After(testInstance, testMethod, executor));
    }
    
    public TestResult test(TestMethodExecutor testMethodExecutor) throws Exception
    {
       Validate.notNull(testMethodExecutor, "TestMethodExecutor must be specified");
-      
-      Test test = new Test(testMethodExecutor);
-      TestContext context = contextLifecycle.createRestoreTestContext(testMethodExecutor.getInstance());
-      context.fire(test);
-      return context.get(TestResult.class);
+
+      final List<TestResult> result = new ArrayList<TestResult>();
+      manager.fire(new Test(testMethodExecutor), new NonManagedObserver<Test>()
+      {
+         @Inject
+         private Instance<TestResult> testResult;
+         
+         @Override
+         public void fired(Test event)
+         {
+            result.add(testResult.get());
+         }
+      });
+      return result.get(0);
+   }
+   
+   public void shutdown()
+   {
+      manager.shutdown();
    }
 }

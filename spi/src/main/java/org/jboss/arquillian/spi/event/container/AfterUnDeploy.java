@@ -16,6 +16,9 @@
  */
 package org.jboss.arquillian.spi.event.container;
 
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.deployment.DeploymentDescription;
+
 
 /**
  * Event fired After DeployableContainer undeployment.
@@ -23,6 +26,10 @@ package org.jboss.arquillian.spi.event.container;
  * @author <a href="mailto:aknutsen@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-public class AfterUnDeploy extends ContainerEvent
+public class AfterUnDeploy extends DeployerEvent
 {
+   public AfterUnDeploy(DeployableContainer<?> deployableContainer, DeploymentDescription deployment)
+   {
+      super(deployableContainer, deployment);
+   }
 }

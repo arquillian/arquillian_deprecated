@@ -18,14 +18,13 @@ package org.jboss.arquillian.container.jbossas.managed_5_1;
 
 import javax.ejb.EJB;
 
-import junit.framework.Assert;
-
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.jbossas.managed_5_1.ejb.MyEjb;
 import org.jboss.arquillian.container.jbossas.managed_5_1.ejb.MyEjbBean;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

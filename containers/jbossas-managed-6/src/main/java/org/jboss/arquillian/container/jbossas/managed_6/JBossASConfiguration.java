@@ -18,11 +18,12 @@ package org.jboss.arquillian.container.jbossas.managed_6;
 
 import java.io.File;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
-import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.ConfigurationException;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
+import org.jboss.arquillian.spi.util.Validate;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the JBoss AS container.
  *
  * @author <a href="mailto:german.escobarc@gmail.com">German Escobar</a>
@@ -34,18 +35,29 @@ public class JBossASConfiguration implements ContainerConfiguration
 
    private int httpPort = 8080;
 
+   private int rmiPort = 1099;
+
    private String profileName = "default";
+
+   private boolean useRmiPortForAliveCheck = false;
    
-   // 
    private String jbossHome = System.getenv("JBOSS_HOME");
    
    private String javaHome = System.getenv("JAVA_HOME");
    
    private String javaVmArguments = "-Xmx512m -XX:MaxPermSize=128m";
+   
+   private int startupTimeoutInSeconds = 120;
 
-   public ContainerProfile getContainerProfile()
+   private int shutdownTimeoutInSeconds = 45;
+
+   /* (non-Javadoc)
+    * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
+    */
+   public void validate() throws ConfigurationException
    {
-      return ContainerProfile.CLIENT;
+      Validate.configurationDirectoryExists(jbossHome, "Either JBOSS_HOME environment variable or jbossHome property in Arquillian configuration must be set and point to a valid directory");
+      Validate.configurationDirectoryExists(javaHome, "Either JAVA_HOME environment variable or javaHome property in Arquillian configuration must be set and point to a valid directory");
    }
    
    public String getBindAddress()
@@ -74,6 +86,26 @@ public class JBossASConfiguration implements ContainerConfiguration
    {
       this.httpPort = httpPort;
    }
+   
+   /**
+    * @return the rmiPort
+    */
+   public int getRmiPort()
+   {
+      return rmiPort;
+   }
+   
+   /**
+    * Set the RMI Connect port. <br/>
+    * This is not the JBoss AS RMI Bind port, bind port must be set in the JBoss XML configuration.<br/>
+    * <b>Only set this if default RMI port is changed in JBoss AS!</b>
+    * 
+    * @param rmiPort the rmiPort to set
+    */
+   public void setRmiPort(int rmiPort)
+   {
+      this.rmiPort = rmiPort;
+   }
 
    public String getProfileName()
    {
@@ -83,6 +115,24 @@ public class JBossASConfiguration implements ContainerConfiguration
    public void setProfileName(String profileName)
    {
       this.profileName = profileName;
+   }
+
+   /**
+    * If true, RMI port and not HTTP port is used to see if the Server is running.
+    * 
+    * @param checkAliveUsingRmiPort the checkAliveUsingRmiPort to set
+    */
+   public void setUseRmiPortForAliveCheck(boolean checkAliveUsingRmiPort)
+   {
+      this.useRmiPortForAliveCheck = checkAliveUsingRmiPort;
+   }
+   
+   /**
+    * @return the checkAliveUsingRmiPort
+    */
+   public boolean isUseRmiPortForAliveCheck()
+   {
+      return useRmiPortForAliveCheck;
    }
 
    public void setJbossHome(String jbossHome)
@@ -122,5 +172,37 @@ public class JBossASConfiguration implements ContainerConfiguration
    public String getJavaVmArguments()
    {
       return javaVmArguments;
+   }
+   
+   /**
+    * @return the startupTimeoutInSeconds
+    */
+   public int getStartupTimeoutInSeconds()
+   {
+      return startupTimeoutInSeconds;
+   }
+   
+   /**
+    * @param startupTimeoutInSeconds the startupTimeoutInSeconds to set
+    */
+   public void setStartupTimeoutInSeconds(int startupTimeoutInSeconds)
+   {
+      this.startupTimeoutInSeconds = startupTimeoutInSeconds;
+   }
+
+   /**
+    * @return the shutdownTimeoutInSeconds
+    */
+   public int getShutdownTimeoutInSeconds()
+   {
+      return shutdownTimeoutInSeconds;
+   }
+
+   /**
+    * @param shutdownTimeoutInSeconds the shutdownTimeoutInSeconds to set
+    */
+   public void setShutdownTimeoutInSeconds(int shutdownTimeoutInSeconds)
+   {
+      this.shutdownTimeoutInSeconds = shutdownTimeoutInSeconds;
    }
 }

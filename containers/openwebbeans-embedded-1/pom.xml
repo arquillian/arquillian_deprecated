@@ -17,7 +17,7 @@
 	<description>OpenWebBeans 1.x Embedded Container integration for the Arquillian Project</description>
 
 	<properties>
-		<version.openwebbeans>1.0.0-M4</version.openwebbeans>
+		<version.openwebbeans>1.0.0</version.openwebbeans>
 	</properties>
 
 	<dependencyManagement>
@@ -37,12 +37,6 @@
 		<dependency>
 			<groupId>org.jboss.arquillian</groupId>
 			<artifactId>arquillian-spi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.arquillian.protocol</groupId>
-			<artifactId>arquillian-protocol-local</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

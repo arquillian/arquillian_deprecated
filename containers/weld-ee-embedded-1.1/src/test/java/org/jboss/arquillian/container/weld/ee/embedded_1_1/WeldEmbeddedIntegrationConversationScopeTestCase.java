@@ -16,18 +16,21 @@
  */
 package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import javax.enterprise.context.Conversation;
 import javax.inject.Inject;
-
-import junit.framework.Assert;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.weld.ee.embedded_1_1.beans.TalkingChicken;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ArchivePaths;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,19 +40,18 @@ import org.junit.runner.RunWith;
  * @author <a href="mailto:aslak@redhat.com">Aslak Knutsen</a>
  * @version $Revision: $
  */
-//@Ignore // Can't guarantee method order in JUnit
 @RunWith(Arquillian.class)
 public class WeldEmbeddedIntegrationConversationScopeTestCase
 {
    @Deployment
    public static JavaArchive createdeployment() 
    {
-      return ShrinkWrap.create(JavaArchive.class, "test.jar")
+      return ShrinkWrap.create(JavaArchive.class)
                   .addClasses(
                         WeldEmbeddedIntegrationConversationScopeTestCase.class,
                         TalkingChicken.class)
-                  .addManifestResource(
-                        new ByteArrayAsset("<beans/>".getBytes()), ArchivePaths.create("beans.xml"));
+                  .addAsManifestResource(
+                        EmptyAsset.INSTANCE, ArchivePaths.create("beans.xml"));
    }
    
    @Inject
@@ -65,22 +67,23 @@ public class WeldEmbeddedIntegrationConversationScopeTestCase
             chicken);
       
       chicken.setAge(10);
+      assertEquals(new Integer(10), chicken.getAge());
    }
 
    @Test
    public void shouldNotBeAbleToReadAgeConversationNotStarted() throws Exception 
    {
-      Assert.assertNotNull(
+      assertNotNull(
             "Verify that the Bean has been injected",
             chicken);
       
-      Assert.assertEquals(new Integer(-1), chicken.getAge());
+      assertEquals(new Integer(-1), chicken.getAge());
    }
 
    @Test
    public void shouldBeAbleToSetAgeAndStartAConversation() throws Exception 
    {
-      Assert.assertNotNull(
+      assertNotNull(
             "Verify that the Bean has been injected",
             chicken);
       
@@ -88,13 +91,14 @@ public class WeldEmbeddedIntegrationConversationScopeTestCase
       conversation.begin();
    }
 
-   @Test
+   // This works most of the time, you can uncomment to test manually
+   @Test @Ignore // Can't do dependent methods in JUnit
    public void shouldBeAbleToReadAgeAfterConversationWasStarted() throws Exception 
    {
-      Assert.assertNotNull(
+      assertNotNull(
             "Verify that the Bean has been injected",
             chicken);
       
-      Assert.assertEquals(new Integer(10), chicken.getAge());
+      assertEquals(new Integer(10), chicken.getAge());
    }
 }

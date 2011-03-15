@@ -25,9 +25,12 @@ import javax.sql.DataSource;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,13 +52,15 @@ public class JettyEmbeddedInContainerTestCase
    @Deployment
    public static WebArchive getTestArchive()
    {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
+      final WebArchive war = ShrinkWrap.create(WebArchive.class)
          .addClass(TestBean.class)
          // adding the configuration class silences the logged exception when building the configuration on the server-side, but shouldn't be necessary
          //.addClass(JettyEmbeddedConfiguration.class)
-         .addLibrary(MavenArtifactResolver.resolve("org.jboss.weld.servlet:weld-servlet:1.0.1-Final"))
-         .addWebResource("jetty-env.xml")
-         .addWebResource(new ByteArrayAsset(new byte[0]), "beans.xml")
+            .addAsLibraries(
+                  DependencyResolvers.use(MavenDependencyResolver.class)
+                        .artifacts("org.jboss.weld.servlet:weld-servlet:1.0.1-Final").resolveAs(GenericArchive.class))
+         .addAsWebInfResource("jetty-env.xml")
+         .addAsWebInfResource(new ByteArrayAsset(new byte[0]), "beans.xml")
          .setWebXML("in-container-web.xml");
       log.info(war.toString(true));
       return war;

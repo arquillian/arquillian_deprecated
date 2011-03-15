@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.jboss.arquillian.spi.TestDeployment;
+import org.jboss.arquillian.spi.client.deployment.ProtocolArchiveProcessor;
 import org.jboss.osgi.testing.OSGiManifestBuilder;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -55,7 +56,7 @@ public class OSGiDeploymentPackagerTestCase
       });
       
       Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
-      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives));
+      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives), new ArrayList<ProtocolArchiveProcessor>());
       assertNotNull("Result archive not null", result);
    }
    
@@ -74,7 +75,7 @@ public class OSGiDeploymentPackagerTestCase
       try
       {
          Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
-         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives));
+         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives), new ArrayList<ProtocolArchiveProcessor>());
          fail("RuntimeException expected");
       }
       catch (RuntimeException ex)

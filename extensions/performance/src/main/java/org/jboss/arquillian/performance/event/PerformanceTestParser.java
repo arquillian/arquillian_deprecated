@@ -16,13 +16,15 @@
  */
 package org.jboss.arquillian.performance.event;
 
-import org.jboss.arquillian.performance.annotation.*;
+import org.jboss.arquillian.performance.annotation.PerformanceTest;
 import org.jboss.arquillian.performance.meta.PerformanceClassResult;
 import org.jboss.arquillian.performance.meta.PerformanceSuiteResult;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestClass;
-import org.jboss.arquillian.spi.event.suite.ClassEvent;
-import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.Inject;
+import org.jboss.arquillian.spi.core.annotation.Observes;
+import org.jboss.arquillian.spi.core.annotation.SuiteScoped;
+import org.jboss.arquillian.spi.event.suite.BeforeClass;
 
 /**
  * 
@@ -31,17 +33,20 @@ import org.jboss.arquillian.spi.event.suite.EventHandler;
  * @author <a href="mailto:stale.pedersen@jboss.org">Stale W. Pedersen</a>
  * @version $Revision: 1.1 $
  */
-public class PerformanceTestParser implements EventHandler<ClassEvent>
+public class PerformanceTestParser 
 {
+   @Inject @SuiteScoped
+   private InstanceProducer<PerformanceSuiteResult> suiteResultInst;
+   
    /**
     * @see org.jboss.arquillian.spi.event.suite.EventHandler#callback(org.jboss.arquillian.spi.Context, java.lang.Object)
     */
-   public void callback(Context context, ClassEvent event) throws Exception
+   public void callback(@Observes BeforeClass event) throws Exception
    {
-      parsePerformanceRules(context, event.getTestClass());
+      parsePerformanceRules(event.getTestClass());
    }
    
-   public void parsePerformanceRules(Context context, TestClass testClass)
+   public void parsePerformanceRules(TestClass testClass)
    {
       PerformanceTest performanceTest = (PerformanceTest) testClass.getAnnotation(PerformanceTest.class);
       if(performanceTest != null)
@@ -49,18 +54,14 @@ public class PerformanceTestParser implements EventHandler<ClassEvent>
          PerformanceClassResult classPerformance = 
             new PerformanceClassResult(performanceTest, testClass.getName());
          
-         PerformanceSuiteResult suitePerformance = 
-            context.getParentContext().get(PerformanceSuiteResult.class);
+         PerformanceSuiteResult suitePerformance = suiteResultInst.get();
          if(suitePerformance == null)
          {
             suitePerformance = new PerformanceSuiteResult(classPerformance.getTestClassName());
-//            System.out.println("adding performancesuiteresult to context");
-            context.getParentContext().add(PerformanceSuiteResult.class, suitePerformance);
+            suiteResultInst.set(suitePerformance);
          }
          
          suitePerformance.addClassResult(testClass.getName(), classPerformance);
-//         setThreshold(performanceTest.resultsThreshold());
-//       System.out.println("PerformanceTest is: "+performanceTest.resultsThreshold());
       }  
    }
 }

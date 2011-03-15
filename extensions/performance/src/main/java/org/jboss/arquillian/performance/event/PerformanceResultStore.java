@@ -31,9 +31,10 @@ import java.util.List;
 import org.jboss.arquillian.performance.exception.PerformanceException;
 import org.jboss.arquillian.performance.meta.PerformanceClassResult;
 import org.jboss.arquillian.performance.meta.PerformanceSuiteResult;
-import org.jboss.arquillian.spi.Context;
 import org.jboss.arquillian.spi.TestResult;
-import org.jboss.arquillian.spi.event.suite.EventHandler;
+import org.jboss.arquillian.spi.core.Instance;
+import org.jboss.arquillian.spi.core.annotation.Inject;
+import org.jboss.arquillian.spi.core.annotation.Observes;
 import org.jboss.arquillian.spi.event.suite.Test;
 
 /**
@@ -45,15 +46,21 @@ import org.jboss.arquillian.spi.event.suite.Test;
  * @version $Revision: 1.1 $
  */
 
-public class PerformanceResultStore implements EventHandler<Test>
+public class PerformanceResultStore 
 {
    private final String folder = "arq-perf";
 
    private final SimpleDateFormat fileFormat = new SimpleDateFormat("dd.MM.yy.mm.ss");
 
-   public void callback(Context context, Test event) throws Exception
+   @Inject
+   private Instance<PerformanceSuiteResult> suiteResultInst;
+   
+   @Inject
+   private Instance<TestResult> testResultInst;
+
+   public void callback(@Observes Test event) throws Exception
    {
-      PerformanceSuiteResult suiteResult = (PerformanceSuiteResult) context.get(PerformanceSuiteResult.class);
+      PerformanceSuiteResult suiteResult = suiteResultInst.get();
 
       if (suiteResult != null)
       {
@@ -63,7 +70,7 @@ public class PerformanceResultStore implements EventHandler<Test>
          }
          catch (PerformanceException pe)
          {
-            TestResult result = context.get(TestResult.class);
+            TestResult result = testResultInst.get();
             if (result != null)
             {
                result.setThrowable(pe);
@@ -188,5 +195,4 @@ public class PerformanceResultStore implements EventHandler<Test>
          }
       }
    }
-
 }
