@@ -18,7 +18,6 @@ package org.jboss.arquillian.container.weld.se.embedded_1;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.enterprise.inject.spi.Extension;
 
@@ -39,6 +38,7 @@ import org.jboss.weld.bootstrap.api.ServiceRegistry;
 import org.jboss.weld.bootstrap.spi.BeanDeploymentArchive;
 import org.jboss.weld.bootstrap.spi.Metadata;
 import org.jboss.weld.manager.api.WeldManager;
+import org.jboss.weld.util.ServiceLoader;
 
 /**
  * WeldSEContainer
@@ -116,7 +116,7 @@ public class WeldSEContainer implements DeployableContainer<WeldSEConfiguration>
           */
          public Iterable<Metadata<Extension>> getExtensions()
          {
-            return Collections.emptyList();
+            return ServiceLoader.load(Extension.class, beanArchive.getClassLoader());
          }
       };
       
