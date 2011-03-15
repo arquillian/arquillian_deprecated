@@ -37,8 +37,14 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.FileDataBodyPart;
 import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
 import org.jboss.arquillian.spi.*;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.xml.sax.InputSource;
 
 /**
@@ -47,7 +53,7 @@ import org.xml.sax.InputSource;
  * @author <a href="http://community.jboss.org/people/LightGuard">Jason Porter</a>
  */
 @SuppressWarnings({"HardcodedFileSeparator"})
-public class GlassFishRestDeployableContainer implements DeployableContainer
+public class GlassFishRestDeployableContainer implements DeployableContainer<GlassFishRestConfiguration>
 {
    private static final String APPLICATION = "/applications/application";
 
@@ -58,6 +64,42 @@ public class GlassFishRestDeployableContainer implements DeployableContainer
    private String applicationBaseUrl;
 
    private String deploymentName;
+
+    public Class<GlassFishRestConfiguration> getConfigurationClass() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setup(GlassFishRestConfiguration configuration) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void start() throws LifecycleException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void stop() throws LifecycleException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public ProtocolDescription getDefaultProtocol() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public ProtocolMetaData deploy(Archive<?> archive) throws DeploymentException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void undeploy(Archive<?> archive) throws DeploymentException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void deploy(Descriptor descriptor) throws DeploymentException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void undeploy(Descriptor descriptor) throws DeploymentException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 
    /**
     * Actions to configure the server / deployment.

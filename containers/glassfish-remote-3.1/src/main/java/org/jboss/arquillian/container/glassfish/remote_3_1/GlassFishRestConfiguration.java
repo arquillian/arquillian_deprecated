@@ -21,8 +21,9 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3_1;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 public class GlassFishRestConfiguration implements ContainerConfiguration
 {
@@ -114,4 +115,12 @@ public class GlassFishRestConfiguration implements ContainerConfiguration
    {
       this.remoteServerHttps = remoteServerHttps;
    }
+
+    /**
+     * Validates if current configuration is valid, that is if all required
+     * properties are set and have correct values
+     */
+    public void validate() throws ConfigurationException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

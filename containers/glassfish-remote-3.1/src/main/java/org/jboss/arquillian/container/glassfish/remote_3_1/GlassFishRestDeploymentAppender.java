@@ -21,8 +21,8 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3_1;
 
-import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
 import org.jboss.arquillian.testenricher.ejb.EJBInjectionEnricher;
 import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
@@ -52,7 +52,7 @@ public class GlassFishRestDeploymentAppender implements AuxiliaryArchiveAppender
             EJBInjectionEnricher.class.getPackage(),
             ResourceInjectionEnricher.class.getPackage(),
             CDIInjectionEnricher.class.getPackage())
-         .addServiceProvider(
+         .addAsServiceProvider(
             TestEnricher.class,
             CDIInjectionEnricher.class,
             EJBInjectionEnricher.class,
