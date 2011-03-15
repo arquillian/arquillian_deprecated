@@ -81,4 +81,5 @@ testenrichers/resource/target
 testng/target
 containers/glassfish-remote-3.1/.idea
 *.iml
-
+*.ipr
+*.iws
