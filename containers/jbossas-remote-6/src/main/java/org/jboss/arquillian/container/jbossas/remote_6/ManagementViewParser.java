@@ -67,7 +67,11 @@ public final class ManagementViewParser
       if (contextRootDeployments.size() > 0)
       {
          String deploymentName = contextRootDeployments.iterator().next();
-         String expression = ".*\\-(.*)-(.*)";
+         /*
+          *  http-localhost%2F127.0.0.1-8080
+          *  http-127.0.0.1-8080
+          */
+         String expression = ".*\\-.*?(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})-(.*)";
          return new HTTPContext(deploymentName.replaceAll(expression, "$1"), Integer.parseInt(deploymentName
                .replaceAll(expression, "$2")));
       }
