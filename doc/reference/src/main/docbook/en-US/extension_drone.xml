@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<section id="extension.drone">
+   <title>Drone</title>
+
+   <para id="extension.drone.description">The Arquillian Drone extension for Arquillian provides a
+   simple way of including functional tests for your web based application. Arquillian Drone manages
+   the life cycle of web testing tool, which is either Arquillian Ajocado, Selenium or WebDriver.
+   Arquillian Drone automatically manages life cycle of objects required for interaction between
+   browser and deployed application.</para>
+
+   <para />
+
+   <sect2>
+      <title>Commented Example</title>
+
+      <para>Following example illustrates how Arquillian Drone can be used with Arquillian Ajocado.
+      This example is a part of Arquillian Drone test classes, so you are free to experiment with
+      it. Arquillian Ajocado is a Selenium on steroids, because it provides type safe API over
+      classic <literal>DefaultSelenium</literal> object, has extended support for handling AJAX
+      based UI and adds pretty fast JQuery locators to you browser, so your test are executed
+      faster. If you are not experienced with Arquillian Ajocado, you can still use
+      <literal>DefaultSelenium</literal> or WebDriver specific browser, such as
+      <literal>FirefoxDriver</literal>. The beauty of Arquillian Drone is that is supports all of
+      them and their usage is pretty much the same.</para>
+
+      <programlisting role="JAVA">package org.jboss.arquillian.drone.example;
+
+import static org.jboss.arquillian.ajocado.Ajocado.elementPresent;
+import static org.jboss.arquillian.ajocado.Ajocado.waitModel;
+import static org.jboss.arquillian.ajocado.guard.request.RequestTypeGuardFactory.waitHttp;
+import static org.jboss.arquillian.ajocado.locator.LocatorFactory.id;
+import static org.jboss.arquillian.ajocado.locator.LocatorFactory.xp;
+import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;
+
+import java.net.URL;
+
+import org.jboss.arquillian.ajocado.framework.AjaxSelenium;
+import org.jboss.arquillian.ajocado.locator.IdLocator;
+import org.jboss.arquillian.ajocado.locator.XpathLocator;
+import org.jboss.arquillian.api.Run;
+import org.jboss.arquillian.drone.annotation.ContextPath;
+import org.jboss.arquillian.drone.annotation.Drone;
+import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+/**
+ * Tests Arquillian Drone extension against Weld Login example. * 
+ * Uses Ajocado driver bound to Firefox browser.
+ * 
+ */
+@RunWith(Arquillian.class)
+@Run(AS_CLIENT)
+public class AjocadoTestCase extends AbstractTestCase
+{
+   // load ajocado driver
+   @Drone
+   AjaxSelenium driver;
+
+   // Load context path to the test
+   @ContextPath
+   URL contextPath;
+
+   protected XpathLocator LOGGED_IN = xp("//li[contains(text(),'Welcome')]");
+   protected XpathLocator LOGGED_OUT = xp("//li[contains(text(),'Goodbye')]");
+
+   protected IdLocator USERNAME_FIELD = id("loginForm:username");
+   protected IdLocator PASSWORD_FIELD = id("loginForm:password");
+
+   protected IdLocator LOGIN_BUTTON = id("loginForm:login");
+   protected IdLocator LOGOUT_BUTTON = id("loginForm:logout");
+
+   @Deployment
+   public static WebArchive createDeployment()
+   {
+      return ShrinkWrap.create(WebArchive.class, "weld-login.war")
+            .addClasses(Credentials.class, LoggedIn.class, Login.class, User.class, Users.class)            
+            .addAsWebInfResource(new File("src/test/webapp/WEB-INF/beans.xml"))
+            .addAsWebInfResource(new File("src/test/webapp/WEB-INF/faces-config.xml"))            
+            .addAsWebInfResource(new File("src/test/resources/import.sql"))
+            .addAsWebResource(new File("src/test/webapp/index.html"))
+            .addAsWebResource(new File("src/test/webapp/home.xhtml"))
+            .addAsWebResource(new File("src/test/webapp/template.xhtml"))
+            .addAsWebResource(new File("src/test/webapp/users.xhtml"))
+            .addAsResource(new File("src/test/resources/META-INF/persistence.xml"), ArchivePaths.create("META-INF/persistence.xml"))
+            .setWebXML(new File("src/test/webapp/WEB-INF/web.xml"));
+   }
+
+   @Test
+   public void testLoginAndLogout()
+   {
+      driver.open(contextPath);
+      waitModel.until(elementPresent.locator(USERNAME_FIELD));      
+      Assert.assertFalse("User should not be logged in!", driver.isElementPresent(LOGOUT_BUTTON));
+      driver.type(USERNAME_FIELD, "demo");
+      driver.type(PASSWORD_FIELD, "demo");
+      
+      waitHttp(driver).click(LOGIN_BUTTON);
+      Assert.assertTrue("User should be logged in!", driver.isElementPresent(LOGGED_IN));
+      
+      waitHttp(driver).click(LOGOUT_BUTTON);
+      Assert.assertTrue("User should not be logged in!", driver.isElementPresent(LOGGED_OUT));
+   }
+
+}
+</programlisting>
+
+      <para>As you can see, execution does not differ from common Arquillian test much. The only
+      requirement is actually running Arquillian in AS_CLIENT mode, which is enforced by
+      <literal>@Run(AS_CLIENT)</literal> annotation. The other annotations present in the test are
+      used to inject web test framework instance (<literal>@Drone</literal>) and context path
+      (<literal>@ContextPath</literal>) for deployed archive into your test. Their life cycle is
+      completely managed by Arquillian Drone, as described in <xref
+      linkend="extensions.drone.lifecycle" />. The instance is used in test method to traverse UI of
+      application via Firefox browser, fill user credentials and signing up and out. Test is based
+      on JUnit, but Arquillian Drone, as well as the rest of Arquillian supports TestNG as
+      well.</para>
+
+      <table>
+         <title>Supported frameworks and their tested versions</title>
+
+         <tgroup cols="3">
+            <thead>
+               <row>
+                  <entry align="center">Framework name and implementation class</entry>
+
+                  <entry align="center">Tested version</entry>
+
+                  <entry align="center">Additional information</entry>
+               </row>
+            </thead>
+
+            <tbody>
+               <row>
+                  <entry>Arquillian Ajocado - <code>AjaxSelenium</code></entry>
+
+                  <entry>1.0.0.Alpha1</entry>
+
+                  <entry>Requires Selenium Server running</entry>
+               </row>
+
+               <row>
+                  <entry>Selenium - <code>DefaultSelenium</code></entry>
+
+                  <entry>2.0b2</entry>
+
+                  <entry>Requires Selenium Server running</entry>
+               </row>
+
+               <row>
+                  <entry>Selenium - <code>HtmlUnitDriver</code>, <code>FirefoxDriver</code></entry>
+
+                  <entry>2.0b2</entry>
+
+                  <entry>Selenium Server is not required</entry>
+               </row>
+            </tbody>
+         </tgroup>
+      </table>
+
+      <para>This combination matrix is tested and known to work. However, we expect that all
+      <literal>WebDriver</literal> interface based browsers will work. Arquillian Drone does not
+      force you to use a specific version of web framework test implementation, so feel free to
+      experiment with it.</para>
+   </sect2>
+
+   <sect2>
+      <title>Maven setup example</title>
+
+      <para>Arquillian Drone requires a few test dependencies which are marked as provided to let
+      you choose their versions. Add following code into your Maven dependecies to enable Arquillian
+      Drone functionality in your test cases.</para>
+
+      <programlisting role="XML">&lt;!-- Arquillian Drone dependency --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.jboss.arquillian.extension&lt;/groupId&gt;
+   &lt;artifactId&gt;arquillian-drone&lt;/artifactId&gt;
+   &lt;version&gt;${arquillian.version}&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Arquillian Ajocado dependencies --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.jboss.arquillian.ajocado&lt;/groupId&gt;
+   &lt;artifactId&gt;arquillian-ajocado-api&lt;/artifactId&gt;
+   &lt;version&gt;${version.ajocado}&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.jboss.arquillian.ajocado&lt;/groupId&gt;
+   &lt;artifactId&gt;arquillian-ajocado-impl&lt;/artifactId&gt;
+   &lt;version&gt;${version.ajocado}&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Selenium (including WebDriver in 2.x versions) --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+   &lt;artifactId&gt;selenium-remote-control&lt;/artifactId&gt;
+   &lt;version&gt;${version.selenium}&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;        
+&lt;/dependency&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+   &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
+   &lt;version&gt;${version.selenium}&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+      
+&lt;!-- required to run Selenium Server, needed if you want Arquillian Drone to start Selenium Server for you --&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
+   &lt;artifactId&gt;slf4j-simple&lt;/artifactId&gt;  &lt;!-- choose different underlying implementation if you want --&gt;
+   &lt;version&gt;${version.slf4j}&lt;/version&gt;  &lt;!-- up to you, tested with 1.5.10 --&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+
+</programlisting>
+   </sect2>
+
+   <sect2 id="extensions.drone.lifecycle">
+      <title>Life cycle of @Drone objects</title>
+
+      <para>Arquillian Drone does not allow you to control life cycle of web testing framework
+      objects, but it provides two different scenarios which should be sufficient for most usages
+      required by developers. These are</para>
+
+      <orderedlist>
+         <listitem>
+            <para>Class based life cycle</para>
+         </listitem>
+
+         <listitem>
+            <para>Method based life cycle</para>
+         </listitem>
+      </orderedlist>
+
+      <para>For class based life cycle, configuration for the instance is created before a test
+      class is run. This configuration is used to propertly initialize an instance of the tool. The
+      instance is injected into the field and hold until the last test in the test class is
+      finished, then it is disposed. You can think of <literal>@BeforeClass</literal> and
+      <literal>@AfterClass</literal> equivalents. On the other hand, for method based life cycle, an
+      instance is configured and created before Arquillian enters test method and it is disposed
+      after method finishes. You can think of <literal>@Before</literal> and
+      <literal>@After</literal> equivalents. </para>
+
+      <para>It is import to know that you can combines multiple instances in one tests and you can
+      have them in different scopes. You can as well combine different framework types. Following
+      example shows class based life cycle instance <literal>foo</literal> of type
+      <literal>AjaxSelenium</literal> (Arquillian Ajocado) combined with method based life cycle
+      <literal>bar</literal> of type <literal>DefaultSelenium</literal> (Selenium).<programlisting
+      role="JAVA">@RunWith(Arquillian.class)
+@RunAs(AS_CLIENT)
+public class EnrichedClass
+{
+   @Drone AjaxSelenium foo;
+
+   public void testRatherWithSelenium(@Drone DefaultSelenium bar)
+   {
+     ...
+   }
+}</programlisting></para>
+   </sect2>
+
+   <sect2>
+      <title>Keeping multiple @Drone instances of the same type</title>
+
+      <para>With Arquillian Drone, it is possible to keep more than one instance of a web test
+      framework tool of the same type and determine which instance to use in a type safe way.
+      Arquillian Drone uses concept of <literal>@Qualifier</literal>, which may be known to you from
+      CDI. <literal>@Qualifier</literal> is a meta-annotations which allows you to annotate
+      annotation you create to tell instances appart. By default, if no
+      <literal>@Qualifier</literal> annotation is present, Arquillian Drone uses
+      <literal>@Default</literal>. Following code defines new qualifying annotation<programlisting
+      role="JAVA">package org.jboss.arquillian.drone.factory;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.jboss.arquillian.drone.spi.Qualifier;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Qualifier
+public @interface Different
+{
+
+}</programlisting></para>
+
+      <para>Once you have defined a qualifier, you can use it in you tests, for example in following
+      way, having two distinct class based life cycle instances of
+      <literal>DefaultSelenium</literal>.<programlisting role="ROLE">@RunWith(Arquillian.class)
+@RunAs(AS_CLIENT)
+public class EnrichedClass
+{
+   @Drone DefaultSelenium foo;
+   @Drone @Different DefaultSelenium bar;
+
+   public void testWithBothFooAndBar()
+   {
+     ...
+   }
+}</programlisting></para>
+   </sect2>
+
+   <sect2>
+      <title>Configuring @Drone instances</title>
+
+      <para />
+   </sect2>
+
+   <sect2 id="extension.selenium.customization">
+      <title>Customizing Selenium object</title>
+
+      <para>The big advantage of Arquillian Selenium extension is its flexibility. We provide you
+      reasonable default, but if they are not sufficient or if they do not fulfill your needs, you
+      can change them. Following section expects you to have a knowledge of Selenium.</para>
+
+      <para>Arquillian Selenium provides two ways how to modify its configuration, either you can
+      use XML based Arquillian configuration you know from arquillian.xml or you can pass system
+      properties in configuration of Maven Surefire plugin. The latter way takes precedence if both
+      are used. The listing of available arguments follows in <xref
+      linkend="extension.selenium.customization.description" />.</para>
+
+      <table frame="all" id="extension.selenium.customization.description">
+         <title>Arquillian Selenium customization</title>
+
+         <tgroup cols="3">
+            <colspec colname="name" colnum="1" colwidth="4*" />
+
+            <colspec colname="default" colnum="2" colwidth="4*" />
+
+            <colspec colname="description" colnum="3" colwidth="5*" />
+
+            <thead>
+               <row>
+                  <entry>Name</entry>
+
+                  <entry>Default value</entry>
+
+                  <entry>Description</entry>
+               </row>
+            </thead>
+
+            <tbody>
+               <row>
+                  <entry>serverEnable</entry>
+
+                  <entry>false</entry>
+
+                  <entry>Determines if Selenium server is started and closed before test suite. This
+                  is necessary only for tests using <literal>DefaultSelenium</literal> as a
+                  browser.</entry>
+               </row>
+
+               <row>
+                  <entry>serverPort</entry>
+
+                  <entry>14444</entry>
+
+                  <entry>A port where Selenium server is running. If starting of Selenium server is
+                  enabled, this is the port where it is listening after start.</entry>
+               </row>
+
+               <row>
+                  <entry>serverPort</entry>
+
+                  <entry>localhost</entry>
+
+                  <entry>A machine Selenium server is running. If starting of Selenium server is
+                  enabled, it is always started on <literal>localhost</literal>.</entry>
+               </row>
+
+               <row>
+                  <entry>serverImplemenation</entry>
+
+                  <entry>org.openqa.selenium. server.SeleniumServer</entry>
+
+                  <entry>A fully qualified name of class which is used to launch the Selenium
+                  server.</entry>
+               </row>
+
+               <row>
+                  <entry>serverOutput</entry>
+
+                  <entry>target/selenium-server-output.log</entry>
+
+                  <entry>A name of file where the output of Selenium server is written to.</entry>
+               </row>
+
+               <row>
+                  <entry>serverCmdline</entry>
+
+                  <entry>(empty)</entry>
+
+                  <entry>Additional arguments which can be passed to Selenium server while it's
+                  starting, such as <literal>-firefoxProfileTemplate
+                  /path/to/a/template</literal>.</entry>
+               </row>
+
+               <row>
+                  <entry>serverToken</entry>
+
+                  <entry>Started org.openqa.jetty.jetty.Server</entry>
+
+                  <entry>A string which, if found in server's output, determines that server was
+                  properly started.</entry>
+               </row>
+
+               <row>
+                  <entry>url</entry>
+
+                  <entry>http://localhost:8080</entry>
+
+                  <entry>The URL opened in the browser, which encapsulates the session.</entry>
+               </row>
+
+               <row>
+                  <entry>timeout</entry>
+
+                  <entry>60000</entry>
+
+                  <entry>Time limit in milliseconds which determines operation failed, either for
+                  executing Selenium command or starting Selenium server.</entry>
+               </row>
+
+               <row>
+                  <entry>speed</entry>
+
+                  <entry>0</entry>
+
+                  <entry>Time delay in milliseconds before each Selenium command is sent.</entry>
+               </row>
+
+               <row>
+                  <entry>browser</entry>
+
+                  <entry>*firefoxproxy</entry>
+
+                  <entry>Identification of the browser for needs of
+                  <literal>DefaultSelenium</literal>. Use can use variants including path to binary,
+                  such as: *firefoxproxy /opt/firefox-3.0/firefox.</entry>
+               </row>
+
+               <row>
+                  <entry>webdriverImplementation</entry>
+
+                  <entry>org.openqa.selenium. htmlunit.HtmlUnitDriver</entry>
+
+                  <entry>Browser implementation for WebDriver browser, that is the name of class to
+                  be instantiated. Needed for <literal>WebDriver</literal> tests only.</entry>
+               </row>
+            </tbody>
+         </tgroup>
+      </table>
+
+      <para>Let's start with the simplest change. You want to see your test running in a browser,
+      for example Firefox. To do this, you have to add <literal>selenium-firefox-driver</literal>
+      and configure the class used to launch the driver:</para>
+
+      <programlisting role="XML">
+&lt;dependency&gt;
+   &lt;artifactId&gt;selenium-firefox-driver&lt;/artifactId&gt;
+   &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+   &lt;version&gt;2.0a5&lt;/version&gt;
+   &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</programlisting>
+
+      <para>You can pass configuration in arquillian.xml file:</para>
+
+      <programlisting role="XML">
+&lt;arquillian xmlns="http://jboss.com/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+   xmlns:selenium="urn:arq:org.jboss.arquillian.selenium"&gt;
+
+   &lt;selenium:extension&gt;
+      &lt;selenium:webdriverImplemenation&gt;
+         org.openqa.selenium.firefox.FirefoxDriver
+      &lt;/selenium:webdriverImplemenation&gt;
+   &lt;/selenium:extension&gt; 
+</programlisting>
+
+      <para>Or via System properties passed to Maven Surefire plugin. The name of the system
+      property can be easily derived, it is <literal>arquillian.selenium.</literal> + name of
+      property in the table where each upper case letter is replaced with a dot '.' and its lower
+      case equivalent, e.g. <literal>webdriverImplemenation</literal> becomes
+      <literal>arquillian.selenium.webdriver.implementation</literal>.</para>
+
+      <programlisting role="XML">
+&lt;build&gt;
+   &lt;plugins&gt;
+      &lt;plugin&gt;
+         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+         &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;        
+         &lt;configuration&gt;
+            &lt;systemPropertyVariables&gt;
+               &lt;arquillian.selenium.webdriver.implementation&gt;
+                  org.openqa.selenium.firefox.FirefoxDriver
+               &lt;/arquillian.selenium.webdriver.implementation&gt;
+            &lt;/systemPropertyVariables&gt;
+         &lt;/configuration&gt;
+      &lt;/plugin&gt;
+   &lt;/plugins&gt;
+&lt;/build&gt; 
+</programlisting>
+
+      <para>Selenium 2.0 is a new project. You might have a lot of functional tests already written
+      in Selenium 1.0. Do you think you have to rewrite them? You are wrong! Using them in
+      Arquillian is as simple as annotating with <literal>@Selenium</literal> annotation because
+      both Arquillian Selenium and Selenium 2.0 can use original
+      <literal>DefaultSelenium</literal>.</para>
+
+      <programlisting role="JAVA">
+import static org.jboss.arquillian.api.RunModeType.AS_CLIENT;   
+   
+// include other arquillian imports here...
+import org.jboss.arquillian.selenium.annotation.Selenium;
+
+// Selenium related imports
+import com.thoughtworks.selenium.DefaultSelenium;
+
+@RunWith(Arquillian.class)
+@Run(AS_CLIENT)
+public class WorkHardCdiTestCase
+{   
+   @Selenium
+   private DefaultSelenium driver;
+
+   @Test
+   public void testLogin()
+   {
+      driver.open("http://localhost:8080/example/home.jsf");
+
+      driver.type("id=loginForm:username", "demo");
+      driver.type("id=loginForm:password", "demo");
+      driver.click("id="loginForm:login");
+      driver.waitForPageToLoad("15000");
+
+      Assert.assertTrue("User should be logged in!", 
+         driver.isElementPresent("xpath=//li[contains(text(),'Welcome')]"));
+   }      
+}
+</programlisting>
+
+      <para>Selenium 1.0 can be configured to use a different browser, in the same way as described
+      for using <literal>FirefoxWebDriver</literal> via <literal>browser</literal> property. You can
+      as well determine Selenium speed, timeout and both machine name and port where Selenium server
+      is running. See <xref linkend="extension.selenium.customization.description" />.</para>
+
+      <para>But that's not all! Imagine, you don't even have to start your own Selenium server! If
+      you add <literal>selenium-server</literal> artifact to dependencies, you can configure
+      Arquillian to automatically launch Selenium server before start of the test phase and destroy
+      it after. Add the following artifact:</para>
+
+      <programlisting role="XML">
+&lt;dependency&gt;
+   &lt;dependency&gt;
+      &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+      &lt;artifactId&gt;selenium-server&lt;/artifactId&gt;
+      &lt;version&gt;2.0a5&lt;/version&gt;
+   &lt;/dependency&gt;
+&lt;/dependency&gt;
+</programlisting>
+
+      <para>Once Selenium server is on the class path, you can enable it by a property
+      <literal>serverEnable</literal>. In fact, you can even bind it to a different port, pass
+      additional arguments, such as Firefox profile and redirect its output. If that not enough, you
+      can provide your own Selenium server by putting it in dependencies and specify its class name
+      in property <literal>serverImplementation</literal>.</para>
+
+      <para>If you need even more customization, you have a possibility. You can override a driver
+      instantiation and let Selenium use your own implementation, such as modified
+      <literal>DefaultSelenium</literal>. All you have to do is to implement
+      <literal>org.jboss.arquillian.selenium.spi.Instantiator</literal> interface and return greater
+      precedence in <literal>getPrecedence()</literal> than zero. Once you are done, simply register
+      your class via SPI as a implementation of
+      <literal>org.jboss.arquillian.selenium.spi.Instantiator</literal> service.</para>
+   </sect2>
+
+   <sect2>
+      <title />
+   </sect2>
+</section>
