@@ -21,9 +21,6 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3_1;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.IsEqual.*;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -36,14 +33,17 @@ import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
- * Verifies arquillian tests can run in client mode with this REST based container.
+ * Verifies arquillian tests can run in container mode with this REST based container.
  *
  * @author <a href="http://community.jboss.org/people/aslak">Aslak Knutsen</a>
  * @author <a href="http://community.jboss.org/people/LightGuard">Jason Porter</a>
@@ -51,30 +51,28 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(RunModeType.IN_CONTAINER)
-public class GlassFishRestDeployWarTest
-{
-   private static final Logger log = Logger.getLogger(GlassFishRestDeployWarTest.class.getName());
+public class GlassFishRestDeployWarTest {
+    private static final Logger log = Logger.getLogger(GlassFishRestDeployWarTest.class.getName());
 
-   @Deployment
-   public static Archive<?> getTestArchive()
-   {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
-         .addClasses(GreeterServlet.class, Greeter.class, GlassFishRestDeployWarTest.class);
-      log.info(war.toString(true));
-      return war;
-   }
+    @Deployment
+    public static WebArchive getTestArchive() {
+        final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
+                .addClasses(GreeterServlet.class, Greeter.class)
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        log.info(war.toString(true));
+        return war;
+    }
 
-   @Test
-   public void assertWarDeployed() throws Exception
-   {
-      final String servletPath = GreeterServlet.class.getAnnotation(WebServlet.class).urlPatterns()[0];
+    @Test
+    public void assertWarDeployed() throws Exception {
+        final String servletPath = GreeterServlet.class.getAnnotation(WebServlet.class).urlPatterns()[0];
 
-      final URLConnection response =  new URL("http://localhost:8080/test" + servletPath).openConnection();
+        final URLConnection response = new URL("http://localhost:8080/test" + servletPath).openConnection();
 
-      BufferedReader in = new BufferedReader( new InputStreamReader( response.getInputStream()));
-      final String result = in.readLine();
+        BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+        final String result = in.readLine();
 
-      assertThat(result, equalTo("Hello"));
-   }
+        assertThat(result, equalTo("Hello"));
+    }
 
 }

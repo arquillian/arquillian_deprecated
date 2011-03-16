@@ -21,9 +21,6 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3_1;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -44,6 +41,9 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  * Verifies arquillian tests can run in client mode with this REST based container.
  *
@@ -53,43 +53,40 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @Run(RunModeType.AS_CLIENT)
-public class GlassFishRestDeployEarTest
-{
-   /**
-    * Logger
-    */
-   private static final Logger log = Logger.getLogger(GlassFishRestDeployEarTest.class.getName());
+public class GlassFishRestDeployEarTest {
+    /**
+     * Logger
+     */
+    private static final Logger log = Logger.getLogger(GlassFishRestDeployEarTest.class.getName());
 
-   /**
-    * Deployment for the test
-    *
-    * @return
-    */
-   @Deployment
-   public static Archive<?> getTestArchive()
-   {
-      final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
-         .addClasses(GreeterServlet.class);
-      final JavaArchive ejb = ShrinkWrap.create(JavaArchive.class, "test.jar")
-         .addClasses(Greeter.class);
-      final EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "test.ear")
-         .setApplicationXML("application.xml")
-         .addModule(war)
-         .addModule(ejb);
-      log.info(ear.toString(true));
-      return ear;
-   }
+    /**
+     * Deployment for the test
+     *
+     * @return
+     */
+    @Deployment
+    public static Archive<?> getTestArchive() {
+        final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
+                .addClasses(GreeterServlet.class);
+        final JavaArchive ejb = ShrinkWrap.create(JavaArchive.class, "test.jar")
+                .addClasses(Greeter.class);
+        final EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "test.ear")
+                .setApplicationXML("application.xml")
+                .addAsModule(war)
+                .addAsModule(ejb);
+        log.info(ear.toString(true));
+        return ear;
+    }
 
-   @Test
-   public void shouldBeAbleToDeployEnterpriseArchive() throws Exception
-   {
-      final String servletPath = GreeterServlet.class.getAnnotation(WebServlet.class).urlPatterns()[0];
+    @Test
+    public void shouldBeAbleToDeployEnterpriseArchive() throws Exception {
+        final String servletPath = GreeterServlet.class.getAnnotation(WebServlet.class).urlPatterns()[0];
 
-      final URLConnection response = new URL("http://localhost:8080/test" + servletPath).openConnection();
+        final URLConnection response = new URL("http://localhost:8080/test" + servletPath).openConnection();
 
-      BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
-      final String result = in.readLine();
+        BufferedReader in = new BufferedReader(new InputStreamReader(response.getInputStream()));
+        final String result = in.readLine();
 
-      assertThat(result, equalTo("Hello"));
-   }
+        assertThat(result, equalTo("Hello"));
+    }
 }
