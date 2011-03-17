@@ -57,6 +57,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getDefaultProtocol()
     */
+   @Override
    public ProtocolDescription getDefaultProtocol()
    {
       return new ProtocolDescription("Servlet 3.0");
@@ -65,6 +66,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#getConfigurationClass()
     */
+   @Override
    public Class<JBossASContainerConfiguration> getConfigurationClass()
    {
       return JBossASContainerConfiguration.class;
@@ -73,6 +75,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#setup(org.jboss.arquillian.spi.client.container.ContainerConfiguration)
     */
+   @Override
    public void setup(JBossASContainerConfiguration configuration)
    {
       this.configuration = configuration;
@@ -86,6 +89,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#start()
     */
+   @Override
    public void start() throws LifecycleException
    {
       try 
@@ -102,6 +106,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#stop()
     */
+   @Override
    public void stop() throws LifecycleException
    {
       try 
@@ -114,27 +119,25 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
       }
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
-    */
+   @Override
    public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      String deploymentName = descriptor.getDescriptorName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(descriptor);
+
+      deploy(deploymentName, deploymentUrl);
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
-    */
+   @Override
    public void undeploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      undeploy(descriptor.getDescriptorName());
    }
 
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
+   @Override
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       String deploymentName = archive.getName();
@@ -154,6 +157,7 @@ public class JBossASEmbeddedContainer implements DeployableContainer<JBossASCont
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.arquillian.spi.client.deployment.Deployment[])
     */
+   @Override
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       try 

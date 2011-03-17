@@ -53,21 +53,25 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
    
    private JBossASConfiguration configuration;
    
+   @Override
    public ProtocolDescription getDefaultProtocol()
    {
       return new ProtocolDescription("Servlet 3.0");
    }
    
+   @Override
    public Class<JBossASConfiguration> getConfigurationClass()
    {
       return JBossASConfiguration.class;
    }
    
+   @Override
    public void setup(JBossASConfiguration configuration)
    {
       this.configuration = configuration;
    }
    
+   @Override
    public void start() throws LifecycleException
    {
       try 
@@ -80,6 +84,7 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       }
    }
    
+   @Override
    public void stop() throws LifecycleException
    {
       try 
@@ -92,24 +97,22 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       }
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
-    */
+   @Override
    public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      String deploymentName = descriptor.getDescriptorName();
+      URL deploymentUrl = ShrinkWrapUtil.toURL(descriptor);
+
+      deploy(deploymentName, deploymentUrl);
    }
    
-   /* (non-Javadoc)
-    * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
-    */
+   @Override
    public void undeploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      undeploy(descriptor.getDescriptorName());
    }
 
+   @Override
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       String deploymentName = archive.getName();
@@ -126,6 +129,7 @@ public class JBossASRemoteContainer implements DeployableContainer<JBossASConfig
       }
    }
 
+   @Override
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       undeploy(archive.getName());
