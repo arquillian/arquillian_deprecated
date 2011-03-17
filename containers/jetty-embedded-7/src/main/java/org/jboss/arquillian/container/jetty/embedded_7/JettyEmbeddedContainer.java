@@ -137,8 +137,7 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
     */
    public void deploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      throw new UnsupportedOperationException("Not implemented");      
    }
    
    /* (non-Javadoc)
@@ -146,8 +145,7 @@ public class JettyEmbeddedContainer implements DeployableContainer<JettyEmbedded
     */
    public void undeploy(Descriptor descriptor) throws DeploymentException
    {
-      // TODO Auto-generated method stub
-      
+      throw new UnsupportedOperationException("Not implemented");      
    }
    
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
