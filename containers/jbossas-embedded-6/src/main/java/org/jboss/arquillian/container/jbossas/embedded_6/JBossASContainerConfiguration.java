@@ -37,11 +37,6 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
     */
    private String bindAddress = "localhost";
       
-   /**
-    * Used by Servlet Protocol to connect to the server. 
-    */
-   private int httpPort = 8080;
-   
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.ContainerConfiguration#validate()
     */
@@ -68,15 +63,5 @@ public class JBossASContainerConfiguration implements ContainerConfiguration
    public void setBindAddress(String bindAddress)
    {
       this.bindAddress = bindAddress;
-   }
-   
-   public int getHttpPort()
-   {
-      return httpPort;
-   }
-   
-   public void setHttpPort(int httpPort)
-   {
-      this.httpPort = httpPort;
    }
 }
