@@ -21,6 +21,9 @@
  */
 package org.jboss.arquillian.container.glassfish.remote_3_1;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -30,8 +33,6 @@ import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Run;
-import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -41,9 +42,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
 /**
  * Verifies arquillian tests can run in client mode with this REST based container.
  *
@@ -52,7 +50,6 @@ import static org.junit.Assert.assertThat;
  * @author <a href="http://community.jboss.org/people/dan.j.allen">Dan Allen</a>
  */
 @RunWith(Arquillian.class)
-@Run(RunModeType.AS_CLIENT)
 public class GlassFishRestDeployEarTest {
     /**
      * Logger
@@ -64,7 +61,7 @@ public class GlassFishRestDeployEarTest {
      *
      * @return
      */
-    @Deployment
+    @Deployment(testable = false)
     public static Archive<?> getTestArchive() {
         final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(GreeterServlet.class);

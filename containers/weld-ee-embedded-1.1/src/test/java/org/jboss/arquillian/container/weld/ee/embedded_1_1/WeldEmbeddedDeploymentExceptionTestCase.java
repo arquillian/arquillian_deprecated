@@ -18,7 +18,7 @@
 package org.jboss.arquillian.container.weld.ee.embedded_1_1;
 
 import org.jboss.arquillian.api.Deployment;
-import org.jboss.arquillian.api.Expected;
+import org.jboss.arquillian.api.ShouldThrowException;
 import org.jboss.arquillian.container.weld.ee.embedded_1_1.beans.LoopingProducer;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class WeldEmbeddedDeploymentExceptionTestCase
 {
-   @Deployment @Expected(DeploymentException.class)
+   @Deployment @ShouldThrowException(DeploymentException.class)
    public static JavaArchive createDeployment()
    {
       return ShrinkWrap.create(JavaArchive.class)
@@ -45,6 +45,6 @@ public class WeldEmbeddedDeploymentExceptionTestCase
                   .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
    }
    
-   @Test // this method will be called even with deployment exception, @Expected marks DeploymentExceptions as acceptable behavior.
+   @Test // this method will be called even with deployment exception, @@ShouldThrowException marks DeploymentExceptions as acceptable behavior.
    public void shouldThrowDeploymentException() {}
 }
