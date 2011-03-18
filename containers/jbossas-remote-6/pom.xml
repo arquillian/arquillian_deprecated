@@ -61,12 +61,6 @@
          <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-         <groupId>org.jboss.arquillian</groupId>
-         <artifactId>arquillian-junit</artifactId>
-         <version>${project.version}</version>
-      </dependency>
-
       <!-- 
     org.jboss
      -->

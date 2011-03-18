@@ -154,7 +154,7 @@ public class OpenEJBTestEnricher extends EJBInjectionEnricher
 //      }
       
       InitialContext initcontext = createContext();
-      if(mappedName != null)
+      if(mappedName != null && !mappedName.equals(""))
       {
          return initcontext.lookup(mappedName);
       }
