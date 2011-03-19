@@ -16,20 +16,27 @@
  */
 package org.jboss.arquillian.container.resin.embedded_4;
 
-import org.jboss.arquillian.spi.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.spi.TestEnricher;
+import org.jboss.arquillian.spi.client.deployment.AuxiliaryArchiveAppender;
 import org.jboss.arquillian.testenricher.cdi.CDIInjectionEnricher;
+import org.jboss.arquillian.testenricher.resource.ResourceInjectionEnricher;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
+/**
+ * Resin deployment adapter.
+ *
+ * @author Dominik Dorn
+ * @author ales.justin@jboss.org
+ */
 public class ResinEmbeddedDeploymentAppender implements AuxiliaryArchiveAppender
 {
    public Archive<?> createAuxiliaryArchive()
    {
       return ShrinkWrap
             .create(JavaArchive.class, "arquillian-resin-testenrichers.jar")
-            .addPackages(false, CDIInjectionEnricher.class.getPackage())
-            .addServiceProvider(TestEnricher.class, CDIInjectionEnricher.class);
+            .addPackages(false, CDIInjectionEnricher.class.getPackage(), ResourceInjectionEnricher.class.getPackage())
+            .addAsServiceProvider(TestEnricher.class, CDIInjectionEnricher.class, ResourceInjectionEnricher.class);
    }
 }

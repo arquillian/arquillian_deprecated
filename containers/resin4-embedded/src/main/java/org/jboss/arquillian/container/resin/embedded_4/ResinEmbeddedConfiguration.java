@@ -16,14 +16,16 @@
  */
 package org.jboss.arquillian.container.resin.embedded_4;
 
-import org.jboss.arquillian.spi.ContainerConfiguration;
+import org.jboss.arquillian.spi.ConfigurationException;
 import org.jboss.arquillian.spi.ContainerProfile;
+import org.jboss.arquillian.spi.client.container.ContainerConfiguration;
 
 /**
- * A {@link org.jboss.arquillian.spi.ContainerConfiguration} implementation for
+ * A {@link org.jboss.arquillian.spi.client.container.ContainerConfiguration} implementation for
  * the Resin4 Embedded container.
  *
  * @author Dominik Dorn
+ * @author ales.justin@jboss.org
  * @version $Revision: $
  */
 public class ResinEmbeddedConfiguration implements ContainerConfiguration
@@ -31,6 +33,11 @@ public class ResinEmbeddedConfiguration implements ContainerConfiguration
    private String bindAddress = "127.0.0.1";
    private String serverId = "arquillian";
    private int bindHttpPort = 9090;
+
+   public void validate() throws ConfigurationException
+   {
+      // TODO
+   }
 
    public ContainerProfile getContainerProfile()
    {

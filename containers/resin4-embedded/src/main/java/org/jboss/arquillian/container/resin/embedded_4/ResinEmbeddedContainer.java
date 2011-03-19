@@ -17,24 +17,21 @@
 package org.jboss.arquillian.container.resin.embedded_4;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.logging.Logger;
-
-import org.jboss.arquillian.protocol.servlet_3.ServletMethodExecutor;
-import org.jboss.arquillian.spi.Configuration;
-import org.jboss.arquillian.spi.ContainerMethodExecutor;
-import org.jboss.arquillian.spi.Context;
-import org.jboss.arquillian.spi.DeployableContainer;
-import org.jboss.arquillian.spi.DeploymentException;
-import org.jboss.arquillian.spi.LifecycleException;
-import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
+import org.jboss.arquillian.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.spi.client.container.DeploymentException;
+import org.jboss.arquillian.spi.client.container.LifecycleException;
+import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * <p>Resin4 Embedded container for the Arquillian project.</p>
@@ -44,7 +41,7 @@ import com.caucho.resin.WebAppEmbed;
  * @version $Revision: $
  */
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
-public class ResinEmbeddedContainer implements DeployableContainer
+public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbeddedConfiguration>
 {
    public static final String HTTP_PROTOCOL = "http";
 
@@ -56,13 +53,17 @@ public class ResinEmbeddedContainer implements DeployableContainer
 
    private File base;
 
-   public void setup(Context context, Configuration arquillianConfig)
+   public Class<ResinEmbeddedConfiguration> getConfigurationClass()
    {
-      containerConfig = arquillianConfig.getContainerConfig(ResinEmbeddedConfiguration.class);
-      arquillianConfig.setDeploymentExportPath("/target/tmp/arquillian");
+      return ResinEmbeddedConfiguration.class;
    }
 
-   public void start(Context context) throws LifecycleException
+   public void setup(ResinEmbeddedConfiguration configuration)
+   {
+      containerConfig = configuration;
+   }
+
+   public void start() throws LifecycleException
    {
       String basePath = "/target/resin4_arquillian";
       base = new File(basePath);
@@ -81,7 +82,7 @@ public class ResinEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void stop(Context context) throws LifecycleException
+   public void stop() throws LifecycleException
    {
       try
       {
@@ -96,7 +97,7 @@ public class ResinEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolMetaData deploy(Archive<?> archive) throws DeploymentException
    {
       try
       {
@@ -106,7 +107,7 @@ public class ResinEmbeddedContainer implements DeployableContainer
 
          log.finer("Web archive = " + archive.getName());
          ZipExporter exporter = archive.as(ZipExporter.class);
-         exporter.exportZip(warFile.getAbsoluteFile());
+         exporter.exportTo(warFile.getAbsoluteFile());
 
          WebAppEmbed webApp = new WebAppEmbed();
          webApp.setContextPath("/test");
@@ -124,13 +125,7 @@ public class ResinEmbeddedContainer implements DeployableContainer
 
       try
       {
-         return new ServletMethodExecutor(
-               new URL(
-                     HTTP_PROTOCOL,
-                     containerConfig.getBindAddress(),
-                     containerConfig.getBindHttpPort(),
-                     "/")
-         );
+         return new ProtocolMetaData();
       }
       catch (Exception e)
       {
@@ -138,9 +133,24 @@ public class ResinEmbeddedContainer implements DeployableContainer
       }
    }
 
-   public void undeploy(Context context, Archive<?> archive) throws DeploymentException
+   public ProtocolDescription getDefaultProtocol()
+   {
+      return new ProtocolDescription("Servlet 3.0");
+   }
+
+   public void undeploy(Archive<?> archive) throws DeploymentException
    {
       server.stop();
+   }
+
+   public void deploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO
+   }
+
+   public void undeploy(Descriptor descriptor) throws DeploymentException
+   {
+      // TODO
    }
 
    static void deleteRecursively(File file) throws IOException

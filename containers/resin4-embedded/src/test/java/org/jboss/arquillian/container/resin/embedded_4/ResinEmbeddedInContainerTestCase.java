@@ -18,9 +18,12 @@ package org.jboss.arquillian.container.resin.embedded_4;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +39,7 @@ import java.util.logging.Logger;
  * Based on the Jetty7 Test by Dan Allen
  *
  * @author Dominik Dorn
+ * @author ales.justin@jboss.org
  * @version $Revision: $
  */
 @RunWith(Arquillian.class)
@@ -53,9 +57,9 @@ public class ResinEmbeddedInContainerTestCase
    {
       final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestBean.class)
-         .addLibrary(MavenArtifactResolver.resolve("org.jboss.arquillian.protocol:arquillian-protocol-servlet-3:1.0.0-SNAPSHOT"))
-         .addWebResource("resin-env.xml", "resin-web.xml") // ads and renames resin-env.xml to resin-web.xml
-         .addWebResource(new ByteArrayAsset(new byte[0]), "beans.xml")
+         .addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class).artifacts("org.jboss.arquillian.protocol:arquillian-protocol-servlet-3:1.0.0-SNAPSHOT").resolveAs(GenericArchive.class))
+         .addAsWebInfResource("resin-env.xml", "resin-web.xml") // adds and renames resin-env.xml to resin-web.xml
+         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
          .setWebXML("in-container-web.xml");
        log.info("created war file: ");
        log.info(war.toString(true));
