@@ -20,7 +20,6 @@ package org.jboss.arquillian.container.resin.embedded_4;
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
-import com.caucho.server.dispatch.ServletConfigImpl;
 import com.caucho.server.dispatch.ServletManager;
 import com.caucho.server.webapp.WebApp;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
@@ -128,7 +127,7 @@ public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbedded
          HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
          WebApp wa = webApp.getWebApp();
          ServletManager servletManager = wa.getServletMapper().getServletManager();
-         Map<String,ServletConfigImpl> servlets = servletManager.getServlets();
+         Map<String, ? extends ServletConfig> servlets = servletManager.getServlets();
          for (String name : servlets.keySet())
          {
             ServletConfig sc = servlets.get(name);
