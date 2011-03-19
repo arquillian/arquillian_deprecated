@@ -34,6 +34,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
+import javax.servlet.ServletConfig;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -130,8 +131,8 @@ public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbedded
          HashMap<String,ServletConfigImpl> servlets = servletManager.getServlets();
          for (String name : servlets.keySet())
          {
-            ServletConfigImpl sci = servlets.get(name);
-            httpContext.add(new Servlet(name, sci.getServletContext().getContextPath()));
+            ServletConfig sc = servlets.get(name);
+            httpContext.add(new Servlet(name, sc.getServletContext().getContextPath()));
          }
          return new ProtocolMetaData().addContext(httpContext);
       }
