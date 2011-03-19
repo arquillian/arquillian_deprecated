@@ -24,6 +24,7 @@ import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
+import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
@@ -123,14 +124,8 @@ public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbedded
          throw new DeploymentException("Could not deploy " + archive.getName(), e);
       }
 
-      try
-      {
-         return new ProtocolMetaData();
-      }
-      catch (Exception e)
-      {
-         throw new RuntimeException("Could not create ContainerMethodExecutor", e);
-      }
+      HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+      return new ProtocolMetaData().addContext(httpContext);
    }
 
    public ProtocolDescription getDefaultProtocol()
