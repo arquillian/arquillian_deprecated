@@ -72,6 +72,11 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.jboss.arquillian.testenricher</groupId>
+			<artifactId>arquillian-testenricher-resource</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
 
