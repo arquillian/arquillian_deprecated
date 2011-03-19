@@ -20,18 +20,23 @@ package org.jboss.arquillian.container.resin.embedded_4;
 import com.caucho.resin.HttpEmbed;
 import com.caucho.resin.ResinEmbed;
 import com.caucho.resin.WebAppEmbed;
+import com.caucho.server.dispatch.ServletConfigImpl;
+import com.caucho.server.dispatch.ServletManager;
+import com.caucho.server.webapp.WebApp;
 import org.jboss.arquillian.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.spi.client.container.DeploymentException;
 import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
+import org.jboss.arquillian.spi.client.protocol.metadata.Servlet;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 /**
@@ -118,14 +123,22 @@ public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbedded
          server.addWebApp(webApp);
 
          server.start();
+
+         HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
+         WebApp wa = webApp.getWebApp();
+         ServletManager servletManager = wa.getServletMapper().getServletManager();
+         HashMap<String,ServletConfigImpl> servlets = servletManager.getServlets();
+         for (String name : servlets.keySet())
+         {
+            ServletConfigImpl sci = servlets.get(name);
+            httpContext.add(new Servlet(name, sci.getServletContext().getContextPath()));
+         }
+         return new ProtocolMetaData().addContext(httpContext);
       }
       catch (Exception e)
       {
          throw new DeploymentException("Could not deploy " + archive.getName(), e);
       }
-
-      HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
-      return new ProtocolMetaData().addContext(httpContext);
    }
 
    public ProtocolDescription getDefaultProtocol()
