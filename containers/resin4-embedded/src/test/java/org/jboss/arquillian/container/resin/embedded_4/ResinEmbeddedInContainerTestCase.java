@@ -18,12 +18,9 @@ package org.jboss.arquillian.container.resin.embedded_4;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +54,6 @@ public class ResinEmbeddedInContainerTestCase
    {
       final WebArchive war = ShrinkWrap.create(WebArchive.class, "test.war")
          .addClass(TestBean.class)
-         .addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class).artifacts("org.jboss.arquillian.protocol:arquillian-protocol-servlet-3:1.0.0-SNAPSHOT").resolveAs(GenericArchive.class))
          .addAsWebInfResource("resin-env.xml", "resin-web.xml") // adds and renames resin-env.xml to resin-web.xml
          .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
          .setWebXML("in-container-web.xml");
