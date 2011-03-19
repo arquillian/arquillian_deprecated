@@ -201,20 +201,26 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       Properties properties = new Properties();
       properties.put(InitialContext.INITIAL_CONTEXT_FACTORY, LocalInitialContextFactory.class.getName());
 
-      // Load properties from a jndi.properties file if it exists.
-      // OpenEJB would have done this if started via the InitialContext
+      // Load properties from a jndi.properties file if specified in
+      // configuration or if it exists on the classpath
+      InputStream jndiPropertiesStream = null;
       if(containerConfig.getJndiProperties() != null)
       {
          File jndiPropertiesFile = new File(containerConfig.getJndiProperties());
          if(jndiPropertiesFile.exists())
          {
-            InputStream jndiPropertiesStream = new FileInputStream(jndiPropertiesFile);
-            if (jndiPropertiesStream != null)
-            {
-               properties.load(jndiPropertiesStream);
-            }
+            jndiPropertiesStream = new FileInputStream(jndiPropertiesFile);
          }
       }
+      else
+      {
+         jndiPropertiesStream = getClass().getResourceAsStream("/jndi.properties");
+      }
+      if (jndiPropertiesStream != null)
+      {
+         properties.load(jndiPropertiesStream);
+      }
+
       // configure OpenEJB to not deploy apps from the classpath
       properties.put("openejb.deployments.classpath", "false");
       // configure OpenEJB to use integration classes from Arquillian
