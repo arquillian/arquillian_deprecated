@@ -37,7 +37,7 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import javax.servlet.ServletConfig;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -128,7 +128,7 @@ public class ResinEmbeddedContainer implements DeployableContainer<ResinEmbedded
          HTTPContext httpContext = new HTTPContext(containerConfig.getBindAddress(), containerConfig.getBindHttpPort());
          WebApp wa = webApp.getWebApp();
          ServletManager servletManager = wa.getServletMapper().getServletManager();
-         HashMap<String,ServletConfigImpl> servlets = servletManager.getServlets();
+         Map<String,ServletConfigImpl> servlets = servletManager.getServlets();
          for (String name : servlets.keySet())
          {
             ServletConfig sc = servlets.get(name);
