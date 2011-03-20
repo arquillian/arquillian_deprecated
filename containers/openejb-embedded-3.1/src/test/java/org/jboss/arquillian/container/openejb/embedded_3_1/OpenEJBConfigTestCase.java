@@ -17,7 +17,9 @@
 
 package org.jboss.arquillian.container.openejb.embedded_3_1;
 
+import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.transaction.UserTransaction;
 
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.DataBean;
@@ -47,6 +49,9 @@ public class OpenEJBConfigTestCase
    // Instance Members -------------------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
+   @Resource
+   private UserTransaction userTransaction;
+
    /**
     * Define the deployment
     */
@@ -74,6 +79,7 @@ public class OpenEJBConfigTestCase
    public void testConfiguration()
    {
       Assert.assertTrue(bean.isDataSourceAvailable());
+      Assert.assertNotNull(userTransaction);
    }
 
 }

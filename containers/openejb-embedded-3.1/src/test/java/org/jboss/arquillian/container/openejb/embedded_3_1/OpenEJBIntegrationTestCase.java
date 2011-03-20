@@ -103,9 +103,7 @@ public class OpenEJBIntegrationTestCase extends OpenEJBTestBase
    
    /**
     * Tests that inherited Resource injections work.
-    * TODO This requires a JIRA issue since these injections don't work here.
     */
-   @Ignore
    @Test
    public void testInheritedResourceInjections()
    {

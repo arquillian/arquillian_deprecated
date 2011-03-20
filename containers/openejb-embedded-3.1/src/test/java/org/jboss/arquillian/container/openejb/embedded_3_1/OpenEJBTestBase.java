@@ -2,6 +2,7 @@ package org.jboss.arquillian.container.openejb.embedded_3_1;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.jms.Queue;
 import javax.sql.DataSource;
 
 import org.jboss.arquillian.container.openejb.embedded_3_1.ejb.SimpleLocalBusiness;
@@ -14,6 +15,9 @@ public class OpenEJBTestBase
    @EJB
    protected SimpleLocalBusiness simpleBean;
 
-   @Resource(name="testDatabase")
+   @Resource
    protected DataSource testDatabase;
+   
+   @Resource
+   private Queue myQueue;
 }

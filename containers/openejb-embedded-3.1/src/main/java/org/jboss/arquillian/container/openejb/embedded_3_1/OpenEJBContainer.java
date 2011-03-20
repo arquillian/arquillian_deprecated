@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.openejb.NoSuchApplicationException;
@@ -38,6 +39,7 @@ import org.jboss.arquillian.spi.client.container.LifecycleException;
 import org.jboss.arquillian.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.spi.core.InstanceProducer;
+import org.jboss.arquillian.spi.core.annotation.ContainerScoped;
 import org.jboss.arquillian.spi.core.annotation.DeploymentScoped;
 import org.jboss.arquillian.spi.core.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
@@ -84,10 +86,18 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
     */
    @Inject @DeploymentScoped
    private InstanceProducer<AppInfo> deployment;
+   
+   /**
+    * The JNDI Context for this container.
+    */
+   @Inject @ContainerScoped
+   private InstanceProducer<Context> jndiContext;
+
    //-------------------------------------------------------------------------------------||
    // Required Implementations -----------------------------------------------------------||
    //-------------------------------------------------------------------------------------||
 
+   @Override
    public ProtocolDescription getDefaultProtocol() 
    {
       return new ProtocolDescription("Local");
@@ -108,6 +118,7 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#deploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
     */
+   @Override
    public void deploy(Descriptor descriptor) throws DeploymentException
    {
       throw new UnsupportedOperationException("deploy Descriptor not supported");
@@ -116,11 +127,13 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
    /* (non-Javadoc)
     * @see org.jboss.arquillian.spi.client.container.DeployableContainer#undeploy(org.jboss.shrinkwrap.descriptor.api.Descriptor)
     */
+   @Override
    public void undeploy(Descriptor descriptor) throws DeploymentException
    {
       throw new UnsupportedOperationException("undeploy Descriptor not supported");
    }
    
+   @Override
    public ProtocolMetaData deploy(final Archive<?> archive) throws DeploymentException
    {
       // Deploy as an archive
@@ -148,6 +161,7 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       return new ProtocolMetaData();
    }
 
+   @Override
    public void start() throws LifecycleException
    {
       ShrinkWrapConfigurationFactory config = null;
@@ -159,6 +173,7 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
          OpenEJB.init(getInitialProperties());
          assembler = (OpenEJBAssembler) SystemInstance.get().getComponent(Assembler.class);
          config = (ShrinkWrapConfigurationFactory) assembler.getConfigurationFactory();
+         jndiContext.set(assembler.getContainerSystem().getJNDIContext());
       }
       catch (final Exception e)
       {
@@ -170,11 +185,13 @@ public class OpenEJBContainer implements DeployableContainer<OpenEJBConfiguratio
       this.config = config;
    }
 
+   @Override
    public void stop() throws LifecycleException
    {
       assembler.destroy();
    }
 
+   @Override
    public void undeploy(final Archive<?> archive) throws DeploymentException
    {
       String deploymentName = archive.getName();
