@@ -39,7 +39,7 @@
       <programlisting role="XML"><![CDATA[<dependency> 
    <groupId>javax.enterprise</groupId> 
    <artifactId>cdi-api</artifactId> 
-   <version>1.0-SP1</version>  
+   <version>1.0-SP4</version>  
 </dependency>]]></programlisting>
 
       <para>
@@ -56,7 +56,7 @@
       <programlisting role="XML"><![CDATA[<dependency> 
    <groupId>junit</groupId> 
    <artifactId>junit</artifactId> 
-   <version>4.8.1</version> 
+   <version>4.8.2</version> 
    <scope>test</scope> 
 </dependency> 
 
@@ -74,7 +74,7 @@
       <programlisting role="XML"><![CDATA[<dependency> 
    <groupId>org.testng</groupId> 
    <artifactId>testng</artifactId> 
-   <version>5.12.1</version> 
+   <version>5.14.9</version> 
    <scope>test</scope> 
 </dependency> 
 
