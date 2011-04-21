@@ -35,11 +35,16 @@
       <artifactId>arquillian-spi</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.protocol</groupId>
+      <artifactId>arquillian-protocol-jmx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- org.jboss.osgi -->
     <dependency>
-      <groupId>org.jboss.osgi</groupId>
-      <artifactId>jboss-osgi-spi</artifactId>
+      <groupId>org.jboss.osgi.spi</groupId>
+      <artifactId>jbosgi-spi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -59,7 +64,7 @@
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.jboss.osgi.vfs</groupId>
-      <artifactId>jboss-osgi-vfs30</artifactId>
+      <artifactId>jbosgi-vfs30</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

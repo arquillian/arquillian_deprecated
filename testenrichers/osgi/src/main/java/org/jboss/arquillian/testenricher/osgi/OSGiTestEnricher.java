@@ -32,8 +32,7 @@ import org.jboss.arquillian.spi.core.Instance;
 import org.jboss.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.packageadmin.PackageAdmin;
+import org.osgi.framework.BundleReference;
 
 /**
  * The OSGi TestEnricher
@@ -126,11 +125,8 @@ public class OSGiTestEnricher implements TestEnricher
       Bundle testbundle = bundleInst.get();
       if (testbundle == null)
       {
-         // Get the test bundle from PackageAdmin with the test class as key 
-         BundleContext bundleContext = getSystemBundleContext();
-         ServiceReference sref = bundleContext.getServiceReference(PackageAdmin.class.getName());
-         PackageAdmin pa = (PackageAdmin)bundleContext.getService(sref);
-         testbundle = pa.getBundle(testClass);
+         BundleReference bref = (BundleReference)testClass.getClassLoader();
+         testbundle = bref.getBundle();
       }
       return testbundle;
    }
