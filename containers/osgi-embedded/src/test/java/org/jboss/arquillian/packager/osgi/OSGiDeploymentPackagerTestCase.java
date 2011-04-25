@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.jboss.arquillian.protocol.osgi.OSGiDeploymentPackager;
 import org.jboss.arquillian.spi.TestDeployment;
@@ -43,7 +44,7 @@ public class OSGiDeploymentPackagerTestCase
    @Test
    public void testValidBundle() throws Exception
    {
-      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class);
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-archive.jar");
       archive.setManifest(new Asset()
       {
          public InputStream openStream()
@@ -55,14 +56,15 @@ public class OSGiDeploymentPackagerTestCase
          }
       });
       
-      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, new ArrayList<Archive<?>>()), new ArrayList<ProtocolArchiveProcessor>());
+      Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
+      Archive<?> result = new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives), new ArrayList<ProtocolArchiveProcessor>());
       assertNotNull("Result archive not null", result);
    }
    
    @Test
    public void testInvalidBundle() throws Exception
    {
-      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class);
+      final JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-archive.jar");
       archive.setManifest(new Asset()
       {
          public InputStream openStream()
@@ -73,7 +75,8 @@ public class OSGiDeploymentPackagerTestCase
       });
       try
       {
-         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, new ArrayList<Archive<?>>()), new ArrayList<ProtocolArchiveProcessor>());
+         Collection<Archive<?>> auxArchives = new ArrayList<Archive<?>>();
+         new OSGiDeploymentPackager().generateDeployment(new TestDeployment(archive, auxArchives), new ArrayList<ProtocolArchiveProcessor>());
          fail("RuntimeException expected");
       }
       catch (RuntimeException ex)
