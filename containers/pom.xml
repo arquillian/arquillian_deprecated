@@ -39,6 +39,7 @@
         <module>jbossas-remote-5</module>
         <module>jbossas-remote-5.1</module>
         <module>jbossas-remote-6</module>
+        <module>jbossas-managed-4.2</module>
         <module>jbossas-managed-5.1</module>
         <module>jbossas-managed-6</module>
         <module>jbossas-embedded-6</module>
