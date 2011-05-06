@@ -35,7 +35,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- module>jbossas-remote-4_2</module -->
+        <module>jbossas-remote-4.2</module>
         <module>jbossas-remote-5</module>
         <module>jbossas-remote-5.1</module>
         <module>jbossas-remote-6</module>
