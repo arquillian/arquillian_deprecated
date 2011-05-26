@@ -43,7 +43,8 @@
         <module>jbossas-managed-6</module>
         <module>jbossas-embedded-6</module>
         <module>reloaded-embedded-1</module>
-<!--       Deprecated 
+        <module>resin4-embedded</module>
+<!--       Deprecated
 	<module>jsr88-remote-1.2</module>
         <module>glassfish-remote-3</module>
         <module>glassfish-embedded-3</module> 

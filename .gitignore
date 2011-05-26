@@ -1,6 +1,8 @@
+.idea
 .project
 .settings/
 .classpath
+resin-data/
 target/
 test-output/
 transaction.log
@@ -12,8 +14,10 @@ build/.project
 build/.settings
 bundle/.classpath
 bundle/target
+containers/appengine-embedded-1.3/target
 containers/glassfish-embedded-3/target
 containers/glassfish-remote-3/target
+containers/glassfish-remote-3.1/target
 containers/jbossas-embedded-6/target
 containers/jbossas-managed-5.1/target
 containers/jbossas-managed-6/target
@@ -27,6 +31,8 @@ containers/openwebbeans-embedded-1/target
 containers/osgi-embedded-4.2/.classpath
 containers/osgi-embedded-4.2/target
 containers/reloaded-embedded-1/target
+containers/resin4-embedded/target
+containers/resin4-embedded/resin-data
 containers/tomcat-embedded-6/target
 containers/weld-ee-embedded-1.1/target
 containers/weld-se-embedded-1/target
@@ -42,6 +48,7 @@ examples/junit/.project
 examples/junit/.settings
 examples/junit/target
 examples/testng/target
+extensions/performance/arq-perf/
 frameworks/jsfunit/target
 impl-base/.classpath
 impl-base/.project
@@ -79,8 +86,6 @@ testenrichers/osgi/target
 testenrichers/resource/.classpath
 testenrichers/resource/target
 testng/target
-containers/glassfish-remote-3.1/.idea
 *.iml
 *.ipr
 *.iws
-.idea
